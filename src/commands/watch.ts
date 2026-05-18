@@ -126,7 +126,7 @@ export async function battleRepos(repo1: string, repo2: string): Promise<BattleR
 }
 
 export function renderBattle(result: BattleResult): void {
-  const { repo1: s1, repo2: s2, winner, starDiff, forkDiff, scores } = result;
+  const { repo1: s1, repo2: s2, winner, starDiff, forkDiff, issueDiff, scores } = result;
   const r1 = s1.repo;
   const r2 = s2.repo;
 
