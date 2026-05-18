@@ -142,3 +142,7 @@ MIT © β-Labs Corp.
   <br>
   <sub>⭐ Star this repo if you find it useful!</sub>
 </div>
+
+## Updates
+- Arena running
+
