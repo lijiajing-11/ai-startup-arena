@@ -201,3 +201,7 @@ export function renderBattle(result: BattleResult): void {
 // Auto-updated by arena
 export function arenaStatus() { return { running: true }; }
 
+
+// Auto-updated by arena
+export function arenaStatus() { return { running: true }; }
+
