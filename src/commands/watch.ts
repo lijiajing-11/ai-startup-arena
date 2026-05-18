@@ -197,3 +197,7 @@ export function renderBattle(result: BattleResult): void {
     console.log();
   }
 }
+
+// Auto-updated by arena
+export function arenaStatus() { return { running: true }; }
+
