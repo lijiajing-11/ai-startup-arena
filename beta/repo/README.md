@@ -5,6 +5,8 @@
 
 <div align="center">
 
+> **8 commands · 1 CLI · 0 config** — your terminal, now with a GitHub sixth sense.
+
 [![npm version](https://img.shields.io/npm/v/repo-sense?style=for-the-badge&logo=npm&color=cb3837)](https://www.npmjs.com/package/repo-sense)
 [![npm downloads](https://img.shields.io/npm/dm/repo-sense?style=for-the-badge&color=blueviolet)](https://www.npmjs.com/package/repo-sense)
 [![GitHub Stars](https://img.shields.io/github/stars/li1050109098/beta-project-arena?style=for-the-badge&logo=github&color=22272e)](https://github.com/li1050109098/beta-project-arena)
@@ -48,7 +50,28 @@ npx repo-sense@latest watch facebook/react
 ```
 
 That's it. One command. Your terminal becomes a live GitHub dashboard — stars tick up, issues close, forks grow.
-You'll never open a browser to check stars again. 🎯
+
+**Here's what you'll see 5 seconds after hitting Enter:**
+
+```text
+  ┌──────────────────────────────────────┐
+  │        🧬  repo-sense  WATCH         │
+  └──────────────────────────────────────┘
+
+┌────────────────────┬──────────────────────────────┐
+│ Repository         │ facebook/react               │
+│ ⭐ Stars           │ 245.1K (+12) ▲🔥             │
+│ ⑂ Forks            │ 51.1K  (+1)                  │
+│ ⚠ Issues           │ 1.3K   (-2) ▼               │
+│ 🔤 Language        │ JavaScript                   │
+│ 📜 License         │ MIT                          │
+│ 🕐 Updated         │ 5/19/2026, 8:30:15 AM        │
+└────────────────────┴──────────────────────────────┘
+
+  Auto-refresh every 30s · Press Ctrl+C to stop
+```
+
+> You'll never open a browser to check stars again. 🎯
 
 **Prefer a native install?**
 
@@ -168,15 +191,14 @@ Each metric gets a 🟢🟡🔴 status light against project thresholds. Pass/fa
 | &nbsp;&nbsp;`-i <sec>` | Custom interval | `rs watch f/react -i 5` |
 | &nbsp;&nbsp;`-j` | NDJSON output | `rs watch f/react -j` |
 | `🏆 battle <a> <b>...` | Side-by-side showdown (2+ repos) | `rs battle react vue` |
-| &nbsp;&nbsp;`-j` | JSON battle results | `rs battle react vue -j` |
-| `📡 watch-multi` | Multi-repo monitor wall | `rs watch-multi react vue svelte` |
-| &nbsp;&nbsp;`-i <sec>` | Custom multi-watch interval | `rs watch-multi a b -i 10` |
-| &nbsp;&nbsp;`-j` | JSON multi-watch output | `rs watch-multi a b -j` |
+| &nbsp;&nbsp;`-j` | JSON output | `rs battle react vue -j` |
+| `📡 watch-multi <a> <b>...` | Multi-repo monitor wall | `rs watch-multi react vue svelte` |
+| &nbsp;&nbsp;`-i <sec>` `-j` | Custom interval / JSON | `rs watch-multi a b -i 10 -j` |
 | `📈 history` | Star growth timeline & milestones | `rs history facebook/react` |
 | `🔍 insight` | Star velocity, topics, speed label | `rs insight facebook/react` |
 | `⭐ stars` | Quick bare stats | `rs stars facebook/react` |
 | `📸 snapshot` | One-shot repo data (table or JSON) | `rs snapshot f/react` |
-| &nbsp;&nbsp;`-j` | JSON snapshot | `rs snapshot f/react -j` |
+| &nbsp;&nbsp;`-j` | JSON output | `rs snapshot f/react -j` |
 | `📊 coverage` | Test coverage dashboard | `rs coverage` |
 | &nbsp;&nbsp;`--no-run` | Skip tests, parse existing report | `rs coverage --no-run` |
 | `📖 --help` | All commands & options | `rs --help` |
@@ -388,13 +410,25 @@ export GITHUB_TOKEN=ghp_your_token_here
 
 ## 🗺️ Roadmap
 
-- [x] `watch`, `battle`, `watch-multi`, `insight`, `stars`, `history`, `snapshot`, `coverage` — all shipped
-- [ ] 🔥 Executive insight summary (`format=sentence`)
-- [ ] 🔥 Star history sparklines
-- [ ] 🏆 Multi-repo tournament (bracket mode)
-- [ ] 🖼️ Export snapshot to SVG
-- [ ] 📊 Trending repos explorer
-- [ ] 🏅 GitHub Actions badge generator
+### ✅ Shipped in v0.2.1
+
+- [x] `watch` — Live dashboard with auto-refresh
+- [x] `battle` — Side-by-side showdown (2+ repos)
+- [x] `watch-multi` — Multi-repo monitor wall
+- [x] `insight` — Star velocity, topics, speed labels
+- [x] `stars` — Quick bare stats
+- [x] `history` — Growth timeline & milestones
+- [x] `snapshot` — One-shot repo data (table or JSON)
+- [x] `coverage` — Test coverage dashboard
+
+### 🔥 Coming Next
+
+- [ ] Executive insight summary (`format=sentence`) — AI-ready
+- [ ] Star history sparklines — inline mini charts
+- [ ] Multi-repo tournament (bracket mode, 4+ repos)
+- [ ] Export snapshot to SVG
+- [ ] Trending repos explorer
+- [ ] GitHub Actions badge generator
 
 > 🚀 **v0.2.1 is live on npm** — `npx repo-sense` it now, no waiting.
 
@@ -458,5 +492,5 @@ MIT © β-Labs Corp.
   <br>
   <sub>⭐ Star this repo if you find it useful!</sub>
   <br><br>
-  <sub>🧑‍🚀 Curated by MarketBeta @ β-Labs · v25</sub>
+  <sub>🧑‍🚀 Curated by MarketBeta @ β-Labs · v26</sub>
 </div>

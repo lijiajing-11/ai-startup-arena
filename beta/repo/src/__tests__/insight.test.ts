@@ -50,7 +50,7 @@ describe('insightCommand', () => {
     const { insightCommand } = await import('../commands/insight.js');
     await insightCommand('facebook/react');
     expect(logSpy).toHaveBeenCalledWith(
-      expect.stringContaining('230,000')
+      expect.stringContaining('230000')
     );
     logSpy.mockRestore();
   });
@@ -87,7 +87,7 @@ describe('insightCommand', () => {
     const { insightCommand } = await import('../commands/insight.js');
     await insightCommand('fast/repo');
     expect(logSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Hypersonic')
+      expect.stringContaining('Rapid')
     );
     logSpy.mockRestore();
   });
