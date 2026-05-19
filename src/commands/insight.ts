@@ -49,7 +49,7 @@ export async function insightCommand(repoStr: string): Promise<void> {
 
   // ── Render ──
   console.log(
-    `\n${chalk.bold.hex('#58a6ff')(repo.fullName)} ${chalk.dim('— Insight')}`,
+    `\n${chalk.hex('#58a6ff').bold(repo.fullName)} ${chalk.dim('— Insight')}`,
   );
   if (repo.description) {
     console.log(`  ${chalk.gray(repo.description)}\n`);

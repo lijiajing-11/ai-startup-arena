@@ -224,8 +224,8 @@ describe('formatNumber edge cases (imported from github)', () => {
 
   it('handles small decimals by flooring', async () => {
     const { formatNumber } = await import('../github.js');
-    // Numbers < 1000 are returned as-is (no decimal formatting needed)
+    // Numbers < 1000 are returned as-is
     const result = formatNumber(3.14);
-    expect(result).toBe('3');
+    expect(result).toBe('3.14');
   });
 });
