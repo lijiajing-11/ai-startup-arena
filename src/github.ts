@@ -168,5 +168,21 @@ export function clearCache(): void {
   cache.clear();
 }
 
+/**
+ * Batch-fetch multiple repos in parallel.
+ * Returns results in the same order as the input strings.
+ */
+export async function getRepos(repoStrs: string[]): Promise<RepoData[]> {
+  const results = await Promise.allSettled(
+    repoStrs.map((r) => getRepo(r))
+  );
+  return results.map((r) => {
+    if (r.status === 'rejected') {
+      throw r.reason;
+    }
+    return r.value;
+  });
+}
+
 // Export for testing
 export { parseRepo, cache as _cache };

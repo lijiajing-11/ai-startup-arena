@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { watchRepo, renderDashboard, battleRepos, renderBattle } from './commands/watch.js';
+import { watchRepo, renderDashboard, battleRepos, renderBattle, watchMultiRepos } from './commands/watch.js';
 
 export async function run(): Promise<void> {
   const program = new Command();
@@ -41,6 +41,27 @@ export async function run(): Promise<void> {
       try {
         const result = await battleRepos(repo1, repo2);
         renderBattle(result);
+      } catch (err: any) {
+        console.error(`✗ Error: ${err.message}`);
+        process.exit(1);
+      }
+    });
+
+  program
+    .command('watch-multi <repos...>')
+    .description('Watch multiple repositories simultaneously')
+    .option('-i, --interval <seconds>', 'Polling interval in seconds', '30')
+    .option('-j, --json', 'Output JSON instead of dashboard', false)
+    .action(async (repos: string[], options: { interval: string; json: boolean }) => {
+      const interval = parseInt(options.interval, 10) || 30;
+      const abortController = new AbortController();
+
+      process.on('SIGINT', () => {
+        abortController.abort();
+      });
+
+      try {
+        await watchMultiRepos(repos, interval, options.json, abortController.signal);
       } catch (err: any) {
         console.error(`✗ Error: ${err.message}`);
         process.exit(1);

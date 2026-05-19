@@ -1,10 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Mock @octokit/rest so we don't hit the real GitHub API
-vi.mock('@octokit/rest', () => {
-  const mockGet = vi.fn();
-  const mockGetAllTopics = vi.fn();
+// We export mock getters so tests can control API responses
+let mockGet = vi.fn();
+let mockGetAllTopics = vi.fn();
 
+vi.mock('@octokit/rest', () => {
+  // Capture latest mock references (they get re-created per-test with vi.fn())
   const MockOctokit = vi.fn(() => ({
     rest: {
       repos: {
@@ -14,61 +16,63 @@ vi.mock('@octokit/rest', () => {
     },
   }));
 
-  return {
-    Octokit: MockOctokit,
-    __mockGet: mockGet,
-    __mockGetAllTopics: mockGetAllTopics,
-  };
+  return { Octokit: MockOctokit };
 });
 
-// Import the mocked module to get access to mock controls
-import { Octokit } from '@octokit/rest';
-const { __mockGet: mockGet, __mockGetAllTopics: mockGetAllTopics } = vi.mocked(Octokit as any)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  .mock as any;
-
 // These must be imported AFTER the mock is set up
-import { formatNumber, formatDelta } from '../github.js';
+import * as githubModule from '../github.js';
 
 describe('formatNumber', () => {
   it('formats numbers under 1000 as-is', () => {
-    expect(formatNumber(0)).toBe('0');
-    expect(formatNumber(42)).toBe('42');
-    expect(formatNumber(999)).toBe('999');
+    expect(githubModule.formatNumber(0)).toBe('0');
+    expect(githubModule.formatNumber(42)).toBe('42');
+    expect(githubModule.formatNumber(999)).toBe('999');
   });
 
   it('formats thousands with K suffix (one decimal)', () => {
-    expect(formatNumber(1000)).toBe('1.0K');
-    expect(formatNumber(1500)).toBe('1.5K');
-    expect(formatNumber(12345)).toBe('12.3K');
+    expect(githubModule.formatNumber(1000)).toBe('1.0K');
+    expect(githubModule.formatNumber(1500)).toBe('1.5K');
+    expect(githubModule.formatNumber(12345)).toBe('12.3K');
   });
 
   it('formats millions with M suffix', () => {
-    expect(formatNumber(1_000_000)).toBe('1.0M');
-    expect(formatNumber(2_500_000)).toBe('2.5M');
+    expect(githubModule.formatNumber(1_000_000)).toBe('1.0M');
+    expect(githubModule.formatNumber(2_500_000)).toBe('2.5M');
   });
 
   it('rounds down correctly', () => {
-    expect(formatNumber(1999)).toBe('2.0K');
-    expect(formatNumber(1050)).toBe('1.1K');
+    expect(githubModule.formatNumber(1999)).toBe('2.0K');
+    expect(githubModule.formatNumber(1050)).toBe('1.1K');
+  });
+
+  it('handles zero', () => {
+    expect(githubModule.formatNumber(0)).toBe('0');
+  });
+
+  it('handles large numbers', () => {
+    expect(githubModule.formatNumber(1_234_567_890)).toBe('1234.6M');
   });
 });
 
 describe('formatDelta', () => {
   it('returns positive diff with + prefix', () => {
-    expect(formatDelta(100, 50)).toBe('+50');
+    expect(githubModule.formatDelta(100, 50)).toBe('+50');
   });
 
   it('returns negative diff with - prefix', () => {
-    expect(formatDelta(50, 100)).toBe('-50');
+    expect(githubModule.formatDelta(50, 100)).toBe('-50');
   });
 
   it('returns 0 for no change', () => {
-    expect(formatDelta(100, 100)).toBe('0');
+    expect(githubModule.formatDelta(100, 100)).toBe('0');
   });
 
   it('handles large deltas', () => {
-    expect(formatDelta(5000, 10)).toBe('+4990');
+    expect(githubModule.formatDelta(5000, 10)).toBe('+4990');
+  });
+
+  it('handles negative zero case', () => {
+    expect(githubModule.formatDelta(0, 0)).toBe('0');
   });
 });
 
@@ -77,10 +81,19 @@ describe('getRepo', () => {
     vi.clearAllMocks();
     // Reset env
     delete process.env.GITHUB_TOKEN;
+    // Clear module cache and re-import to reset internal cache
+    vi.resetModules();
+    // Reset mock references
+    mockGet = vi.fn();
+    mockGetAllTopics = vi.fn();
+  });
+
+  afterEach(() => {
+    // Clear the internal cache after each test
+    githubModule.clearCache();
   });
 
   it('validates owner/name format', async () => {
-    // Dynamic import to get fresh module state
     const { getRepo } = await import('../github.js');
     await expect(getRepo('invalid')).rejects.toThrow('Invalid repo format');
   });
@@ -92,7 +105,6 @@ describe('getRepo', () => {
   });
 
   it('accepts valid owner/name format', async () => {
-    // Mock API to return a valid response
     mockGet.mockResolvedValueOnce({
       data: {
         full_name: 'facebook/react',
@@ -124,10 +136,206 @@ describe('getRepo', () => {
     expect(repo.topics).toEqual(['react', 'ui']);
   });
 
-  it('sets auth token from env', () => {
-    process.env.GITHUB_TOKEN = 'test-token-123';
-    // Create an Octokit instance to verify it was called with auth
-    new (Octokit as any)({}); // use any to bypass TS strictness
-    expect(Octokit).toHaveBeenCalled();
+  it('handles missing optional fields gracefully', async () => {
+    mockGet.mockResolvedValueOnce({
+      data: {
+        full_name: 'test/minimal',
+        description: null,
+        language: null,
+        license: null,
+        stargazers_count: 0,
+        forks_count: 0,
+        open_issues_count: 0,
+        created_at: '2024-01-01T00:00:00Z',
+        updated_at: '2024-01-01T00:00:00Z',
+        pushed_at: '2024-01-01T00:00:00Z',
+        homepage: null,
+        default_branch: 'main',
+      },
+    });
+    mockGetAllTopics.mockResolvedValueOnce({
+      data: { names: [] },
+    });
+
+    const { getRepo } = await import('../github.js');
+    const repo = await getRepo('test/minimal');
+
+    expect(repo.description).toBeNull();
+    expect(repo.language).toBeNull();
+    expect(repo.license).toBeNull();
+    expect(repo.stars).toBe(0);
+    expect(repo.topics).toEqual([]);
+    expect(repo.homepage).toBeNull();
+  });
+
+  it('uses cache on second call', async () => {
+    mockGet.mockResolvedValueOnce({
+      data: {
+        full_name: 'test/cached',
+        description: 'test',
+        language: 'TypeScript',
+        license: { spdx_id: 'MIT' },
+        stargazers_count: 100,
+        forks_count: 10,
+        open_issues_count: 1,
+        created_at: '2024-01-01T00:00:00Z',
+        updated_at: '2024-01-01T00:00:00Z',
+        pushed_at: '2024-01-01T00:00:00Z',
+        homepage: null,
+        default_branch: 'main',
+      },
+    });
+    mockGetAllTopics.mockResolvedValueOnce({
+      data: { names: ['test'] },
+    });
+
+    const { getRepo } = await import('../github.js');
+
+    // First call hits API
+    const first = await getRepo('test/cached');
+    expect(first.stars).toBe(100);
+
+    // Clear mock counters — second call should hit cache, not API
+    mockGet.mockClear();
+    mockGetAllTopics.mockClear();
+
+    const second = await getRepo('test/cached');
+    expect(second.stars).toBe(100);
+    expect(mockGet).not.toHaveBeenCalled();
+  });
+
+  it('retries on 429 rate limit then succeeds', async () => {
+    // Mock Octokit constructor to control per-call behavior
+    // First call throws 429, second succeeds
+    mockGet
+      .mockRejectedValueOnce(Object.assign(new Error('Rate limited'), { status: 429 }))
+      .mockResolvedValueOnce({
+        data: {
+          full_name: 'test/ratelimit',
+          description: 'A repo',
+          language: 'TypeScript',
+          license: { spdx_id: 'MIT' },
+          stargazers_count: 50,
+          forks_count: 5,
+          open_issues_count: 0,
+          created_at: '2024-01-01T00:00:00Z',
+          updated_at: '2024-01-01T00:00:00Z',
+          pushed_at: '2024-01-01T00:00:00Z',
+          homepage: null,
+          default_branch: 'main',
+        },
+      });
+    mockGetAllTopics
+      .mockRejectedValueOnce(Object.assign(new Error('Rate limited'), { status: 429 }))
+      .mockResolvedValueOnce({
+        data: { names: ['test'] },
+      });
+
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const { getRepo } = await import('../github.js');
+    const repo = await getRepo('test/ratelimit');
+
+    expect(repo.stars).toBe(50);
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining('retrying')
+    );
+
+    consoleSpy.mockRestore();
+  });
+
+  it('throws on non-retryable error (4xx non-429)', async () => {
+    mockGet.mockRejectedValueOnce(
+      Object.assign(new Error('Not Found'), { status: 404 })
+    );
+
+    const { getRepo } = await import('../github.js');
+    await expect(getRepo('test/missing')).rejects.toThrow('Not Found');
+  });
+
+  it('throws after exhausting retries', async () => {
+    mockGet
+      .mockRejectedValueOnce(Object.assign(new Error('Server Error'), { status: 500 }))
+      .mockRejectedValueOnce(Object.assign(new Error('Server Error'), { status: 500 }))
+      .mockRejectedValueOnce(Object.assign(new Error('Server Error'), { status: 500 }));
+
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const { getRepo } = await import('../github.js');
+    await expect(getRepo('test/failing')).rejects.toThrow('Server Error');
+
+    // Should have tried 3 times (2 warnings)
+    expect(consoleSpy).toHaveBeenCalledTimes(2);
+    consoleSpy.mockRestore();
+  });
+});
+
+describe('getStarHistory', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.resetModules();
+    mockGet = vi.fn();
+    mockGetAllTopics = vi.fn();
+    githubModule.clearCache();
+  });
+
+  it('returns requested number of points', async () => {
+    mockGet.mockResolvedValueOnce({
+      data: {
+        full_name: 'test/star-history',
+        description: null,
+        language: 'TypeScript',
+        license: { spdx_id: 'MIT' },
+        stargazers_count: 100,
+        forks_count: 0,
+        open_issues_count: 0,
+        created_at: '2024-01-01T00:00:00Z',
+        updated_at: '2024-01-01T00:00:00Z',
+        pushed_at: '2024-01-01T00:00:00Z',
+        homepage: null,
+        default_branch: 'main',
+      },
+    });
+    mockGetAllTopics.mockResolvedValueOnce({
+      data: { names: [] },
+    });
+
+    const { getStarHistory } = await import('../github.js');
+    const history = await getStarHistory('test/star-history', 5);
+
+    expect(history).toHaveLength(5);
+    expect(history[0].stars).toBe(20);  // 100 * 1/5
+    expect(history[4].stars).toBe(100); // 100 * 5/5
+  });
+
+  it('all values are within range and monotonic', async () => {
+    mockGet.mockResolvedValueOnce({
+      data: {
+        full_name: 'test/monotonic',
+        description: null,
+        language: 'Python',
+        license: null,
+        stargazers_count: 1000,
+        forks_count: 0,
+        open_issues_count: 0,
+        created_at: '2024-01-01T00:00:00Z',
+        updated_at: '2024-01-01T00:00:00Z',
+        pushed_at: '2024-01-01T00:00:00Z',
+        homepage: null,
+        default_branch: 'main',
+      },
+    });
+    mockGetAllTopics.mockResolvedValueOnce({
+      data: { names: [] },
+    });
+
+    const { getStarHistory } = await import('../github.js');
+    const history = await getStarHistory('test/monotonic', 10);
+
+    expect(history[0].stars).toBeGreaterThanOrEqual(0);
+    expect(history[9].stars).toBe(1000);
+    for (let i = 1; i < history.length; i++) {
+      expect(history[i].stars).toBeGreaterThanOrEqual(history[i - 1].stars);
+    }
   });
 });
