@@ -64,9 +64,9 @@ export async function withRetry<T>(
 function getOctokit(): Octokit {
   const token = process.env.GITHUB_TOKEN;
   if (token) {
-    return new Octokit({ auth: token, userAgent: 'repo-sense/0.1.0' });
+    return new Octokit({ auth: token, userAgent: 'repo-sense/0.2.0' });
   }
-  return new Octokit({ userAgent: 'repo-sense/0.1.0' });
+  return new Octokit({ userAgent: 'repo-sense/0.2.0' });
 }
 
 function parseRepo(repo: string): { owner: string; name: string } {

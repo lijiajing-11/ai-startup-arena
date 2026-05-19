@@ -74,11 +74,25 @@ export async function run(): Promise<void> {
       }
     });
 
+  // stars 命令
+  program
+    .command('stars <repo>')
+    .description('Quickly check stars and basic info for a repository')
+    .action(async (repo: string) => {
+      try {
+        await starsCommand(repo);
+      } catch (err: any) {
+        console.error(`✗ Error: ${err.message}`);
+        process.exit(1);
+      }
+    });
+
   await program.parseAsync(process.argv);
 }
 
-// Allow running directly
-const isTestEnv = process.env.NODE_ENV === 'test' || process.env.VITEST === 'true';
-if (!isTestEnv) {
+// VITEST 守卫：避免测试 import 时自动执行
+if (typeof process !== 'undefined' && !process.env.VITEST) {
   run();
 }
+
+export default run;
