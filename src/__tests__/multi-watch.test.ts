@@ -307,6 +307,7 @@ describe('watchMultiRepos edge cases', () => {
   });
 
   it('watchMultiRepos with empty repo list resolves immediately', async () => {
+    const { watchMultiRepos } = await import('../commands/watch.js');
     const ac = new AbortController();
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     const promise = watchMultiRepos([], 1, true, ac.signal);
@@ -317,6 +318,7 @@ describe('watchMultiRepos edge cases', () => {
   }, 5000);
 
   it('watchMultiRepos JSON output is valid JSON', async () => {
+    const { watchMultiRepos } = await import('../commands/watch.js');
     const mockGet = getMockGet();
     const mockTopics = getMockGetAllTopics();
 

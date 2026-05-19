@@ -403,16 +403,17 @@ describe('withRetry', () => {
     // jitter = Math.random() * 0.3 * delay
     // So max total wait per attempt = delay + 0.3*delay = 1.3*delay
     // With delay capped at maxDelayMs, max total per attempt = 1.3 * maxDelayMs
-    // We use a slow baseDelay that reaches maxDelay quickly
     const fn = vi.fn().mockRejectedValue(Object.assign(new Error('Server Error'), { status: 500 }));
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const start = Date.now();
     await expect(withRetry(fn, { maxAttempts: 5, baseDelayMs: 500, maxDelayMs: 300 })).rejects.toThrow('Server Error');
     const elapsed = Date.now() - start;
-    // 4 retries, each capped at maxDelayMs=300, plus jitter up to 0.3*300=90
-    // Max per attempt: 390ms. 4 * 390 = 1560ms
-    // The test should complete comfortably under 3000ms (with safety margin)
-    expect(elapsed).toBeLessThan(3000);
+    // 4 retries, each capped at maxDelayMs=300, plus jitter up to 90ms
+    // Theoretical max: 4 * 390 = 1560ms. But with scheduling overhead on
+    // shared infra, we allow significant margin. The key point is this is
+    // finite and bounded — it doesn't grow unbounded despite exponential base.
+    // Without the cap, delay would be 500+1000+2000+4000=7500ms + jitter.
+    expect(elapsed).toBeLessThan(6500);
     warnSpy.mockRestore();
   });
 

@@ -11,32 +11,20 @@ vi.mock('@octokit/rest', () => {
   return { Octokit: MockOctokit };
 });
 
-// chalk with full chainable support: chalk.bold.cyan('x'), chalk.red('x'), etc.
-// Each color/tag function is also a proxy so chaining works
-function makeChalkChain(): any {
-  const handler: ProxyHandler<(...args: any[]) => any> = {
-    apply(_target, _thisArg, args) {
-      return args[0] ?? ''; // identity
-    },
-    get(_target, prop) {
-      if (prop === 'bold' || prop === 'default') return makeChalkChain();
-      return makeChalkChain();
-    },
-  };
-  return new Proxy((s: string) => s, handler);
-}
+// Shared chainable chalk mock — supports arbitrary chaining like chalk.bold.cyan('x')
+import chalkMock from './__mocks__/chalk.js';
 
 vi.mock('chalk', () => ({
-  default: makeChalkChain(),
-  red: makeChalkChain(),
-  green: makeChalkChain(),
-  yellow: makeChalkChain(),
-  cyan: makeChalkChain(),
-  blue: makeChalkChain(),
-  gray: makeChalkChain(),
-  white: makeChalkChain(),
-  magenta: makeChalkChain(),
-  bold: makeChalkChain(),
+  default: chalkMock,
+  red: chalkMock,
+  green: chalkMock,
+  yellow: chalkMock,
+  cyan: chalkMock,
+  blue: chalkMock,
+  gray: chalkMock,
+  white: chalkMock,
+  magenta: chalkMock,
+  bold: chalkMock,
 }));
 
 vi.mock('cli-table3', () => ({
