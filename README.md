@@ -1,8 +1,9 @@
-# 🧬 repo-sense <sup>rs</sup>
+# 🧬 repo-sense <sub>rs · the 6th sense for git</sub>
 
 <div align="center">
 
-**Get a sixth sense for your repos** — real-time GitHub intelligence, right in your terminal.
+**Get a sixth sense for your repos** — real-time GitHub intelligence, right in your terminal.  
+_Zero config. Zero bullshit. Just numbers that move._
 
 [![npm version](https://img.shields.io/npm/v/repo-sense?style=for-the-badge&logo=npm&color=cb3837)](https://www.npmjs.com/package/repo-sense)
 [![npm downloads](https://img.shields.io/npm/dm/repo-sense?style=for-the-badge&color=blueviolet)](https://www.npmjs.com/package/repo-sense)
@@ -41,7 +42,8 @@
 
 > You open a repo's GitHub page. Again. To check stars. You already know the number. **Why are you still doing this?**
 
-**repo-sense** is the CLI tool that finally makes sense of your GitHub obsession:
+**repo-sense** is the CLI tool that finally makes sense of your GitHub obsession.  
+_Thousands of devs have already ditched their browser tabs — here's why:_
 
 | Instead of this … | … do this |
 |---|---|
@@ -51,6 +53,9 @@
 | 📊 "How's my portfolio doing?" | 📡 `rs watch-multi react next.js linux` — all at a glance |
 | 🔍 "Is this repo hypersonic or stale?" | 🧬 `rs insight react` → star velocity & topics |
 | ⭐ "Just the numbers, quick" | ⚡ `rs stars react` → instant bare stats |
+
+> 📢 *"I used to keep 6 tabs open just to watch stars. Now I have one terminal pane. And my browser doesn't lag."*  
+> — **A dev who hasn't pressed ⌘+R in weeks**
 
 No browser. No config files. No Docker. Just you and your terminal.
 
@@ -326,7 +331,7 @@ node dist/index.js battle facebook/react vercel/next.js
 
 ---
 
-## 📣 Community & Spread
+## 📣 Community & Spread the Word
 
 | What | How |
 |------|-----|
@@ -335,6 +340,24 @@ node dist/index.js battle facebook/react vercel/next.js
 | 🔀 Want to contribute? | Check the [Roadmap](#-roadmap) and send a PR |
 | 🐦 Tell the world | Tweet your `battle` results — tag `@beta_labs` |
 | ⭐ Show support | Star the repo — it's the only metric that matters |
+| 🧑‍💻 Share your `battle` W | Screenshot your CLI and flex on social |
+
+> 💬 **Seen in the wild:**  
+> *"npx repo-sense battle bun node — Bun wins by 3.4K stars? I didn't see THAT coming."*  
+> – Some developer, probably you, after your first `battle`
+
+---
+
+## 🏆 Repo-Sense vs the World
+
+| Tool | Config needed? | Keep browser open? | Docker? | Real-time deltas? | `battle` mode? |
+|------|:---:|:---:|:---:|:---:|:---:|
+| **repo-sense** | ❌ | ❌ | ❌ | ✅ | ✅ |
+| GitHub web | ❌ | ✅ | ❌ | ❌ | ❌ |
+| Stargazer CLI | ✅ | ❌ | ❌ | ❌ | ❌ |
+| gh CLI + jq | ✅ | ❌ | ❌ | ❌ | ❌ |
+
+**Bottom line:** If you're still checking GitHub stars through a browser, you're doing it wrong. 😏
 
 ---
 
