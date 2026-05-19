@@ -1,29 +1,28 @@
 # Release Checklist
 
-This document describes the steps required to publish a new release of `repo-sense`.
-
-> **Current status**: This project is not yet published to npm. The instructions below document the intended release process for when publishing begins.
-
----
-
-## Prerequisites
-
-- [ ] Node.js >= 18 installed
-- [ ] npm account with access to the `@li1050109098/repo-sense` (or to-be-registered `repo-sense` package)
-- [ ] `npm login` completed
-- [ ] Write access to `li1050109098/beta-project-arena` on GitHub
+> **Current status**: This package is published on npm as `repo-sense`.  
+> Use `npx repo-sense` (zero-install) or `npm install -g repo-sense`.
 
 ---
 
-## Release Steps
+## ⚡ Quick Release (pull requests)
 
-### 1. Update version
+For minor fixes and documentation changes, merge the PR and let CI handle verification.
+No manual release steps needed for PR-only changes.
+
+---
+
+## 📦 Full Release Checklist
+
+Run these steps in order. Each step depends on the previous one passing.
+
+### 1. Version Bump
 
 ```bash
-# Major: npm version major
-# Minor: npm version minor
-# Patch: npm version patch
-npm version minor -m "chore: release v%s"
+# Pick one:
+npm version patch   # bug fixes (0.0.x)
+npm version minor   # new features (0.x.0)
+npm version major   # breaking changes (x.0.0)
 ```
 
 This updates `package.json` and creates a git tag automatically.
@@ -34,46 +33,108 @@ This updates `package.json` and creates a git tag automatically.
 npm run build
 ```
 
-Verify the `dist/` directory is up to date and contains all expected files.
+Verify `dist/` contains the compiled JavaScript and the CLI starts:
 
-### 3. Run tests
+```bash
+node dist/index.js --version
+node dist/index.js --help
+```
+
+### 3. Run Tests
 
 ```bash
 npm test
 ```
 
-All tests must pass (see package.json — `vitest run`).
+All tests **must** pass (green). If tests fail, fix before proceeding.
 
-### 4. Review CHANGELOG
+### 4. Review Changelog
 
-- [ ] Open `CHANGELOG.md`
-- [ ] Add the new version entry under the `[Unreleased]` section
-- [ ] Move released items from `[Unreleased]` to the new version
-- [ ] Update the release date
+- Open `CHANGELOG.md`
+- Confirm the new version entry is accurate
+- Add any missing entries from the commit log
 
-### 5. Commit and tag
+### 5. Commit & Tag
+
+If you used `npm version`, the tag is already created:
 
 ```bash
-git add package.json CHANGELOG.md
-git commit -m "chore: release v<version>"
 git push --follow-tags
 ```
 
-### 6. Create GitHub Release (optional)
+If you bumped manually:
+
+```bash
+git add package.json CHANGELOG.md
+git commit -m "chore: release vX.Y.Z"
+git tag vX.Y.Z
+git push && git push --tags
+```
+
+### 6. Create GitHub Release
 
 - Go to https://github.com/li1050109098/beta-project-arena/releases/new
-- Select the tag created by `npm version`
-- Title: `v<version>`
-- Paste the relevant CHANGELOG entries as release notes
+- Select the tag you just pushed
+- Title: `vX.Y.Z`
+- Description: Copy the relevant section from `CHANGELOG.md`
+- Click "Publish release"
+
+This triggers the CI workflow automatically (if it runs on tags).
 
 ### 7. Publish to npm
 
 ```bash
-# First-time publish (if package name is available):
 npm publish
-
-# Scoped package publish (if using @scope):
-npm publish --access public
 ```
 
-> ⚠️ Note: npm publish will fail if the package name `repo-sense` is already taken. If that happens, either rename the package in `package.json` or restrict to a scoped name.
+> ⚠️ **npm publish** requires:
+> - `npm login` (authenticated as the package owner)
+> - Write access to the `repo-sense` package on npm
+>
+> If you get `403 Forbidden`, you may not have publish permissions.
+> Run `npm whoami` to check your logged-in user.
+
+### 8. Verify
+
+- [ ] CI badge on README shows green
+- [ ] `npx repo-sense --version` shows the new version
+- [ ] GitHub Release page shows the new release
+
+---
+
+## 🧪 Dry Run (pre-flight)
+
+To test the publish step without actually publishing:
+
+```bash
+npm pack --dry-run
+```
+
+This shows what files would be included in the npm tarball.
+Verify the `files` field in `package.json` includes `dist/` and `bin/`.
+
+---
+
+## 🚑 Emergency Release (hotfix)
+
+```bash
+git checkout -b hotfix/vX.Y.Z master
+# Fix the issue
+git commit -m "fix: critical bug description"
+npm version patch
+npm run build && npm test
+git push --follow-tags
+# Create PR, merge, then follow steps 6-8
+```
+
+---
+
+## 🔐 Access & Permissions
+
+| Resource | URL / Command | Required Access |
+|----------|---------------|-----------------|
+| GitHub repo | https://github.com/li1050109098/beta-project-arena | Write |
+| npm package | https://www.npmjs.com/package/repo-sense | Publish |
+| CI (GitHub Actions) | Auto from `master` | — |
+
+Managed by β-Labs Corp. For access requests, contact the team lead.
