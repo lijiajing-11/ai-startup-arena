@@ -28,12 +28,15 @@ vi.mock('chalk', () => {
   return { default: mock };
 });
 
-vi.mock('cli-table3', () => ({
-  default: vi.fn().mockImplementation(() => ({
-    push: vi.fn(),
+vi.mock('cli-table3', () => {
+  // Return a plain constructor function (not vi.fn) so new Table() returns the mock object
+  // This avoids vitest's vi.fn constructor interception which can break push/toString
+  const MockTable = () => ({
+    push: () => {},
     toString: () => '',
-  })),
-}));
+  });
+  return { default: MockTable };
+});
 
 // ── Tests ──────────────────────────────────────────────────────────────
 
@@ -556,7 +559,7 @@ describe('battleMultiRepos', () => {
   });
 
   it('3 repos calls getRepos (not battleRepos)', async () => {
-    // Use the existing getRepo mock via github module
+    // Mock getRepo directly — avoids Octokit prototype issues
     const githubModule = await import('../github.js');
     const fakeRepo = {
       owner: 'test', name: 'mock', fullName: 'test/mock',
@@ -578,9 +581,13 @@ describe('battleMultiRepos', () => {
   it('renderBattleMulti renders without throwing', async () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
-    // Force cli-table3 mock reset before this test
-    const tableModule = await import('cli-table3');
-    const TableMock = vi.mocked((tableModule as any).default ?? tableModule);
+    // Re-mock cli-table3 to ensure fresh instance with push
+    vi.mock('cli-table3', () => ({
+      default: vi.fn(() => ({
+        push: vi.fn(),
+        toString: () => '',
+      })),
+    }));
 
     const { renderBattleMulti } = await import('../commands/watch.js');
 
