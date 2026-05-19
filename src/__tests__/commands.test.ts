@@ -469,3 +469,141 @@ describe('insightCommand', () => {
     vi.restoreAllMocks();
   });
 });
+
+describe('history command', () => {
+  it('should export historyCommand function', async () => {
+    const historyModule = await import('../commands/history.js');
+    expect(typeof historyModule.historyCommand).toBe('function');
+  });
+
+  it('renders history output without throwing', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    const githubModule = await import('../github.js');
+    vi.spyOn(githubModule, 'getRepo').mockResolvedValue({
+      owner: 'facebook',
+      name: 'react',
+      fullName: 'facebook/react',
+      description: 'A UI library',
+      language: 'TypeScript',
+      license: 'MIT',
+      stars: 245114,
+      forks: 51065,
+      openIssues: 1299,
+      createdAt: '2013-05-29T21:18:12Z',
+      updatedAt: '2025-12-01T00:00:00Z',
+      pushedAt: '2025-12-01T00:00:00Z',
+      topics: ['react', 'ui', 'frontend', 'javascript'],
+      homepage: null,
+      defaultBranch: 'main',
+    });
+
+    const { historyCommand } = await import('../commands/history.js');
+    await historyCommand('facebook/react');
+
+    expect(logSpy).toHaveBeenCalled();
+    logSpy.mockRestore();
+    vi.restoreAllMocks();
+  });
+
+  it('handles repo with very few stars', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    const githubModule = await import('../github.js');
+    vi.spyOn(githubModule, 'getRepo').mockResolvedValue({
+      owner: 'test',
+      name: 'tiny',
+      fullName: 'test/tiny',
+      description: null,
+      language: null,
+      license: null,
+      stars: 5,
+      forks: 0,
+      openIssues: 0,
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-15T00:00:00Z',
+      pushedAt: '2025-01-15T00:00:00Z',
+      topics: [],
+      homepage: null,
+      defaultBranch: 'main',
+    });
+
+    const { historyCommand } = await import('../commands/history.js');
+    await expect(historyCommand('test/tiny')).resolves.not.toThrow();
+
+    expect(logSpy).toHaveBeenCalled();
+    logSpy.mockRestore();
+    vi.restoreAllMocks();
+  });
+});
+
+// ── Multi-repo battle 3+ tests ────────────────────────────────────────
+
+describe('battleMultiRepos', () => {
+  it('should export battleMultiRepos function', async () => {
+    const watchModule = await import('../commands/watch.js');
+    expect(typeof watchModule.battleMultiRepos).toBe('function');
+  });
+
+  it('should export renderBattleMulti function', async () => {
+    const watchModule = await import('../commands/watch.js');
+    expect(typeof watchModule.renderBattleMulti).toBe('function');
+  });
+
+  it('throws with <2 repos', async () => {
+    const { battleMultiRepos } = await import('../commands/watch.js');
+    await expect(battleMultiRepos(['facebook/react'])).rejects.toThrow('Need at least 2 repos');
+  });
+
+  it('3 repos calls getRepos (not battleRepos)', async () => {
+    const { Octokit } = await import('@octokit/rest');
+    const mockOctokit = vi.mocked(Octokit);
+    // Return a mock octokit that yields predictable RepoData
+    mockOctokit.prototype.rest = {
+      repos: {
+        get: vi.fn().mockResolvedValue({
+          data: {
+            full_name: 'test/mock',
+            description: null,
+            language: 'TypeScript',
+            license: { spdx_id: 'MIT' },
+            stargazers_count: 100,
+            forks_count: 10,
+            open_issues_count: 5,
+            created_at: '2024-01-01T00:00:00Z',
+            updated_at: '2024-01-01T00:00:00Z',
+            pushed_at: '2024-01-01T00:00:00Z',
+            homepage: null,
+            default_branch: 'main',
+          },
+        }),
+        getAllTopics: vi.fn().mockResolvedValue({ data: { names: [] } }),
+      },
+    } as any;
+
+    const { battleMultiRepos } = await import('../commands/watch.js');
+    const result = await battleMultiRepos(['a/a', 'b/b', 'c/c']);
+    expect(result.repos).toHaveLength(3);
+    expect(result.winner).toBe('test/mock');
+  });
+
+  it('renderBattleMulti renders without throwing', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const { renderBattleMulti } = await import('../commands/watch.js');
+
+    const makeRepo = (name: string, stars: number) => ({
+      owner: 'test', name, fullName: `test/${name}`,
+      description: null, language: 'TypeScript', license: 'MIT',
+      stars, forks: 10, openIssues: 5,
+      createdAt: '2024-01-01T00:00:00Z', updatedAt: '2024-01-01T00:00:00Z',
+      pushedAt: '2024-01-01T00:00:00Z', topics: [], homepage: null, defaultBranch: 'main',
+    });
+
+    const repos = [makeRepo('alpha', 1000), makeRepo('beta', 500), makeRepo('gamma', 750)];
+    expect(() => renderBattleMulti(repos, 'test/alpha')).not.toThrow();
+    expect(logSpy).toHaveBeenCalled();
+
+    logSpy.mockRestore();
+  });
+});
+

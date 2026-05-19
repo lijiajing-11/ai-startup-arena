@@ -1,6 +1,6 @@
 {
   "name": "repo-sense",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A beautiful TypeScript CLI for GitHub repo intelligence — watch repos, battle comparisons, insights",
   "type": "module",
   "main": "dist/index.js",

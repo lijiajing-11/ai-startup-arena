@@ -281,6 +281,108 @@ export function renderBattle(result: BattleResult): void {
   }
 }
 
+// ── Multi-repo battle (3+) ─────────────────────────────────────────────
+
+/**
+ * Battle multiple repos (3+).
+ * Falls back to existing battleRepos when called with exactly 2 repos.
+ */
+export async function battleMultiRepos(repoStrs: string[]): Promise<{ repos: RepoSnapshot[]; winner: string }> {
+  if (repoStrs.length < 2) throw new Error('Need at least 2 repos');
+  if (repoStrs.length === 2) {
+    const result = await battleRepos(repoStrs[0], repoStrs[1]);
+    return {
+      repos: [result.repo1, result.repo2],
+      winner: result.winner === 'tie' ? 'Tie' : result.repo1.repo.fullName,
+    };
+  }
+
+  const repoData = await getRepos(repoStrs);
+  const snapshots = repoData.map((r) => ({ repo: r, timestamp: new Date() }));
+
+  // Sort: most stars wins, tie-breaker: forks
+  const sorted = [...repoData].sort((a, b) => b.stars - a.stars || b.forks - a.forks);
+  const winner = sorted[0].fullName;
+
+  return { repos: snapshots, winner };
+}
+
+/**
+ * Render the N-way battle comparison table.
+ * Column width adjusts dynamically based on repo count.
+ */
+export function renderBattleMulti(results: RepoData[], winnerName: string): void {
+  const colCount = results.length;
+
+  if (colCount > 5) {
+    console.log(chalk.yellow(`⚠ Warning: ${colCount} repos may not fit well in terminal width.`));
+  }
+
+  const colWidth = Math.min(22, Math.floor(68 / colCount));
+  const totalWidth = 14 + colCount * colWidth + colCount;
+
+  const head = ['Metric', ...results.map((r) => chalk.cyan(r.fullName))];
+  const widths = [14, ...Array(colCount).fill(colWidth)];
+
+  const table = new Table({
+    style: { head: ['cyan'], border: ['gray'] },
+    head,
+    colWidths: widths,
+  });
+
+  // Stars row — mark winner
+  const maxStars = Math.max(...results.map((r) => r.stars));
+  const starRow = [
+    '⭐ Stars',
+    ...results.map((r) => {
+      const val = chalk.yellow(formatNumber(r.stars));
+      return r.stars === maxStars ? `${val} 🏆` : val;
+    }),
+  ];
+
+  // Forks row — mark winner
+  const maxForks = Math.max(...results.map((r) => r.forks));
+  const forkRow = [
+    '⑂ Forks',
+    ...results.map((r) => {
+      const val = chalk.blue(formatNumber(r.forks));
+      return r.forks === maxForks ? `${val} 🏆` : val;
+    }),
+  ];
+
+  // Issues row — mark fewest issues as winner
+  const minIssues = Math.min(...results.map((r) => r.openIssues));
+  const issueRow = [
+    '⚠ Issues',
+    ...results.map((r) => {
+      const val = chalk.red(formatNumber(r.openIssues));
+      return r.openIssues === minIssues ? `${val} 🏆` : val;
+    }),
+  ];
+
+  const langRow = ['🔤 Lang', ...results.map((r) => r.language ?? chalk.gray('—'))];
+  const licRow = ['📜 Lic', ...results.map((r) => r.license ?? chalk.gray('—'))];
+
+  // Age row
+  const now = Date.now();
+  const ageRow = [
+    '📅 Age',
+    ...results.map((r) => {
+      const ageMs = now - new Date(r.createdAt).getTime();
+      const years = ageMs / (1000 * 60 * 60 * 24 * 365.25);
+      return `${years.toFixed(1)} yrs`;
+    }),
+  ];
+
+  table.push(starRow, forkRow, issueRow, langRow, licRow, ageRow);
+
+  console.log(chalk.bold.cyan('\n  ╔══════════════════════════════════════════════════════════╗'));
+  console.log(chalk.bold.cyan('  ║            ⚔️   MULTI REPO BATTLE  ⚔️                  ║'));
+  console.log(chalk.bold.cyan('  ╚══════════════════════════════════════════════════════════╝\n'));
+  console.log(table.toString());
+  console.log(chalk.bold(`\n  🏆 Overall Winner: ${chalk.green(winnerName)}\n`));
+}
+
 /**
  * Watch multiple repos simultaneously with a compact dashboard.
  */

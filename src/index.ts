@@ -1,7 +1,8 @@
 import { Command } from 'commander';
-import { watchRepo, watchSingleRepoJson, renderDashboard, battleRepos, renderBattle, watchMultiRepos } from './commands/watch.js';
+import { watchRepo, watchSingleRepoJson, renderDashboard, battleRepos, renderBattle, battleMultiRepos, renderBattleMulti, watchMultiRepos } from './commands/watch.js';
 import { starsCommand } from './commands/stars.js';
 import { insightCommand } from './commands/insight.js';
+import { historyCommand } from './commands/history.js';
 
 export async function run(): Promise<void> {
   const program = new Command();
@@ -42,12 +43,17 @@ export async function run(): Promise<void> {
     });
 
   program
-    .command('battle <repo1> <repo2>')
-    .description('Compare two repositories head-to-head')
-    .action(async (repo1: string, repo2: string) => {
+    .command('battle <repos...>')
+    .description('Compare repositories head-to-head (2+ repos)')
+    .action(async (repos: string[]) => {
       try {
-        const result = await battleRepos(repo1, repo2);
-        renderBattle(result);
+        if (repos.length === 2) {
+          const result = await battleRepos(repos[0], repos[1]);
+          renderBattle(result);
+        } else {
+          const result = await battleMultiRepos(repos);
+          renderBattleMulti(result.repos.map((s) => s.repo), result.winner);
+        }
       } catch (err: any) {
         console.error(`✗ Error: ${err.message}`);
         process.exit(1);
@@ -95,6 +101,19 @@ export async function run(): Promise<void> {
     .action(async (repo: string) => {
       try {
         await insightCommand(repo);
+      } catch (err: any) {
+        console.error(`✗ Error: ${err.message}`);
+        process.exit(1);
+      }
+    });
+
+  // history 命令
+  program
+    .command('history <repo>')
+    .description('Star history trend — velocity, milestones, growth phases')
+    .action(async (repo: string) => {
+      try {
+        await historyCommand(repo);
       } catch (err: any) {
         console.error(`✗ Error: ${err.message}`);
         process.exit(1);
