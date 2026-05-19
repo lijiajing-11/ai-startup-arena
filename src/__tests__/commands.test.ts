@@ -12,9 +12,21 @@ vi.mock('@octokit/rest', () => {
 });
 
 // Shared chainable chalk mock — supports arbitrary chaining like chalk.bold.cyan('x')
-import { createChalkMock } from './__mocks__/chalk.js';
-
-vi.mock('chalk', () => createChalkMock());
+// Inline to avoid Proxy hoisting issues in vitest's ES module resolution
+vi.mock('chalk', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const makeChalkFn = (): any => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fn: any = (s: string) => (typeof s === 'string' ? s : '');
+    return new Proxy(fn, {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      get: () => makeChalkFn(),
+    });
+  };
+  const mock = makeChalkFn();
+  mock.default = mock;
+  return { default: mock };
+});
 
 vi.mock('cli-table3', () => ({
   default: vi.fn().mockImplementation(() => ({
