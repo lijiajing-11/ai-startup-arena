@@ -3,7 +3,47 @@ import Table from 'cli-table3';
 import type { RepoData, RepoSnapshot, BattleResult, JsonSnapshot, SingleJsonSnapshot } from '../models.js';
 import { formatNumber, getRepo, clearCache, getRepos } from '../github.js';
 
-// ── Helpers ────────────────────────────────────────────────────────────────
+// ── Shared poll-loop utility ─────────────────────────────────────────────
+
+type PollTick = () => Promise<void>;
+
+/**
+ * Creates and runs a polling loop with AbortSignal support.
+ * Handles the first tick, setInterval setup, abort cleanup, and summary.
+ * Returns a promise that resolves when the loop ends.
+ */
+async function createPollLoop(
+  tick: PollTick,
+  intervalSec: number,
+  signal: AbortSignal | undefined,
+  onEnd: () => void
+): Promise<void> {
+  await tick();
+  if (signal?.aborted) return;
+
+  return new Promise<void>((resolve) => {
+    const cleanup = () => {
+      clearInterval(timer);
+      onEnd();
+      resolve();
+    };
+
+    if (signal) {
+      signal.addEventListener('abort', cleanup, { once: true });
+    }
+
+    const timer = setInterval(async () => {
+      if (signal?.aborted) {
+        clearInterval(timer);
+        signal.removeEventListener('abort', cleanup);
+        onEnd();
+        resolve();
+        return;
+      }
+      await tick();
+    }, intervalSec * 1000);
+  });
+}
 
 function formatElapsed(startTime: number): string {
   const elapsed = Math.round((Date.now() - startTime) / 1000);
@@ -32,7 +72,7 @@ export async function watchRepo(
 ): Promise<void> {
   let previous: RepoSnapshot | undefined;
   let totalGrowth = 0;
-  let startTime = Date.now();
+  const startTime = Date.now();
 
   const tick = async (): Promise<void> => {
     if (signal?.aborted) return;
@@ -57,31 +97,7 @@ export async function watchRepo(
     }
   };
 
-  await tick();
-  if (signal?.aborted) return;
-
-  return new Promise((resolve) => {
-    const onAbort = () => {
-      clearInterval(timer);
-      onAbortSummary(startTime, totalGrowth);
-      resolve();
-    };
-
-    if (signal) {
-      signal.addEventListener('abort', onAbort, { once: true });
-    }
-
-    const timer = setInterval(async () => {
-      if (signal?.aborted) {
-        clearInterval(timer);
-        if (signal) signal.removeEventListener('abort', onAbort);
-        onAbortSummary(startTime, totalGrowth);
-        resolve();
-        return;
-      }
-      await tick();
-    }, interval * 1000);
-  });
+  await createPollLoop(tick, interval, signal, () => onAbortSummary(startTime, totalGrowth));
 }
 
 /**
@@ -94,7 +110,7 @@ export async function watchSingleRepoJson(
   interval: number = 30,
   signal?: AbortSignal
 ): Promise<void> {
-  let startTime = Date.now();
+  const startTime = Date.now();
 
   const tick = async (): Promise<void> => {
     if (signal?.aborted) return;
@@ -111,31 +127,7 @@ export async function watchSingleRepoJson(
     }
   };
 
-  await tick();
-  if (signal?.aborted) return;
-
-  return new Promise((resolve) => {
-    const onAbort = () => {
-      clearInterval(timer);
-      onAbortSummary(startTime, 0, 'JSON mode');
-      resolve();
-    };
-
-    if (signal) {
-      signal.addEventListener('abort', onAbort, { once: true });
-    }
-
-    const timer = setInterval(async () => {
-      if (signal?.aborted) {
-        clearInterval(timer);
-        if (signal) signal.removeEventListener('abort', onAbort);
-        onAbortSummary(startTime, 0, 'JSON mode');
-        resolve();
-        return;
-      }
-      await tick();
-    }, interval * 1000);
-  });
+  await createPollLoop(tick, interval, signal, () => onAbortSummary(startTime, 0, 'JSON mode'));
 }
 
 export function renderDashboard(snapshot: RepoSnapshot, previous?: RepoSnapshot): void {
