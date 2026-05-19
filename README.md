@@ -15,7 +15,17 @@
 [![Bundle Size](https://img.shields.io/badge/minzipped-%3C10KB-success?style=for-the-badge)](#)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079?style=for-the-badge)](https://github.com/semantic-release/semantic-release)
 
-🔥 **Zero config · Live refresh · Terminal-native** ⚡
+```
+  ┌────────────────────────────────────────────────────────┐
+  │  🧬  repo-sense — Get a sixth sense for your repos    │
+  │                                                        │
+  │  ⚡  npx repo-sense watch facebook/react               │
+  │  🏆  npx repo-sense battle react next.js              │
+  │  📡  npx repo-sense watch-multi a b c                 │
+  │                                                        │
+  │  Zero config · Live refresh · Terminal-native          │
+  └────────────────────────────────────────────────────────┘
+```
 
 > One command to watch a repo live, or settle which one's hotter — no web UI, no config file, no BS.
 
