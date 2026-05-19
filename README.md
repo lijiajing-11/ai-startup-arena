@@ -9,7 +9,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](https://opensource.org/licenses/MIT)
 [![GitHub Stars](https://img.shields.io/github/stars/li1050109098/beta-project-arena?style=flat-square&logo=github)](https://github.com/li1050109098/beta-project-arena)
 [![npm downloads](https://img.shields.io/npm/dm/repo-sense?style=flat-square&color=blueviolet)](https://www.npmjs.com/package/repo-sense)
-[![CI](https://img.shields.io/github/actions/workflow/status/li1050109098/beta-project-arena/ci.yml?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/li1050109098/beta-project-arena/actions)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square)](http://makeapullrequest.com)
 
 🔥 **Zero config · Live refresh · Terminal-native** ⚡
@@ -27,7 +26,7 @@
 | `npx repo-sense watch facebook/react` | Live dashboard that refreshes every 30s |
 | `npx repo-sense battle facebook/react vercel/next.js` | Side-by-side smackdown with a winner |
 | `npx repo-sense watch-multi react next.js tailwindcss` | Whole landscape at a glance |
-| `rs --help` | Full command reference |
+| `rs summary facebook/react` | Markdown-friendly one-liner for your README |
 
 **60 req/hr** without auth, **5,000 req/hr** with a `GITHUB_TOKEN` — details below.
 
@@ -78,6 +77,17 @@ npx repo-sense watch-multi facebook/react vercel/next.js tailwindlabs/tailwindcs
 
 All repos, one table, live updates. Add `-j` for JSON output you can pipe into your own dashboards or Slack bots.
 
+### 📝 `summary` — README Badge
+
+Drop a live-regenerating badge into your own project's README:
+
+```bash
+npx repo-sense summary vercel/next.js
+# → ⭐ 139.5K · ⑂ 31.1K · ⚠ 4.0K · 🔤 JavaScript · 📜 MIT
+```
+
+Great for project pages, pitch decks, and YouTrack dashboards.
+
 ---
 
 ## 📖 Command Reference
@@ -89,6 +99,7 @@ All repos, one table, live updates. Add `-j` for JSON output you can pipe into y
 | `rs battle <a> <b>` | Side-by-side comparison, winner declared |
 | `rs watch-multi <repos...>` | Multi-repo live monitoring |
 | `rs watch-multi <repos...> -j` | JSON output for programmatic use |
+| `rs summary <repo>` | One-liner badge for your own README |
 | `rs --help` | All commands and options |
 | `rs --version` | Show version |
 
@@ -116,7 +127,7 @@ Or drop a `.env` file in the project root (see `.env.example`).
 ┌────────────────────┬──────────────────────────────┐
 │ Repository         │ facebook/react               │
 │ Description        │ A declarative UI library     │
-│ ⭐ Stars           │ 245.1K (+12) ▲               │
+│ ⭐ Stars           │ 245.1K (+12) ▲🔥             │
 │ ⑂ Forks            │ 51.1K  (+1)                  │
 │ ⚠ Issues           │ 1.3K   (-2) ▼               │
 │ 🔤 Language        │ JavaScript                   │
@@ -210,6 +221,20 @@ node dist/index.js battle facebook/react vercel/next.js
 5. On `battle`, it compares every metric and declares a winner
 
 That's it. No config files, no Docker, no cloud service. Just you and the terminal.
+
+---
+
+## 📣 Community & Spread
+
+`repo-sense` is open-source and we'd love your help making it better.
+
+| What | How |
+|------|-----|
+| 🐛 Found a bug? | [Open an issue](https://github.com/li1050109098/beta-project-arena/issues) |
+| 💡 Have an idea? | Feature requests are always welcome |
+| 🔀 Want to contribute? | Check the [Roadmap](#-roadmap) and send a PR |
+| 🐦 Tell the world | Tweet your `battle` results — tag `@beta_labs` |
+| ⭐ Show support | Star the repo — it's the only metric that matters |
 
 ---
 
