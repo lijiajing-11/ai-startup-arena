@@ -56,7 +56,7 @@ export async function withRetry<T>(
     }
   }
 
-  // Unreachable but TS doesn't know about the throw above
+  // TS exhaustiveness — unreachable because loop always throws on last attempt
   throw lastErr;
 }
 
