@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import { watchRepo, watchSingleRepoJson, renderDashboard, battleRepos, renderBattle, watchMultiRepos } from './commands/watch.js';
+import { starsCommand } from './commands/stars.js';
 
 export async function run(): Promise<void> {
   const program = new Command();
@@ -7,7 +8,7 @@ export async function run(): Promise<void> {
   program
     .name('rs')
     .description('🧬 repo-sense — Beautiful GitHub repo intelligence from your terminal')
-    .version('0.1.0');
+    .version('0.2.0');
 
   program
     .command('watch <repo>')
