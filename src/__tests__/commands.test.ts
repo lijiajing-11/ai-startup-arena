@@ -404,6 +404,16 @@ describe('starsCommand', () => {
     // Restore original impl
     vi.restoreAllMocks();
   });
+
+  it('handles GitHub API error gracefully (rejects with error)', async () => {
+    const githubModule = await import('../github.js');
+    vi.spyOn(githubModule, 'getRepo').mockRejectedValue(new Error('Not Found'));
+
+    const { starsCommand } = await import('../commands/stars.js');
+    await expect(starsCommand('unknown/repo')).rejects.toThrow('Not Found');
+
+    vi.restoreAllMocks();
+  });
 });
 
 describe('insightCommand', () => {

@@ -229,3 +229,65 @@ describe('formatNumber edge cases (imported from github)', () => {
     expect(result).toBe('3.14');
   });
 });
+
+// ── JsonSnapshot / SingleJsonSnapshot interface tests ──────────────────
+
+describe('JsonSnapshot interface', () => {
+  it('holds a timestamp and repos array', () => {
+    const snapshot: import('../models.js').JsonSnapshot = {
+      timestamp: '2025-01-15T10:30:00.000Z',
+      repos: [],
+    };
+    expect(snapshot.timestamp).toBe('2025-01-15T10:30:00.000Z');
+    expect(snapshot.repos).toEqual([]);
+  });
+
+  it('holds multiple RepoData entries', () => {
+    const snapshot: import('../models.js').JsonSnapshot = {
+      timestamp: '2025-01-15T10:30:00.000Z',
+      repos: [
+        {
+          owner: 'facebook', name: 'react', fullName: 'facebook/react',
+          description: null, language: 'TypeScript', license: 'MIT',
+          stars: 100000, forks: 10000, openIssues: 500,
+          createdAt: '2013-05-29T21:18:12Z', updatedAt: '2024-01-01T00:00:00Z',
+          pushedAt: '2024-01-01T00:00:00Z', topics: [], homepage: null, defaultBranch: 'main',
+        },
+      ],
+    };
+    expect(snapshot.repos).toHaveLength(1);
+    expect(snapshot.repos[0].fullName).toBe('facebook/react');
+  });
+});
+
+describe('SingleJsonSnapshot interface', () => {
+  it('holds a single repo with a timestamp', () => {
+    const snapshot: import('../models.js').SingleJsonSnapshot = {
+      timestamp: '2025-01-15T10:30:00.000Z',
+      repo: {
+        owner: 'vercel', name: 'next.js', fullName: 'vercel/next.js',
+        description: 'The React Framework', language: 'TypeScript', license: 'MIT',
+        stars: 120000, forks: 25000, openIssues: 800,
+        createdAt: '2016-10-05T20:16:14Z', updatedAt: '2024-01-01T00:00:00Z',
+        pushedAt: '2024-01-01T00:00:00Z', topics: ['react', 'nextjs'], homepage: null, defaultBranch: 'main',
+      },
+    };
+    expect(snapshot.repo.fullName).toBe('vercel/next.js');
+    expect(snapshot.repo.topics).toContain('nextjs');
+  });
+
+  it('handles minimal repo data', () => {
+    const snapshot: import('../models.js').SingleJsonSnapshot = {
+      timestamp: '2025-01-01T00:00:00.000Z',
+      repo: {
+        owner: 'test', name: 'minimal', fullName: 'test/minimal',
+        description: null, language: null, license: null,
+        stars: 0, forks: 0, openIssues: 0,
+        createdAt: '2024-01-01T00:00:00Z', updatedAt: '2024-01-01T00:00:00Z',
+        pushedAt: '2024-01-01T00:00:00Z', topics: [], homepage: null, defaultBranch: 'main',
+      },
+    };
+    expect(snapshot.repo.stars).toBe(0);
+    expect(snapshot.repo.description).toBeNull();
+  });
+});
