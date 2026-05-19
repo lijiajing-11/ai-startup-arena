@@ -37,6 +37,20 @@ _Zero config. Zero bullshit. Just numbers that move._
 
 ---
 
+## ⚡ 30 Second Quickstart
+
+Don't install. Don't configure. Just run:
+
+```bash
+# See if React is trending RIGHT NOW — zero friction
+npx repo-sense@latest watch facebook/react
+```
+
+One command. Your terminal becomes a live GitHub dashboard. Stars tick up. Issues close. Forks grow.  
+You'll never open a browser to check stars again. 🎯
+
+---
+
 ## 🧩 Why repo-sense?
 
 > You open a repo's GitHub page. Again. To check stars. You already know the number. **Why are you still doing this?**
@@ -76,7 +90,7 @@ rs watch facebook/react
 
 > 💡 Pro tip: add `alias repo-sense=rs` to your `.zshrc` or `.bashrc` for even less typing.
 
-**60 req/hr** without auth, **5,000 req/hr** with a `GITHUB_TOKEN` — details in [Auth](#🔐-auth-optional).
+**60 req/hr** without auth, **5,000 req/hr** with a `GITHUB_TOKEN` — details in [Auth](#-auth-optional).
 
 ---
 
@@ -306,9 +320,22 @@ cp .env.example .env   # then edit .env with your token
 
 ---
 
+## 🏆 repo-sense vs the World
+
+| Tool | Config needed? | Keep browser open? | Docker? | Real-time deltas? | `battle` mode? | Growth history? |
+|------|:---:|:---:|:---:|:---:|:---:|:---:|
+| **repo-sense** | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
+| GitHub web | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Stargazer CLI | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| gh CLI + jq | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+
+**Bottom line:** If you're still checking GitHub stars through a browser, you're doing it wrong. 😏
+
+---
+
 ## 💬 The Vibe
 
-> *"I used to have 6 tabs open just to watch my repos. Now I have one terminal pane. And my browser doesn't lag."*
+> *"I used to have 6 tabs open just to watch my repos. Now I have one terminal pane. And my browser doesn't lag."*  
 > — Anonymous dev who hasn't typed `⌘+R` in 3 days
 
 **repo-sense** is for people who:
@@ -328,12 +355,12 @@ cp .env.example .env   # then edit .env with your token
 - [x] `insight` — deep repo intelligence (star velocity, topics, speed label)
 - [x] `stars` — quick bare stats glance
 - [x] `history` — star growth timeline with velocity bars & milestones
-- [ ] Executive insight summary (`format=sentence`)
-- [ ] Star history sparklines
-- [ ] Multi-repo tournament (bracket mode)
-- [ ] Export snapshot to SVG
-- [ ] Trending repos explorer
-- [ ] GitHub Actions badge generator
+- [ ] 🔥 Executive insight summary (`format=sentence`)
+- [ ] 🔥 Star history sparklines
+- [ ] 🏆 Multi-repo tournament (bracket mode)
+- [ ] 🖼️ Export snapshot to SVG
+- [ ] 📊 Trending repos explorer
+- [ ] 🏅 GitHub Actions badge generator
 
 > 🚀 **v0.2.1 is live on npm** — `npx repo-sense` it now, no waiting.
 
@@ -388,19 +415,6 @@ node dist/index.js battle facebook/react vercel/next.js
 
 ---
 
-## 🏆 Repo-Sense vs the World
-
-| Tool | Config needed? | Keep browser open? | Docker? | Real-time deltas? | `battle` mode? | Growth history? |
-|------|:---:|:---:|:---:|:---:|:---:|:---:|
-| **repo-sense** | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
-| GitHub web | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Stargazer CLI | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| gh CLI + jq | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-
-**Bottom line:** If you're still checking GitHub stars through a browser, you're doing it wrong. 😏
-
----
-
 ## 📄 License
 
 MIT © β-Labs Corp.
@@ -412,5 +426,5 @@ MIT © β-Labs Corp.
   <br>
   <sub>⭐ Star this repo if you find it useful!</sub>
   <br><br>
-  <sub>🧑‍🚀 Curated by MarketBeta @ β-Labs · v18</sub>
+  <sub>🧑‍🚀 Curated by MarketBeta @ β-Labs · v19</sub>
 </div>

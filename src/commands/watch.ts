@@ -385,7 +385,7 @@ export async function watchMultiRepos(
   signal?: AbortSignal
 ): Promise<void> {
   let previousData: RepoData[] = [];
-  let startTime = Date.now();
+  const startTime = Date.now();
 
   const tick = async (): Promise<void> => {
     if (signal?.aborted) return;
@@ -409,31 +409,7 @@ export async function watchMultiRepos(
     }
   };
 
-  await tick();
-  if (signal?.aborted) return;
-
-  return new Promise((resolve) => {
-    const onAbort = () => {
-      clearInterval(timer);
-      onAbortSummary(startTime, 0, `${repoStrs.length} repos`);
-      resolve();
-    };
-
-    if (signal) {
-      signal.addEventListener('abort', onAbort, { once: true });
-    }
-
-    const timer = setInterval(async () => {
-      if (signal?.aborted) {
-        clearInterval(timer);
-        if (signal) signal.removeEventListener('abort', onAbort);
-        onAbortSummary(startTime, 0, `${repoStrs.length} repos`);
-        resolve();
-        return;
-      }
-      await tick();
-    }, interval * 1000);
-  });
+  await createPollLoop(tick, interval, signal, () => onAbortSummary(startTime, 0, `${repoStrs.length} repos`));
 }
 
 /** Compact multi-repo dashboard table */
