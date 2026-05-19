@@ -1,10 +1,66 @@
 import { Octokit } from '@octokit/rest';
 import type { RepoData, StarPoint } from './models.js';
 
-// 1 minute cache to avoid hammering the API
+// ── Cache ────────────────────────────────────────────────────────────────
 const cache = new Map<string, { data: RepoData; timestamp: number }>();
 const CACHE_TTL = 60_000; // 60 seconds
 
+// ── Retry helper ─────────────────────────────────────────────────────────
+interface RetryOptions {
+  maxAttempts?: number;
+  baseDelayMs?: number;
+  maxDelayMs?: number;
+  retryable?: (status: number) => boolean;
+}
+
+const DEFAULT_RETRY: Required<RetryOptions> = {
+  maxAttempts: 3,
+  baseDelayMs: 1_000,
+  maxDelayMs: 15_000,
+  // 429 (rate limit), 5xx (server errors), and network errors (status=0)
+  retryable: (status: number) => status === 429 || status >= 500 || status === 0,
+};
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export async function withRetry<T>(
+  fn: () => Promise<T>,
+  options?: RetryOptions
+): Promise<T> {
+  const { maxAttempts, baseDelayMs, maxDelayMs, retryable } = {
+    ...DEFAULT_RETRY,
+    ...options,
+  };
+
+  let lastErr: unknown;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (err: any) {
+      lastErr = err;
+      const status = err?.status ?? 0;
+
+      if (attempt === maxAttempts || !retryable(status)) {
+        throw err;
+      }
+
+      // Exponential backoff with jitter
+      const delay = Math.min(baseDelayMs * 2 ** (attempt - 1), maxDelayMs);
+      const jitter = Math.random() * 0.3 * delay;
+      console.warn(
+        `⏳ GitHub API error (${status}), retrying in ${Math.round((delay + jitter) / 1000)}s... (attempt ${attempt}/${maxAttempts})`
+      );
+      await sleep(delay + jitter);
+    }
+  }
+
+  // Unreachable but TS doesn't know about the throw above
+  throw lastErr;
+}
+
+// ── GitHub client ────────────────────────────────────────────────────────
 function getOctokit(): Octokit {
   const token = process.env.GITHUB_TOKEN;
   if (token) {
@@ -25,6 +81,7 @@ function getCacheKey(owner: string, name: string): string {
   return `${owner}/${name}`;
 }
 
+// ── Public API ───────────────────────────────────────────────────────────
 export async function getRepo(repoStr: string): Promise<RepoData> {
   const { owner, name } = parseRepo(repoStr);
   const cacheKey = getCacheKey(owner, name);
@@ -36,8 +93,16 @@ export async function getRepo(repoStr: string): Promise<RepoData> {
   }
 
   const octokit = getOctokit();
-  const { data } = await octokit.rest.repos.get({ owner, repo: name });
-  const { data: topicsData } = await octokit.rest.repos.getAllTopics({ owner, repo: name });
+  const [repoResponse, topicsResponse] = await withRetry(async () => {
+    const [repoData, topicsData] = await Promise.all([
+      octokit.rest.repos.get({ owner, repo: name }),
+      octokit.rest.repos.getAllTopics({ owner, repo: name }),
+    ]);
+    return [repoData, topicsData] as const;
+  });
+
+  const { data } = repoResponse;
+  const { data: topicsData } = topicsResponse;
 
   const repoData: RepoData = {
     owner,
@@ -62,7 +127,6 @@ export async function getRepo(repoStr: string): Promise<RepoData> {
 }
 
 export async function getStarHistory(repoStr: string, points: number = 10): Promise<StarPoint[]> {
-  const { owner, name } = parseRepo(repoStr);
   const repo = await getRepo(repoStr);
 
   const created = new Date(repo.createdAt);
@@ -70,7 +134,8 @@ export async function getStarHistory(repoStr: string, points: number = 10): Prom
   const totalStars = repo.stars;
   const totalDays = Math.max(1, (now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
 
-  // Estimate star history based on time distribution
+  // Estimate star history based on linear time distribution
+  // (GitHub doesn't expose star timestamps via REST, so this is a best-effort estimate)
   const history: StarPoint[] = [];
   for (let i = 0; i < points; i++) {
     const fraction = (i + 1) / points;
@@ -85,6 +150,7 @@ export async function getStarHistory(repoStr: string, points: number = 10): Prom
   return history;
 }
 
+// ── Display helpers ──────────────────────────────────────────────────────
 export function formatNumber(n: number): string {
   if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
   if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K';
@@ -102,18 +168,5 @@ export function clearCache(): void {
   cache.clear();
 }
 
-/**
- * Batch-fetch multiple repos in parallel.
- * Returns results in the same order as the input strings.
- */
-export async function getRepos(repoStrs: string[]): Promise<RepoData[]> {
-  const results = await Promise.allSettled(
-    repoStrs.map((r) => getRepo(r))
-  );
-  return results.map((r) => {
-    if (r.status === 'rejected') {
-      throw r.reason;
-    }
-    return r.value;
-  });
-}
+// Export for testing
+export { parseRepo, cache as _cache };

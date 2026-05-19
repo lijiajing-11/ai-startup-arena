@@ -1,7 +1,7 @@
-     1|import chalk from 'chalk';
-     2|import Table from 'cli-table3';
-     3|import type { RepoData, RepoSnapshot, BattleResult } from '../models.js';
-     4|import { formatNumber, getRepo, clearCache } from '../github.js';
+import chalk from 'chalk';
+import Table from 'cli-table3';
+import type { RepoData, RepoSnapshot, BattleResult, JsonSnapshot } from '../models.js';
+import { formatNumber, getRepo, clearCache, getRepos } from '../github.js';
      5|
      6|export async function watchRepo(
      7|  repoStr: string,
