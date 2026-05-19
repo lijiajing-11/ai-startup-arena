@@ -1,27 +1,50 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-// Mock @octokit/rest so we don't hit the real GitHub API
-// We export mock getters so tests can control API responses
-let mockGet = vi.fn();
-let mockGetAllTopics = vi.fn();
+// ── Mocks with exported controllers ──────────────────────────────────
+// We export __mockGet / __mockGetAllTopics from the mock factory so tests
+// can configure them. This avoids the closure-variable capture issue that
+// plagues module-scoped let variables when combined with vi.resetModules().
 
 vi.mock('@octokit/rest', () => {
-  // Capture latest mock references (they get re-created per-test with vi.fn())
+  const __mockGet = vi.fn();
+  const __mockGetAllTopics = vi.fn();
   const MockOctokit = vi.fn(() => ({
     rest: {
       repos: {
-        get: mockGet,
-        getAllTopics: mockGetAllTopics,
+        get: __mockGet,
+        getAllTopics: __mockGetAllTopics,
       },
     },
   }));
-
-  return { Octokit: MockOctokit };
+  return { Octokit: MockOctokit, __mockGet, __mockGetAllTopics };
 });
+
+// Get the mock controllers from the factory — these survive vi.resetModules()
+// because the factory closure persists across the mock system.
+import { Octokit } from '@octokit/rest';
+const MockOctokit = vi.mocked(Octokit);
 
 // These must be imported AFTER the mock is set up
 import * as githubModule from '../github.js';
 import { withRetry } from '../github.js';
+
+function getMockGet() {
+  const instance = (MockOctokit as any).mock.results[0]?.value;
+  if (!instance) {
+    new (Octokit as any)();
+    return (MockOctokit as any).mock.results[0]?.value?.rest?.repos?.get;
+  }
+  return instance.rest.repos.get;
+}
+
+function getMockGetAllTopics() {
+  const instance = (MockOctokit as any).mock.results[0]?.value;
+  if (!instance) {
+    new (Octokit as any)();
+    return (MockOctokit as any).mock.results[0]?.value?.rest?.repos?.getAllTopics;
+  }
+  return instance.rest.repos.getAllTopics;
+}
 
 describe('formatNumber', () => {
   it('formats numbers under 1000 as-is', () => {
@@ -77,20 +100,35 @@ describe('formatDelta', () => {
   });
 });
 
+const makeApiResponse = (owner: string, name: string, stars: number) => ({
+  data: {
+    full_name: `${owner}/${name}`,
+    description: null,
+    language: 'TypeScript',
+    license: { spdx_id: 'MIT' },
+    stargazers_count: stars,
+    forks_count: Math.floor(stars / 10),
+    open_issues_count: 5,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z',
+    pushed_at: '2024-01-01T00:00:00Z',
+    homepage: null,
+    default_branch: 'main',
+  },
+});
+
+const makeTopicsResponse = (topics: string[] = []) => ({
+  data: { names: topics },
+});
+
 describe('getRepo', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Reset env
     delete process.env.GITHUB_TOKEN;
-    // Clear module cache and re-import to reset internal cache
     vi.resetModules();
-    // Reset mock references
-    mockGet = vi.fn();
-    mockGetAllTopics = vi.fn();
   });
 
   afterEach(() => {
-    // Clear the internal cache after each test
     githubModule.clearCache();
   });
 
@@ -106,25 +144,10 @@ describe('getRepo', () => {
   });
 
   it('accepts valid owner/name format', async () => {
-    mockGet.mockResolvedValueOnce({
-      data: {
-        full_name: 'facebook/react',
-        description: 'A UI library',
-        language: 'TypeScript',
-        license: { spdx_id: 'MIT' },
-        stargazers_count: 123456,
-        forks_count: 12345,
-        open_issues_count: 500,
-        created_at: '2013-05-29T21:18:12Z',
-        updated_at: '2024-01-01T00:00:00Z',
-        pushed_at: '2024-01-01T00:00:00Z',
-        homepage: 'https://react.dev',
-        default_branch: 'main',
-      },
-    });
-    mockGetAllTopics.mockResolvedValueOnce({
-      data: { names: ['react', 'ui'] },
-    });
+    const mockGet = getMockGet();
+    const mockTopics = getMockGetAllTopics();
+    mockGet.mockResolvedValueOnce(makeApiResponse('facebook', 'react', 123456));
+    mockTopics.mockResolvedValueOnce(makeTopicsResponse(['react', 'ui']));
 
     const { getRepo } = await import('../github.js');
     const repo = await getRepo('facebook/react');
@@ -138,6 +161,8 @@ describe('getRepo', () => {
   });
 
   it('handles missing optional fields gracefully', async () => {
+    const mockGet = getMockGet();
+    const mockTopics = getMockGetAllTopics();
     mockGet.mockResolvedValueOnce({
       data: {
         full_name: 'test/minimal',
@@ -154,9 +179,7 @@ describe('getRepo', () => {
         default_branch: 'main',
       },
     });
-    mockGetAllTopics.mockResolvedValueOnce({
-      data: { names: [] },
-    });
+    mockTopics.mockResolvedValueOnce({ data: { names: [] } });
 
     const { getRepo } = await import('../github.js');
     const repo = await getRepo('test/minimal');
@@ -170,25 +193,10 @@ describe('getRepo', () => {
   });
 
   it('uses cache on second call', async () => {
-    mockGet.mockResolvedValueOnce({
-      data: {
-        full_name: 'test/cached',
-        description: 'test',
-        language: 'TypeScript',
-        license: { spdx_id: 'MIT' },
-        stargazers_count: 100,
-        forks_count: 10,
-        open_issues_count: 1,
-        created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z',
-        pushed_at: '2024-01-01T00:00:00Z',
-        homepage: null,
-        default_branch: 'main',
-      },
-    });
-    mockGetAllTopics.mockResolvedValueOnce({
-      data: { names: ['test'] },
-    });
+    const mockGet = getMockGet();
+    const mockTopics = getMockGetAllTopics();
+    mockGet.mockResolvedValueOnce(makeApiResponse('test', 'cached', 100));
+    mockTopics.mockResolvedValueOnce(makeTopicsResponse(['test']));
 
     const { getRepo } = await import('../github.js');
 
@@ -198,7 +206,7 @@ describe('getRepo', () => {
 
     // Clear mock counters — second call should hit cache, not API
     mockGet.mockClear();
-    mockGetAllTopics.mockClear();
+    mockTopics.mockClear();
 
     const second = await getRepo('test/cached');
     expect(second.stars).toBe(100);
@@ -207,26 +215,10 @@ describe('getRepo', () => {
 
   it('returns all topics from GitHub API', async () => {
     const manyTopics = Array.from({ length: 10 }, (_, i) => `topic-${i + 1}`);
-
-    mockGet.mockResolvedValueOnce({
-      data: {
-        full_name: 'test/many-topics',
-        description: 'Many topics repo',
-        language: 'TypeScript',
-        license: { spdx_id: 'MIT' },
-        stargazers_count: 100,
-        forks_count: 5,
-        open_issues_count: 0,
-        created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z',
-        pushed_at: '2024-01-01T00:00:00Z',
-        homepage: null,
-        default_branch: 'main',
-      },
-    });
-    mockGetAllTopics.mockResolvedValueOnce({
-      data: { names: manyTopics },
-    });
+    const mockGet = getMockGet();
+    const mockTopics = getMockGetAllTopics();
+    mockGet.mockResolvedValueOnce(makeApiResponse('test', 'many-topics', 100));
+    mockTopics.mockResolvedValueOnce({ data: { names: manyTopics } });
 
     const { getRepo } = await import('../github.js');
     const repo = await getRepo('test/many-topics');
@@ -236,31 +228,14 @@ describe('getRepo', () => {
   });
 
   it('retries on 429 rate limit then succeeds', async () => {
-    // Mock Octokit constructor to control per-call behavior
-    // First call throws 429, second succeeds
+    const mockGet = getMockGet();
+    const mockTopics = getMockGetAllTopics();
     mockGet
       .mockRejectedValueOnce(Object.assign(new Error('Rate limited'), { status: 429 }))
-      .mockResolvedValueOnce({
-        data: {
-          full_name: 'test/ratelimit',
-          description: 'A repo',
-          language: 'TypeScript',
-          license: { spdx_id: 'MIT' },
-          stargazers_count: 50,
-          forks_count: 5,
-          open_issues_count: 0,
-          created_at: '2024-01-01T00:00:00Z',
-          updated_at: '2024-01-01T00:00:00Z',
-          pushed_at: '2024-01-01T00:00:00Z',
-          homepage: null,
-          default_branch: 'main',
-        },
-      });
-    mockGetAllTopics
+      .mockResolvedValueOnce(makeApiResponse('test', 'ratelimit', 50));
+    mockTopics
       .mockRejectedValueOnce(Object.assign(new Error('Rate limited'), { status: 429 }))
-      .mockResolvedValueOnce({
-        data: { names: ['test'] },
-      });
+      .mockResolvedValueOnce(makeTopicsResponse(['test']));
 
     const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
@@ -276,6 +251,7 @@ describe('getRepo', () => {
   });
 
   it('throws on non-retryable error (4xx non-429)', async () => {
+    const mockGet = getMockGet();
     mockGet.mockRejectedValueOnce(
       Object.assign(new Error('Not Found'), { status: 404 })
     );
@@ -285,6 +261,7 @@ describe('getRepo', () => {
   });
 
   it('throws after exhausting retries', async () => {
+    const mockGet = getMockGet();
     mockGet
       .mockRejectedValueOnce(Object.assign(new Error('Server Error'), { status: 500 }))
       .mockRejectedValueOnce(Object.assign(new Error('Server Error'), { status: 500 }))
@@ -295,7 +272,7 @@ describe('getRepo', () => {
     const { getRepo } = await import('../github.js');
     await expect(getRepo('test/failing')).rejects.toThrow('Server Error');
 
-    // Should have tried 3 times (2 warnings)
+    // Should have tried 3 times (2 warnings — last attempt throws before warn)
     expect(consoleSpy).toHaveBeenCalledTimes(2);
     consoleSpy.mockRestore();
   }, 15000);
@@ -305,31 +282,14 @@ describe('getStarHistory', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.resetModules();
-    mockGet = vi.fn();
-    mockGetAllTopics = vi.fn();
     githubModule.clearCache();
   });
 
   it('returns requested number of points', async () => {
-    mockGet.mockResolvedValueOnce({
-      data: {
-        full_name: 'test/star-history',
-        description: null,
-        language: 'TypeScript',
-        license: { spdx_id: 'MIT' },
-        stargazers_count: 100,
-        forks_count: 0,
-        open_issues_count: 0,
-        created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z',
-        pushed_at: '2024-01-01T00:00:00Z',
-        homepage: null,
-        default_branch: 'main',
-      },
-    });
-    mockGetAllTopics.mockResolvedValueOnce({
-      data: { names: [] },
-    });
+    const mockGet = getMockGet();
+    const mockTopics = getMockGetAllTopics();
+    mockGet.mockResolvedValueOnce(makeApiResponse('test', 'star-history', 100));
+    mockTopics.mockResolvedValueOnce(makeTopicsResponse());
 
     const { getStarHistory } = await import('../github.js');
     const history = await getStarHistory('test/star-history', 5);
@@ -340,25 +300,10 @@ describe('getStarHistory', () => {
   });
 
   it('all values are within range and monotonic', async () => {
-    mockGet.mockResolvedValueOnce({
-      data: {
-        full_name: 'test/monotonic',
-        description: null,
-        language: 'Python',
-        license: null,
-        stargazers_count: 1000,
-        forks_count: 0,
-        open_issues_count: 0,
-        created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z',
-        pushed_at: '2024-01-01T00:00:00Z',
-        homepage: null,
-        default_branch: 'main',
-      },
-    });
-    mockGetAllTopics.mockResolvedValueOnce({
-      data: { names: [] },
-    });
+    const mockGet = getMockGet();
+    const mockTopics = getMockGetAllTopics();
+    mockGet.mockResolvedValueOnce(makeApiResponse('test', 'monotonic', 1000));
+    mockTopics.mockResolvedValueOnce(makeTopicsResponse());
 
     const { getStarHistory } = await import('../github.js');
     const history = await getStarHistory('test/monotonic', 10);
@@ -408,42 +353,21 @@ describe('withRetry', () => {
   });
 
   it('respects maxDelay with many retries (exponential capped)', async () => {
-    // With baseDelayMs=100, maxDelayMs=500, the exponential delay would be:
-    // attempt 1: min(100*2^0=100, 500)=100
-    // attempt 2: min(100*2^1=200, 500)=200
-    // attempt 3: min(100*2^2=400, 500)=400
-    // attempt 4: min(100*2^3=800, 500)=500 (capped)
-    // attempt 5: min(100*2^4=1600, 500)=500 (capped)
-    // We test with maxAttempts=6 to verify the cap stays at 500
     const fn = vi.fn().mockRejectedValue(Object.assign(new Error('Server Error'), { status: 500 }));
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const start = Date.now();
     await expect(withRetry(fn, { maxAttempts: 6, baseDelayMs: 100, maxDelayMs: 500 })).rejects.toThrow('Server Error');
     const elapsed = Date.now() - start;
-    // Without cap: 100+200+400+800+1600 = 3100ms, plus jitter
-    // With cap at 500: 100+200+400+500+500 = 1700ms, plus jitter up to 30% of each
-    // Max with cap: 100*1.3 + 200*1.3 + 400*1.3 + 500*1.3 + 500*1.3 = 2210ms
-    // Should be well under 3000ms
-    // Allow generous margin for shared CI environments
     expect(elapsed).toBeLessThan(8000);
     warnSpy.mockRestore();
   });
 
   it('jitter does not exceed maxDelay x 1.5 per attempt', async () => {
-    // Verify the jitter formula: delay = min(baseDelay * 2^(attempt-1), maxDelay)
-    // jitter = Math.random() * 0.3 * delay
-    // So max total wait per attempt = delay + 0.3*delay = 1.3*delay
-    // With delay capped at maxDelayMs, max total per attempt = 1.3 * maxDelayMs
     const fn = vi.fn().mockRejectedValue(Object.assign(new Error('Server Error'), { status: 500 }));
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const start = Date.now();
     await expect(withRetry(fn, { maxAttempts: 5, baseDelayMs: 500, maxDelayMs: 300 })).rejects.toThrow('Server Error');
     const elapsed = Date.now() - start;
-    // 4 retries, each capped at maxDelayMs=300, plus jitter up to 90ms
-    // Theoretical max: 4 * 390 = 1560ms. But with scheduling overhead on
-    // shared infra, we allow significant margin. The key point is this is
-    // finite and bounded — it doesn't grow unbounded despite exponential base.
-    // Without the cap, delay would be 500+1000+2000+4000=7500ms + jitter.
     expect(elapsed).toBeLessThan(6500);
     warnSpy.mockRestore();
   });
@@ -459,8 +383,6 @@ describe('withRetry', () => {
     const start = Date.now();
     await expect(withRetry(fn, { maxAttempts: 5, baseDelayMs: 5000, maxDelayMs: 100 })).rejects.toThrow('Server Error');
     const elapsed = Date.now() - start;
-    // With maxDelayMs=100, jitter adds at most 30ms per attempt
-    // 4 retries * ~130ms = ~520ms, should be well under 5000ms
     expect(elapsed).toBeLessThan(5000);
     expect(fn).toHaveBeenCalledTimes(5);
   }, 10000);
