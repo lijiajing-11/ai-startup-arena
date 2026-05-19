@@ -540,12 +540,6 @@ describe('history command', () => {
 // ── Multi-repo battle 3+ tests ────────────────────────────────────────
 
 describe('battleMultiRepos', () => {
-  beforeEach(() => {
-    // Only reset Octokit mocks, not the cli-table3 mock
-    const { Octokit } = vi.importMock('@octokit/rest') as any;
-    // Re-assign fresh mock functions on prototype
-  });
-
   it('should export battleMultiRepos function', async () => {
     const watchModule = await import('../commands/watch.js');
     expect(typeof watchModule.battleMultiRepos).toBe('function');
@@ -562,38 +556,32 @@ describe('battleMultiRepos', () => {
   });
 
   it('3 repos calls getRepos (not battleRepos)', async () => {
-    const { Octokit } = await import('@octokit/rest');
-    const mockOctokit = vi.mocked(Octokit);
-    mockOctokit.prototype.rest = {
-      repos: {
-        get: vi.fn().mockResolvedValue({
-          data: {
-            full_name: 'test/mock',
-            description: null,
-            language: 'TypeScript',
-            license: { spdx_id: 'MIT' },
-            stargazers_count: 100,
-            forks_count: 10,
-            open_issues_count: 5,
-            created_at: '2024-01-01T00:00:00Z',
-            updated_at: '2024-01-01T00:00:00Z',
-            pushed_at: '2024-01-01T00:00:00Z',
-            homepage: null,
-            default_branch: 'main',
-          },
-        }),
-        getAllTopics: vi.fn().mockResolvedValue({ data: { names: [] } }),
-      },
-    } as any;
+    // Use the existing getRepo mock via github module
+    const githubModule = await import('../github.js');
+    const fakeRepo = {
+      owner: 'test', name: 'mock', fullName: 'test/mock',
+      description: null, language: 'TypeScript', license: 'MIT',
+      stars: 100, forks: 10, openIssues: 5,
+      createdAt: '2024-01-01T00:00:00Z', updatedAt: '2024-01-01T00:00:00Z',
+      pushedAt: '2024-01-01T00:00:00Z', topics: [], homepage: null, defaultBranch: 'main',
+    };
+    const getRepoSpy = vi.spyOn(githubModule, 'getRepo').mockResolvedValue(fakeRepo);
 
     const { battleMultiRepos } = await import('../commands/watch.js');
     const result = await battleMultiRepos(['a/a', 'b/b', 'c/c']);
     expect(result.repos).toHaveLength(3);
     expect(result.winner).toBe('test/mock');
+
+    getRepoSpy.mockRestore();
   });
 
   it('renderBattleMulti renders without throwing', async () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    // Force cli-table3 mock reset before this test
+    const tableModule = await import('cli-table3');
+    const TableMock = vi.mocked((tableModule as any).default ?? tableModule);
+
     const { renderBattleMulti } = await import('../commands/watch.js');
 
     const makeRepo = (name: string, stars: number) => ({
