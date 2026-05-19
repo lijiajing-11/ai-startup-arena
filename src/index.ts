@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import { watchRepo, watchSingleRepoJson, renderDashboard, battleRepos, renderBattle, watchMultiRepos } from './commands/watch.js';
 import { starsCommand } from './commands/stars.js';
+import { insightCommand } from './commands/insight.js';
 
 export async function run(): Promise<void> {
   const program = new Command();
@@ -81,6 +82,19 @@ export async function run(): Promise<void> {
     .action(async (repo: string) => {
       try {
         await starsCommand(repo);
+      } catch (err: any) {
+        console.error(`✗ Error: ${err.message}`);
+        process.exit(1);
+      }
+    });
+
+  // insight 命令
+  program
+    .command('insight <repo>')
+    .description('Deep repository insight — star velocity, topics, age, and more')
+    .action(async (repo: string) => {
+      try {
+        await insightCommand(repo);
       } catch (err: any) {
         console.error(`✗ Error: ${err.message}`);
         process.exit(1);

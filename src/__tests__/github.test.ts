@@ -205,6 +205,36 @@ describe('getRepo', () => {
     expect(mockGet).not.toHaveBeenCalled();
   });
 
+  it('returns all topics from GitHub API', async () => {
+    const manyTopics = Array.from({ length: 10 }, (_, i) => `topic-${i + 1}`);
+
+    mockGet.mockResolvedValueOnce({
+      data: {
+        full_name: 'test/many-topics',
+        description: 'Many topics repo',
+        language: 'TypeScript',
+        license: { spdx_id: 'MIT' },
+        stargazers_count: 100,
+        forks_count: 5,
+        open_issues_count: 0,
+        created_at: '2024-01-01T00:00:00Z',
+        updated_at: '2024-01-01T00:00:00Z',
+        pushed_at: '2024-01-01T00:00:00Z',
+        homepage: null,
+        default_branch: 'main',
+      },
+    });
+    mockGetAllTopics.mockResolvedValueOnce({
+      data: { names: manyTopics },
+    });
+
+    const { getRepo } = await import('../github.js');
+    const repo = await getRepo('test/many-topics');
+
+    expect(repo.topics).toHaveLength(10);
+    expect(repo.topics).toEqual(manyTopics);
+  });
+
   it('retries on 429 rate limit then succeeds', async () => {
     // Mock Octokit constructor to control per-call behavior
     // First call throws 429, second succeeds

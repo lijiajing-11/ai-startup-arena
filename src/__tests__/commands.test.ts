@@ -349,3 +349,111 @@ describe('renderBattle', () => {
     logSpy.mockRestore();
   });
 });
+
+describe('starsCommand', () => {
+  it('should export starsCommand function', async () => {
+    const starsModule = await import('../commands/stars.js');
+    expect(typeof starsModule.starsCommand).toBe('function');
+  });
+
+  it('should log repo info when called', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    // Mock getRepo to return fake data
+    const githubModule = await import('../github.js');
+    vi.spyOn(githubModule, 'getRepo').mockResolvedValue({
+      owner: 'facebook',
+      name: 'react',
+      fullName: 'facebook/react',
+      description: 'A UI library',
+      language: 'TypeScript',
+      license: 'MIT',
+      stars: 100000,
+      forks: 10000,
+      openIssues: 500,
+      createdAt: '2013-05-29T21:18:12Z',
+      updatedAt: '2024-01-01T00:00:00Z',
+      pushedAt: '2024-01-01T00:00:00Z',
+      topics: [],
+      homepage: null,
+      defaultBranch: 'main',
+    });
+
+    const { starsCommand } = await import('../commands/stars.js');
+    await starsCommand('facebook/react');
+
+    expect(logSpy).toHaveBeenCalled();
+    // Should print at least: stars, forks, issues lines
+    expect(logSpy.mock.calls.length).toBeGreaterThanOrEqual(3);
+
+    logSpy.mockRestore();
+    // Restore original impl
+    vi.restoreAllMocks();
+  });
+});
+
+describe('insightCommand', () => {
+  it('exports insightCommand as a function', async () => {
+    const insightModule = await import('../commands/insight.js');
+    expect(typeof insightModule.insightCommand).toBe('function');
+  });
+
+  it('renders insight output without throwing', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    const githubModule = await import('../github.js');
+    vi.spyOn(githubModule, 'getRepo').mockResolvedValue({
+      owner: 'facebook',
+      name: 'react',
+      fullName: 'facebook/react',
+      description: 'A UI library',
+      language: 'TypeScript',
+      license: 'MIT',
+      stars: 250000,
+      forks: 50000,
+      openIssues: 1200,
+      createdAt: '2013-05-29T21:18:12Z',
+      updatedAt: '2025-12-01T00:00:00Z',
+      pushedAt: '2025-12-01T00:00:00Z',
+      topics: ['react', 'ui', 'frontend', 'javascript', 'declarative'],
+      homepage: null,
+      defaultBranch: 'main',
+    });
+
+    const { insightCommand } = await import('../commands/insight.js');
+    await insightCommand('facebook/react');
+
+    expect(logSpy).toHaveBeenCalled();
+    logSpy.mockRestore();
+    vi.restoreAllMocks();
+  });
+
+  it('handles repo with no topics and null description', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    const githubModule = await import('../github.js');
+    vi.spyOn(githubModule, 'getRepo').mockResolvedValue({
+      owner: 'test',
+      name: 'minimal',
+      fullName: 'test/minimal',
+      description: null,
+      language: null,
+      license: null,
+      stars: 10,
+      forks: 0,
+      openIssues: 0,
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-15T00:00:00Z',
+      pushedAt: '2025-01-15T00:00:00Z',
+      topics: [],
+      homepage: null,
+      defaultBranch: 'main',
+    });
+
+    const { insightCommand } = await import('../commands/insight.js');
+    await expect(insightCommand('test/minimal')).resolves.not.toThrow();
+    expect(logSpy).toHaveBeenCalled();
+    logSpy.mockRestore();
+    vi.restoreAllMocks();
+  });
+});
