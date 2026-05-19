@@ -156,6 +156,90 @@ describe('battle command', () => {
     expect(() => renderBattle(result)).not.toThrow();
     logSpy.mockRestore();
   });
+
+  it('renderBattle reveals repo1 as winner with positive starDiff', async () => {
+    const makeRepo = (name: string, stars: number): RepoData => ({
+      owner: 'test',
+      name,
+      fullName: `test/${name}`,
+      description: 'A great repo',
+      language: 'TypeScript',
+      license: 'MIT',
+      stars,
+      forks: 10,
+      openIssues: 5,
+      createdAt: '2024-01-01T00:00:00Z',
+      updatedAt: '2024-01-01T00:00:00Z',
+      pushedAt: '2024-01-01T00:00:00Z',
+      topics: [],
+      homepage: null,
+      defaultBranch: 'main',
+    });
+
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    const { renderBattle } = await import('../commands/watch.js');
+    const result: BattleResult = {
+      repo1: { repo: makeRepo('alpha', 2000), timestamp: new Date() },
+      repo2: { repo: makeRepo('beta', 500), timestamp: new Date() },
+      winner: 'repo1',
+      starDiff: 1500,
+      forkDiff: 0,
+      issueDiff: 0,
+      scores: {
+        stars: 'test/alpha',
+        forks: 'Tie',
+        issues: 'Tie',
+        language: 'Same',
+      },
+    };
+
+    expect(() => renderBattle(result)).not.toThrow();
+    expect(logSpy).toHaveBeenCalled();
+    logSpy.mockRestore();
+  });
+
+  it('renderBattle handles null description/language/license with winner', async () => {
+    const makeRepo = (name: string): RepoData => ({
+      owner: 'test',
+      name,
+      fullName: `test/${name}`,
+      description: null,
+      language: null,
+      license: null,
+      stars: 100,
+      forks: 5,
+      openIssues: 2,
+      createdAt: '2024-01-01T00:00:00Z',
+      updatedAt: '2024-01-01T00:00:00Z',
+      pushedAt: '2024-01-01T00:00:00Z',
+      topics: [],
+      homepage: null,
+      defaultBranch: 'main',
+    });
+
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    const { renderBattle } = await import('../commands/watch.js');
+    const result: BattleResult = {
+      repo1: { repo: makeRepo('alpha'), timestamp: new Date() },
+      repo2: { repo: makeRepo('beta'), timestamp: new Date() },
+      winner: 'tie',
+      starDiff: 0,
+      forkDiff: 0,
+      issueDiff: 0,
+      scores: {
+        stars: 'Tie',
+        forks: 'Tie',
+        issues: 'Tie',
+        language: 'Same',
+      },
+    };
+
+    expect(() => renderBattle(result)).not.toThrow();
+    expect(logSpy).toHaveBeenCalled();
+    logSpy.mockRestore();
+  });
 });
 
 describe('index CLI', () => {

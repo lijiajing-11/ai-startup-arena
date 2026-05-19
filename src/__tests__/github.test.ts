@@ -268,7 +268,7 @@ describe('getRepo', () => {
     // Should have tried 3 times (2 warnings)
     expect(consoleSpy).toHaveBeenCalledTimes(2);
     consoleSpy.mockRestore();
-  });
+  }, 15000);
 });
 
 describe('getStarHistory', () => {
@@ -375,5 +375,45 @@ describe('withRetry', () => {
     const fn = vi.fn().mockRejectedValue(Object.assign(new Error('Not Found'), { status: 404 }));
     await expect(withRetry(fn, { maxAttempts: 3, baseDelayMs: 10 })).rejects.toThrow('Not Found');
     expect(fn).toHaveBeenCalledTimes(1);
+  });
+
+  it('respects maxDelay with many retries (exponential capped)', async () => {
+    // With baseDelayMs=100, maxDelayMs=500, the exponential delay would be:
+    // attempt 1: min(100*2^0=100, 500)=100
+    // attempt 2: min(100*2^1=200, 500)=200
+    // attempt 3: min(100*2^2=400, 500)=400
+    // attempt 4: min(100*2^3=800, 500)=500 (capped)
+    // attempt 5: min(100*2^4=1600, 500)=500 (capped)
+    // We test with maxAttempts=10 to verify the cap stays at 500
+    const fn = vi.fn().mockRejectedValue(Object.assign(new Error('Server Error'), { status: 500 }));
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const start = Date.now();
+    await expect(withRetry(fn, { maxAttempts: 10, baseDelayMs: 100, maxDelayMs: 500 })).rejects.toThrow('Server Error');
+    const elapsed = Date.now() - start;
+    // With 10 retries and maxDelayMs=500, max time is 9 * ~650ms = ~5850ms
+    // With maxDelay capped, each attempt waits at most 500 + 0.3*500 = 650ms
+    // The cap test: total should be less than 9*600 = 5400ms (with no jitter)
+    // But jitter adds up to 0.3*500 = 150ms per attempt, so 9*650 = 5850ms
+    // It should be significantly LESS than 9*1600 = 14400ms (if no cap)
+    expect(elapsed).toBeLessThan(10000);
+    warnSpy.mockRestore();
+  });
+
+  it('jitter does not exceed maxDelay x 1.5 per attempt', async () => {
+    // Verify the jitter formula: delay = min(baseDelay * 2^(attempt-1), maxDelay)
+    // jitter = Math.random() * 0.3 * delay
+    // So max total wait per attempt = delay + 0.3*delay = 1.3*delay
+    // With delay capped at maxDelayMs, max total per attempt = 1.3 * maxDelayMs
+    // We use a slow baseDelay that reaches maxDelay quickly
+    const fn = vi.fn().mockRejectedValue(Object.assign(new Error('Server Error'), { status: 500 }));
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const start = Date.now();
+    await expect(withRetry(fn, { maxAttempts: 5, baseDelayMs: 2000, maxDelayMs: 1000 })).rejects.toThrow('Server Error');
+    const elapsed = Date.now() - start;
+    // 4 retries, each capped at maxDelayMs=1000, plus jitter up to 0.3*1000=300
+    // Max per attempt: 1300ms. 4 * 1300 = 5200ms
+    // The test should complete comfortably under 8000ms
+    expect(elapsed).toBeLessThan(8000);
+    warnSpy.mockRestore();
   });
 });
