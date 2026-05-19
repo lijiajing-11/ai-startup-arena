@@ -10,7 +10,7 @@ export async function run(): Promise<void> {
   program
     .name('rs')
     .description('🧬 repo-sense — Beautiful GitHub repo intelligence from your terminal')
-    .version('0.2.0');
+    .version('0.2.1');
 
   program
     .command('watch <repo>')
