@@ -48,6 +48,7 @@ vi.mock('cli-table3', () => ({
 
 // ── Tests ──────────────────────────────────────────────────────────────
 
+import { renderBattle, renderDashboard } from '../commands/watch.js';
 import type { RepoData, RepoSnapshot, BattleResult } from '../models.js';
 
 describe('watch command', () => {
@@ -314,5 +315,60 @@ describe('renderDashboard', () => {
     expect(() => renderDashboard(snapshot)).not.toThrow();
     logSpy.mockRestore();
     clearSpy.mockRestore();
+  });
+});
+
+describe('renderBattle', () => {
+  const makeRepo = (overrides: Partial<RepoData> = {}): RepoData => ({
+    owner: 'facebook', name: 'react', fullName: 'facebook/react',
+    description: 'A UI library', language: 'TypeScript', license: 'MIT',
+    stars: 100000, forks: 10000, openIssues: 500,
+    createdAt: '2013-05-29T21:18:12Z', updatedAt: '2024-01-01T00:00:00Z',
+    pushedAt: '2024-01-01T00:00:00Z', topics: [], homepage: null, defaultBranch: 'main',
+    ...overrides,
+  });
+
+  it('renders battle with repo1 winning by stars', () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const r1: RepoData = { ...makeRepo(), stars: 200000 };
+    const r2: RepoData = { ...makeRepo({ name: 'next.js', fullName: 'vercel/next.js' }), stars: 100000 };
+    const result: BattleResult = {
+      repo1: { repo: r1, timestamp: new Date() },
+      repo2: { repo: r2, timestamp: new Date() },
+      winner: 'repo1', starDiff: 100000, forkDiff: 0, issueDiff: 0,
+      scores: { stars: 'facebook/react', forks: 'Tie', issues: 'Tie', language: 'Same', license: 'Same' },
+    };
+    renderBattle(result);
+    expect(logSpy).toHaveBeenCalled();
+    logSpy.mockRestore();
+  });
+
+  it('renders battle with tie', () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const r1 = makeRepo();
+    const r2 = makeRepo({ name: 'next.js', fullName: 'vercel/next.js' });
+    const result: BattleResult = {
+      repo1: { repo: r1, timestamp: new Date() },
+      repo2: { repo: r2, timestamp: new Date() },
+      winner: 'tie', starDiff: 0, forkDiff: 0, issueDiff: 0,
+      scores: { stars: 'Tie', forks: 'Tie', issues: 'Tie', language: 'Same', license: 'Same' },
+    };
+    renderBattle(result);
+    expect(logSpy).toHaveBeenCalled();
+    logSpy.mockRestore();
+  });
+
+  it('renders battle with null fields (description/language/license)', () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const r1 = makeRepo({ description: null, language: null, license: null, stars: 50000 });
+    const r2 = makeRepo({ name: 'next.js', fullName: 'vercel/next.js', description: null, language: null, license: null, stars: 30000 });
+    const result: BattleResult = {
+      repo1: { repo: r1, timestamp: new Date() },
+      repo2: { repo: r2, timestamp: new Date() },
+      winner: 'repo1', starDiff: 20000, forkDiff: 0, issueDiff: 0,
+      scores: { stars: 'facebook/react', forks: 'Tie', issues: 'Tie', language: 'N/A vs N/A', license: 'None vs None' },
+    };
+    expect(() => renderBattle(result)).not.toThrow();
+    logSpy.mockRestore();
   });
 });

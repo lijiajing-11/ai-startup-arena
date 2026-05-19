@@ -9,7 +9,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](https://opensource.org/licenses/MIT)
 [![GitHub Stars](https://img.shields.io/github/stars/li1050109098/beta-project-arena?style=flat-square&logo=github)](https://github.com/li1050109098/beta-project-arena)
 [![npm downloads](https://img.shields.io/npm/dm/repo-sense?style=flat-square&color=blueviolet)](https://www.npmjs.com/package/repo-sense)
-[![CI](https://img.shields.io/github/actions/workflow/status/li1050109098/beta-project-arena/ci.yml?style=flat-square&logo=githubactions&label=CI)](https://github.com/li1050109098/beta-project-arena/actions)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square)](http://makeapullrequest.com)
 
 🔥 **Zero config · Live refresh · Terminal-native** ⚡
@@ -29,7 +28,7 @@
 | `npx repo-sense watch-multi react next.js tailwindcss` | Whole landscape at a glance |
 | `rs --help` | Full command reference |
 
-**60 req/hr** without auth, **5,000 req/hr** with a `GITHUB_TOKEN` — more on that below.
+**60 req/hr** without auth, **5,000 req/hr** with a `GITHUB_TOKEN` — details below.
 
 ---
 
@@ -141,7 +140,7 @@ Or drop a `.env` file in the project root (see `.env.example`).
 ├──────────────┼──────────────────────┼──────────────────────┼──────────────┤
 │ ⭐ Stars     │ 245.1K               │ 139.5K               │ 🏆 react     │
 │ ⑂ Forks      │ 51.1K                │ 31.1K                │ 🏆 react     │
-│ ⚠ Issues     │ 1.3K                 │ 4.0K                 │ 🏆 react      │
+│ ⚠ Issues     │ 1.3K                 │ 4.0K                 │ 🏆 react     │
 │ 🔤 Language  │ JavaScript           │ JavaScript           │ ✓ Same       │
 │ 📜 License   │ MIT                  │ MIT                  │ ✓ Same       │
 └──────────────┴──────────────────────┴──────────────────────┴──────────────┘
@@ -224,5 +223,5 @@ MIT © β-Labs Corp.
   <br>
   <sub>⭐ Star this repo if you find it useful!</sub>
   <br><br>
-  <sub>Made with 🧬 by MarketBeta @ β-Labs</sub>
+  <sub>🧑‍🚀 Refined by MarketBeta @ β-Labs · v4</sub>
 </div>

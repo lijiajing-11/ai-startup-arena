@@ -384,18 +384,17 @@ describe('withRetry', () => {
     // attempt 3: min(100*2^2=400, 500)=400
     // attempt 4: min(100*2^3=800, 500)=500 (capped)
     // attempt 5: min(100*2^4=1600, 500)=500 (capped)
-    // We test with maxAttempts=10 to verify the cap stays at 500
+    // We test with maxAttempts=6 to verify the cap stays at 500
     const fn = vi.fn().mockRejectedValue(Object.assign(new Error('Server Error'), { status: 500 }));
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const start = Date.now();
-    await expect(withRetry(fn, { maxAttempts: 10, baseDelayMs: 100, maxDelayMs: 500 })).rejects.toThrow('Server Error');
+    await expect(withRetry(fn, { maxAttempts: 6, baseDelayMs: 100, maxDelayMs: 500 })).rejects.toThrow('Server Error');
     const elapsed = Date.now() - start;
-    // With 10 retries and maxDelayMs=500, max time is 9 * ~650ms = ~5850ms
-    // With maxDelay capped, each attempt waits at most 500 + 0.3*500 = 650ms
-    // The cap test: total should be less than 9*600 = 5400ms (with no jitter)
-    // But jitter adds up to 0.3*500 = 150ms per attempt, so 9*650 = 5850ms
-    // It should be significantly LESS than 9*1600 = 14400ms (if no cap)
-    expect(elapsed).toBeLessThan(10000);
+    // Without cap: 100+200+400+800+1600 = 3100ms, plus jitter
+    // With cap at 500: 100+200+400+500+500 = 1700ms, plus jitter up to 30% of each
+    // Max with cap: 100*1.3 + 200*1.3 + 400*1.3 + 500*1.3 + 500*1.3 = 2210ms
+    // Should be well under 3000ms
+    expect(elapsed).toBeLessThan(3000);
     warnSpy.mockRestore();
   });
 
@@ -408,12 +407,29 @@ describe('withRetry', () => {
     const fn = vi.fn().mockRejectedValue(Object.assign(new Error('Server Error'), { status: 500 }));
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const start = Date.now();
-    await expect(withRetry(fn, { maxAttempts: 5, baseDelayMs: 2000, maxDelayMs: 1000 })).rejects.toThrow('Server Error');
+    await expect(withRetry(fn, { maxAttempts: 5, baseDelayMs: 500, maxDelayMs: 300 })).rejects.toThrow('Server Error');
     const elapsed = Date.now() - start;
-    // 4 retries, each capped at maxDelayMs=1000, plus jitter up to 0.3*1000=300
-    // Max per attempt: 1300ms. 4 * 1300 = 5200ms
-    // The test should complete comfortably under 8000ms
-    expect(elapsed).toBeLessThan(8000);
+    // 4 retries, each capped at maxDelayMs=300, plus jitter up to 0.3*300=90
+    // Max per attempt: 390ms. 4 * 390 = 1560ms
+    // The test should complete comfortably under 3000ms (with safety margin)
+    expect(elapsed).toBeLessThan(3000);
     warnSpy.mockRestore();
   });
+
+  it('exponentialBackoff respects maxDelay', async () => {
+    const fn = vi.fn().mockRejectedValue(Object.assign(new Error('Server Error'), { status: 500 }));
+    await expect(withRetry(fn, { maxAttempts: 10, baseDelayMs: 20000, maxDelayMs: 100 })).rejects.toThrow('Server Error');
+    expect(fn).toHaveBeenCalledTimes(10);
+  }, 10000);
+
+  it('exponentialBackoff with jitter does not exceed maxDelay x 1.5', async () => {
+    const fn = vi.fn().mockRejectedValue(Object.assign(new Error('Server Error'), { status: 500 }));
+    const start = Date.now();
+    await expect(withRetry(fn, { maxAttempts: 5, baseDelayMs: 5000, maxDelayMs: 100 })).rejects.toThrow('Server Error');
+    const elapsed = Date.now() - start;
+    // With maxDelayMs=100, jitter adds at most 30ms per attempt
+    // 4 retries * ~130ms = ~520ms, should be well under 5000ms
+    expect(elapsed).toBeLessThan(5000);
+    expect(fn).toHaveBeenCalledTimes(5);
+  }, 10000);
 });

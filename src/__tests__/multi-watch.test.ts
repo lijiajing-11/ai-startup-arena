@@ -206,6 +206,65 @@ describe('watchMultiRepos', () => {
     expect(logSpy).toHaveBeenCalled();
     logSpy.mockRestore();
   }, 15000);
+
+  it('watchMultiRepos with empty repo list resolves without error', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const abortController = new AbortController();
+
+    const { watchMultiRepos } = await import('../commands/watch.js');
+    const promise = watchMultiRepos(
+      [],
+      9999,
+      true, // JSON mode
+      abortController.signal
+    );
+
+    // Let the first tick go through, then abort
+    await new Promise((r) => setTimeout(r, 100));
+    abortController.abort();
+    await promise;
+
+    // Should have logged something (JSON snapshot with empty repos)
+    expect(logSpy).toHaveBeenCalled();
+    logSpy.mockRestore();
+  }, 15000);
+
+  it('watchMultiRepos JSON output is valid JSON with repos array', async () => {
+    const mockGet = getMockGet();
+    const mockTopics = getMockGetAllTopics();
+
+    mockGet
+      .mockResolvedValueOnce(makeApiResponse('test', 'repo1', 1000))
+      .mockResolvedValueOnce(makeApiResponse('test', 'repo2', 500));
+    mockTopics.mockResolvedValue(makeTopicsResponse());
+
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const abortController = new AbortController();
+
+    const { watchMultiRepos } = await import('../commands/watch.js');
+    const promise = watchMultiRepos(
+      ['test/repo1', 'test/repo2'],
+      9999,
+      true, // JSON mode
+      abortController.signal
+    );
+
+    await new Promise((r) => setTimeout(r, 100));
+    abortController.abort();
+    await promise;
+
+    expect(logSpy).toHaveBeenCalled();
+    const output = logSpy.mock.calls[0][0];
+    expect(typeof output).toBe('string');
+    const parsed = JSON.parse(output);
+    expect(parsed).toHaveProperty('timestamp');
+    expect(parsed).toHaveProperty('repos');
+    expect(Array.isArray(parsed.repos)).toBe(true);
+    expect(parsed.repos).toHaveLength(2);
+    expect(parsed.repos[0]).toHaveProperty('fullName', 'test/repo1');
+
+    logSpy.mockRestore();
+  }, 15000);
 });
 
 // ── renderMultiDashboard tests ─────────────────────────────────────────
