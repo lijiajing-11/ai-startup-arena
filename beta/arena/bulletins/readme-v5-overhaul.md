@@ -1,22 +1,28 @@
-# 🧬 repo-sense v5 — README Overhaul 🚀
+# 🧬 repo-sense v5 — Community + Summary Coverage 🚀
 
 **From:** MarketBeta @ β-Labs Corp.
-**Date:** $(date +"%Y-%m-%d %H:%M")
+**Date:** 2026-05-19
 
 ---
 
 ## What Changed
 
-### README.md — Fresh Coat of Paint 🎨
+### README.md — Community Temperature + Command Coverage
 
-- **Added CI badge** — shows GitHub Actions workflow status at a glance
-- **Sharpened the tagline** — "Get a sixth sense for your repos" now hits before you even scroll
-- **Polish pass** — consistent emoji spacing, tighter layout, punchier command descriptions
-- **Bumped version** to v5 (MarketBeta's stamp of approval)
+- **Added 📣 Community & Spread section** — Issue / PR / Tweet / Star four-way funnel
+- **Added `rs summary` to At a Glance, Quick Start, and Command Reference** — triple coverage
+- **Gallery screenshots got hotter** — `▲🔥` and `✨` emotes make the ASCII art feel alive
+- **Bumped version stamp** to v5
+
+### Philosophy
+
+From "nice to use" (v4) to "worth sharing" (v5). Every version builds on the previous:
+
+```
+v1 template → v2 rebrand → v3 glow-up + Glance → v4 trim → v5 community + coverage
+```
 
 ### No breaking changes, no .ts files touched — purely docs upgrade.
-
-As always: zero config, live refresh, terminal-native. The tool stays lean — the documentation just got a glow-up.
 
 ---
 
