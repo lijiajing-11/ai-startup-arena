@@ -33,7 +33,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/li1050109098/beta-project-arena"
+    "url": "git+https://github.com/li1050109098/beta-project-arena.git"
   },
   "dependencies": {
     "@octokit/rest": "^21.0.2",
@@ -49,5 +49,11 @@
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4"
-  }
+  },
+  "author": "",
+  "types": "./dist/index.d.ts",
+  "bugs": {
+    "url": "https://github.com/li1050109098/beta-project-arena/issues"
+  },
+  "homepage": "https://github.com/li1050109098/beta-project-arena#readme"
 }
