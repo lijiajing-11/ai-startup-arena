@@ -49,36 +49,6 @@ export interface BattleOptions {
   verbose?: boolean;
 }
 
-/** Repo owner/name parts from parsing "owner/name" */
-export interface RepoIdentifier {
-  owner: string;
-  name: string;
-}
-
-/** GitHub API error with status code */
-export interface GitHubApiError extends Error {
-  status: number;
-  response?: {
-    data?: unknown;
-    headers?: Record<string, string>;
-  };
-}
-
-/** Retry configuration */
-export interface RetryOptions {
-  maxAttempts?: number;
-  baseDelayMs?: number;
-  maxDelayMs?: number;
-  retryable?: (status: number) => boolean;
-}
-
-/** Options for multi-repo watch */
-export interface MultiWatchOptions {
-  repos: string[];
-  interval: number;
-  json: boolean;
-}
-
 /** JSON-serializable snapshot for multi-repo --json output */
 export interface JsonSnapshot {
   timestamp: string;
