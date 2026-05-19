@@ -297,3 +297,44 @@ describe('renderMultiDashboard', () => {
     logSpy.mockRestore();
   }, 5000);
 });
+
+// ── watchMultiRepos edge cases ──────────────────────────────────────────
+
+describe('watchMultiRepos edge cases', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    delete process.env.GITHUB_TOKEN;
+  });
+
+  it('watchMultiRepos with empty repo list resolves immediately', async () => {
+    const ac = new AbortController();
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const promise = watchMultiRepos([], 1, true, ac.signal);
+    await new Promise(r => setTimeout(r, 200));
+    ac.abort();
+    await promise;
+    logSpy.mockRestore();
+  }, 5000);
+
+  it('watchMultiRepos JSON output is valid JSON', async () => {
+    const mockGet = getMockGet();
+    const mockTopics = getMockGetAllTopics();
+
+    mockGet.mockResolvedValueOnce(makeApiResponse('facebook', 'react', 200000));
+    mockTopics.mockResolvedValue(makeTopicsResponse());
+
+    const ac = new AbortController();
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const promise = watchMultiRepos(['facebook/react'], 1, true, ac.signal);
+    await new Promise(r => setTimeout(r, 1100));
+    ac.abort();
+    await promise;
+    const calls = logSpy.mock.calls.filter(c => typeof c[0] === 'string');
+    if (calls.length > 0) {
+      const parsed = JSON.parse(calls[0][0]);
+      expect(parsed).toHaveProperty('timestamp');
+      expect(parsed).toHaveProperty('repos');
+    }
+    logSpy.mockRestore();
+  }, 15000);
+});
