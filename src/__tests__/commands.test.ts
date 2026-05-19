@@ -540,6 +540,10 @@ describe('history command', () => {
 // ── Multi-repo battle 3+ tests ────────────────────────────────────────
 
 describe('battleMultiRepos', () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+  });
+
   it('should export battleMultiRepos function', async () => {
     const watchModule = await import('../commands/watch.js');
     expect(typeof watchModule.battleMultiRepos).toBe('function');
@@ -558,7 +562,6 @@ describe('battleMultiRepos', () => {
   it('3 repos calls getRepos (not battleRepos)', async () => {
     const { Octokit } = await import('@octokit/rest');
     const mockOctokit = vi.mocked(Octokit);
-    // Return a mock octokit that yields predictable RepoData
     mockOctokit.prototype.rest = {
       repos: {
         get: vi.fn().mockResolvedValue({
@@ -589,7 +592,6 @@ describe('battleMultiRepos', () => {
 
   it('renderBattleMulti renders without throwing', async () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-
     const { renderBattleMulti } = await import('../commands/watch.js');
 
     const makeRepo = (name: string, stars: number) => ({
