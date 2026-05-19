@@ -29,12 +29,11 @@ vi.mock('chalk', () => {
 });
 
 vi.mock('cli-table3', () => {
-  // Return a plain constructor function (not vi.fn) so new Table() returns the mock object
-  // This avoids vitest's vi.fn constructor interception which can break push/toString
-  const MockTable = () => ({
-    push: () => {},
-    toString: () => '',
-  });
+  // Return a plain constructor function so new Table() returns a mock object with push/toString
+  function MockTable() {
+    this.push = () => {};
+    this.toString = () => '';
+  }
   return { default: MockTable };
 });
 
@@ -559,38 +558,36 @@ describe('battleMultiRepos', () => {
   });
 
   it('3 repos calls getRepos (not battleRepos)', async () => {
-    // Mock getRepo directly — avoids Octokit prototype issues
-    const githubModule = await import('../github.js');
-    const fakeRepo = {
-      owner: 'test', name: 'mock', fullName: 'test/mock',
-      description: null, language: 'TypeScript', license: 'MIT',
-      stars: 100, forks: 10, openIssues: 5,
-      createdAt: '2024-01-01T00:00:00Z', updatedAt: '2024-01-01T00:00:00Z',
-      pushedAt: '2024-01-01T00:00:00Z', topics: [], homepage: null, defaultBranch: 'main',
-    };
-    const getRepoSpy = vi.spyOn(githubModule, 'getRepo').mockResolvedValue(fakeRepo);
+    // Mock at Octokit instance level so getRepo's internal call also uses it
+    const { Octokit } = await import('@octokit/rest');
+    const MockOctokit = vi.mocked(Octokit);
+    const mockGet = vi.fn().mockResolvedValue({
+      data: {
+        full_name: 'test/mock', description: null, language: 'TypeScript',
+        license: { spdx_id: 'MIT' }, stargazers_count: 100, forks_count: 10,
+        open_issues_count: 5, created_at: '2024-01-01T00:00:00Z',
+        updated_at: '2024-01-01T00:00:00Z', pushed_at: '2024-01-01T00:00:00Z',
+        homepage: null, default_branch: 'main',
+      },
+    });
+    const mockGetAllTopics = vi.fn().mockResolvedValue({ data: { names: [] } });
+
+    // The mock factory returns a new Octokit instance each time with these shared mock fns
+    // Force a fresh instance so the shared mocks are used
+    MockOctokit.mockImplementation(() => ({
+      rest: { repos: { get: mockGet, getAllTopics: mockGetAllTopics } },
+    }) as any);
 
     const { battleMultiRepos } = await import('../commands/watch.js');
     const result = await battleMultiRepos(['a/a', 'b/b', 'c/c']);
     expect(result.repos).toHaveLength(3);
     expect(result.winner).toBe('test/mock');
-
-    getRepoSpy.mockRestore();
+    expect(mockGet).toHaveBeenCalledTimes(3);
   });
-
   it('renderBattleMulti renders without throwing', async () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
-    // Re-mock cli-table3 to ensure fresh instance with push
-    vi.mock('cli-table3', () => ({
-      default: vi.fn(() => ({
-        push: vi.fn(),
-        toString: () => '',
-      })),
-    }));
-
     const { renderBattleMulti } = await import('../commands/watch.js');
-
     const makeRepo = (name: string, stars: number) => ({
       owner: 'test', name, fullName: `test/${name}`,
       description: null, language: 'TypeScript', license: 'MIT',
