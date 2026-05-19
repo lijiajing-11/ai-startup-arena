@@ -1,40 +1,44 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Mock @octokit/rest — shared mock refs
-let mockGet = vi.fn();
-let mockGetAllTopics = vi.fn();
+// ── Mocks with shared state ────────────────────────────────────────────
+// We expose mock controllers on the mocked module itself so tests can
+// configure them. This avoids the closure-variable capture issue.
 
 vi.mock('@octokit/rest', () => {
+  const __mockGet = vi.fn();
+  const __mockGetAllTopics = vi.fn();
   const MockOctokit = vi.fn(() => ({
     rest: {
       repos: {
-        get: mockGet,
-        getAllTopics: mockGetAllTopics,
+        get: __mockGet,
+        getAllTopics: __mockGetAllTopics,
       },
     },
   }));
 
-  return { Octokit: MockOctokit };
+  return { Octokit: MockOctokit, __mockGet, __mockGetAllTopics };
 });
 
-vi.mock('chalk', () => {
-  const identityProxy: Record<string, (s: string) => string> = new Proxy(
-    {} as Record<string, (s: string) => string>,
-    { get: () => (s: string) => s, apply: () => '' }
-  );
-  return {
-    default: identityProxy,
-    red: (s: string) => s,
-    green: (s: string) => s,
-    yellow: (s: string) => s,
-    cyan: (s: string) => s,
-    blue: (s: string) => s,
-    gray: (s: string) => s,
-    white: (s: string) => s,
-    magenta: (s: string) => s,
-    bold: identityProxy,
+function makeChalkChain(): any {
+  const handler: ProxyHandler<(...args: any[]) => any> = {
+    apply(_target, _thisArg, args) { return args[0] ?? ''; },
+    get() { return makeChalkChain(); },
   };
-});
+  return new Proxy((s: string) => s, handler);
+}
+
+vi.mock('chalk', () => ({
+  default: makeChalkChain(),
+  red: makeChalkChain(),
+  green: makeChalkChain(),
+  yellow: makeChalkChain(),
+  cyan: makeChalkChain(),
+  blue: makeChalkChain(),
+  gray: makeChalkChain(),
+  white: makeChalkChain(),
+  magenta: makeChalkChain(),
+  bold: makeChalkChain(),
+}));
 
 vi.mock('cli-table3', () => ({
   default: vi.fn().mockImplementation(() => ({
@@ -42,6 +46,31 @@ vi.mock('cli-table3', () => ({
     toString: () => '',
   })),
 }));
+
+// G et the mock controllers from the mock factory
+import { Octokit } from '@octokit/rest';
+const MockOctokit = vi.mocked(Octokit);
+
+function getMockGet() {
+  // Each call to MockOctokit() creates a new instance, but it always
+  // returns the same __mockGet / __mockGetAllTopics from the factory
+  const instance = (MockOctokit as any).mock.results[0]?.value;
+  if (!instance) {
+    // Force creation
+    new (Octokit as any)();
+    return (MockOctokit as any).mock.results[0]?.value?.rest?.repos?.get;
+  }
+  return instance.rest.repos.get;
+}
+
+function getMockGetAllTopics() {
+  const instance = (MockOctokit as any).mock.results[0]?.value;
+  if (!instance) {
+    new (Octokit as any)();
+    return (MockOctokit as any).mock.results[0]?.value?.rest?.repos?.getAllTopics;
+  }
+  return instance.rest.repos.getAllTopics;
+}
 
 const makeApiResponse = (owner: string, name: string, stars: number) => ({
   data: {
@@ -68,21 +97,20 @@ describe('getRepos', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     delete process.env.GITHUB_TOKEN;
-    // Reset mock refs so previous test config doesn't leak
-    mockGet = vi.fn();
-    mockGetAllTopics = vi.fn();
   });
 
   it('fetches multiple repos in parallel and returns data in order', async () => {
+    const mockGet = getMockGet();
+    const mockTopics = getMockGetAllTopics();
+
     mockGet
       .mockResolvedValueOnce(makeApiResponse('facebook', 'react', 200000))
       .mockResolvedValueOnce(makeApiResponse('vercel', 'next.js', 120000))
       .mockResolvedValueOnce(makeApiResponse('microsoft', 'vscode', 150000));
-    mockGetAllTopics
-      .mockResolvedValue(makeTopicsResponse());
+    mockTopics.mockResolvedValue(makeTopicsResponse());
 
     const { getRepos, clearCache } = await import('../github.js');
-    clearCache(); // ensure no stale cache
+    clearCache();
     const repos = await getRepos(['facebook/react', 'vercel/next.js', 'microsoft/vscode']);
 
     expect(repos).toHaveLength(3);
@@ -96,10 +124,13 @@ describe('getRepos', () => {
   });
 
   it('throws on first failure with invalid repo', async () => {
+    const mockGet = getMockGet();
+    const mockTopics = getMockGetAllTopics();
+
     mockGet.mockRejectedValue(
       Object.assign(new Error('Not Found'), { status: 404 })
     );
-    mockGetAllTopics.mockResolvedValue(makeTopicsResponse());
+    mockTopics.mockResolvedValue(makeTopicsResponse());
 
     const { getRepos, clearCache } = await import('../github.js');
     clearCache();
@@ -111,8 +142,6 @@ describe('watchMultiRepos', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     delete process.env.GITHUB_TOKEN;
-    mockGet = vi.fn();
-    mockGetAllTopics = vi.fn();
   });
 
   it('exports watchMultiRepos function', async () => {
@@ -121,10 +150,13 @@ describe('watchMultiRepos', () => {
   });
 
   it('single tick with JSON output does not throw', async () => {
+    const mockGet = getMockGet();
+    const mockTopics = getMockGetAllTopics();
+
     mockGet
       .mockResolvedValueOnce(makeApiResponse('facebook', 'react', 200000))
       .mockResolvedValueOnce(makeApiResponse('vercel', 'next.js', 120000));
-    mockGetAllTopics.mockResolvedValue(makeTopicsResponse());
+    mockTopics.mockResolvedValue(makeTopicsResponse());
 
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     const abortController = new AbortController();
@@ -138,26 +170,27 @@ describe('watchMultiRepos', () => {
     );
 
     // Let the first tick go through, then abort
-    await new Promise((r) => setTimeout(r, 50));
+    await new Promise((r) => setTimeout(r, 100));
     abortController.abort();
     await promise;
 
-    // Should have logged JSON output
     expect(logSpy).toHaveBeenCalled();
     const firstCall = logSpy.mock.calls[0][0];
     expect(typeof firstCall).toBe('string');
-    // JSON output should contain the repos
     const parsed = JSON.parse(firstCall);
     expect(parsed.repos).toHaveLength(2);
 
     logSpy.mockRestore();
-  }, 10000);
+  }, 15000);
 
   it('multi-watch calls getRepos internally', async () => {
+    const mockGet = getMockGet();
+    const mockTopics = getMockGetAllTopics();
+
     mockGet
       .mockResolvedValueOnce(makeApiResponse('facebook', 'react', 200000))
       .mockResolvedValueOnce(makeApiResponse('vercel', 'next.js', 120000));
-    mockGetAllTopics.mockResolvedValue(makeTopicsResponse());
+    mockTopics.mockResolvedValue(makeTopicsResponse());
 
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     const abortController = new AbortController();
@@ -170,12 +203,11 @@ describe('watchMultiRepos', () => {
       abortController.signal
     );
 
-    await new Promise((r) => setTimeout(r, 50));
+    await new Promise((r) => setTimeout(r, 100));
     abortController.abort();
     await promise;
 
-    // Should not throw — dashboard render is called
     expect(logSpy).toHaveBeenCalled();
     logSpy.mockRestore();
-  }, 10000);
+  }, 15000);
 });

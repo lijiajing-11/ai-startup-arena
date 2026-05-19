@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeAll } from 'vitest';
 
-// Mock dependencies
+// ── Unified dependency mocks ───────────────────────────────────────────
+
 vi.mock('@octokit/rest', () => {
   const mockGet = vi.fn();
   const mockGetAllTopics = vi.fn();
@@ -10,47 +11,42 @@ vi.mock('@octokit/rest', () => {
   return { Octokit: MockOctokit };
 });
 
-// Chalk mock that supports chained calls like chalk.bold.cyan('text')
-const chalkIdentity = (s: string) => s;
-chalkIdentity.bold = new Proxy(chalkIdentity, {
-  get: () => chalkIdentity,
-  apply: () => '',
-}) as any;
+// chalk with full chainable support: chalk.bold.cyan('x'), chalk.red('x'), etc.
+// Each color/tag function is also a proxy so chaining works
+function makeChalkChain(): any {
+  const handler: ProxyHandler<(...args: any[]) => any> = {
+    apply(_target, _thisArg, args) {
+      return args[0] ?? ''; // identity
+    },
+    get(_target, prop) {
+      if (prop === 'bold' || prop === 'default') return makeChalkChain();
+      return makeChalkChain();
+    },
+  };
+  return new Proxy((s: string) => s, handler);
+}
 
 vi.mock('chalk', () => ({
-  default: chalkIdentity,
-  red: chalkIdentity,
-  green: chalkIdentity,
-  yellow: chalkIdentity,
-  cyan: chalkIdentity,
-  blue: chalkIdentity,
-  gray: chalkIdentity,
-  white: chalkIdentity,
-  magenta: chalkIdentity,
-  bold: chalkIdentity,
+  default: makeChalkChain(),
+  red: makeChalkChain(),
+  green: makeChalkChain(),
+  yellow: makeChalkChain(),
+  cyan: makeChalkChain(),
+  blue: makeChalkChain(),
+  gray: makeChalkChain(),
+  white: makeChalkChain(),
+  magenta: makeChalkChain(),
+  bold: makeChalkChain(),
 }));
 
-vi.mock('cli-table3', () => {
-  return {
-    default: vi.fn().mockImplementation(() => ({
-      push: vi.fn(),
-      toString: () => '',
-    })),
-  };
-});
-
-vi.mock('ora', () => ({
-  default: vi.fn().mockReturnValue({
-    start: vi.fn().mockReturnThis(),
-    succeed: vi.fn().mockReturnThis(),
-    fail: vi.fn().mockReturnThis(),
-    stop: vi.fn().mockReturnThis(),
-    text: '',
-  }),
+vi.mock('cli-table3', () => ({
+  default: vi.fn().mockImplementation(() => ({
+    push: vi.fn(),
+    toString: () => '',
+  })),
 }));
 
-// Prevent index.ts run() from auto-executing during import
-vi.mock('../index.js', () => ({}));
+// ── Tests ──────────────────────────────────────────────────────────────
 
 import type { RepoData, BattleResult } from '../models.js';
 
@@ -96,7 +92,6 @@ describe('battle command', () => {
       defaultBranch: 'main',
     });
 
-    // Spy on console.log to suppress output
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
     const { renderBattle } = await import('../commands/watch.js');
@@ -165,8 +160,8 @@ describe('battle command', () => {
 
 describe('index CLI', () => {
   it('should export run function', async () => {
-    // Use direct import with auto-run suppressed
     const indexModule = await import('../index.js');
+    // index.ts exports { run }, and the auto-run is guarded by VITEST env check
     expect(typeof indexModule.run).toBe('function');
   });
 });

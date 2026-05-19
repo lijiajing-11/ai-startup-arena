@@ -72,4 +72,7 @@ export async function run(): Promise<void> {
 }
 
 // Allow running directly
-run();
+const isTestEnv = process.env.NODE_ENV === 'test' || process.env.VITEST === 'true';
+if (!isTestEnv) {
+  run();
+}
