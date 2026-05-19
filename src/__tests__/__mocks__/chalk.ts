@@ -6,9 +6,9 @@ const identity = (s: string) => s;
 const handler: ProxyHandler<typeof identity> = {
   get: (target, prop) => {
     if (prop === 'then' || prop === 'catch') return undefined; // not a Promise
-    if (typeof prop === 'string' && prop in target) return (target as any)[prop];
-    // For any chained property, return identity
-    return identity;
+    // Return the proxy itself for any property access — this enables
+    // arbitrary chaining: chalk.bold.cyan('text'), chalk.red.bold.underline('x')
+    return proxy;
   },
   apply: (target, thisArg, args) => {
     if (typeof args[0] === 'string') return args[0];
@@ -16,10 +16,10 @@ const handler: ProxyHandler<typeof identity> = {
   },
 };
 
-const chalk = new Proxy(identity, handler);
-(chalk as any).default = chalk;
+const proxy = new Proxy(identity, handler) as any;
+proxy.default = proxy;
 
-export default chalk;
+export default proxy;
 
 /**
  * Call this in a test file's vi.mock('chalk', ...) callback to get
@@ -29,15 +29,15 @@ export default chalk;
  */
 export function createChalkMock() {
   return {
-    default: chalk,
-    red: chalk,
-    green: chalk,
-    yellow: chalk,
-    cyan: chalk,
-    blue: chalk,
-    gray: chalk,
-    white: chalk,
-    magenta: chalk,
-    bold: chalk,
+    default: proxy,
+    red: proxy,
+    green: proxy,
+    yellow: proxy,
+    cyan: proxy,
+    blue: proxy,
+    gray: proxy,
+    white: proxy,
+    magenta: proxy,
+    bold: proxy,
   };
 }
