@@ -1,22 +1,18 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import * as fs from 'fs';
+import * as cp from 'child_process';
 
-// Mock child_process — coverage.ts in import scope would try execSync
+// ── Top-level module mocks (stateless) ────────────────────────────────
+// These use vi.fn() directly so tests can control behavior via vi.mocked().
+// NO shared let variables — each beforeEach clears + reconfigures.
+
 vi.mock('child_process', () => ({
   execSync: vi.fn(),
 }));
 
-// Shared state for fs mock — tests set these, mock factory reads them
-let __mockExists = true;
-let __mockReadData = '';
-
 vi.mock('fs', () => ({
-  existsSync: vi.fn(() => __mockExists),
-  readFileSync: vi.fn((_path: string, _encoding: string) => {
-    if (!__mockExists) {
-      throw new Error('ENOENT');
-    }
-    return __mockReadData;
-  }),
+  existsSync: vi.fn(),
+  readFileSync: vi.fn(),
 }));
 
 // Also mock chalk and cli-table3 since coverage.ts uses them
@@ -42,8 +38,13 @@ describe('coverageCommand', () => {
   let exitSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    __mockExists = true;
-    __mockReadData = '';
+    vi.clearAllMocks();
+    // Default: coverage file exists with valid data
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({
+      total: { lines: { pct: 80 }, branches: { pct: 80 }, functions: { pct: 80 }, statements: { pct: 80 } },
+    }));
+
     logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => {
@@ -56,11 +57,11 @@ describe('coverageCommand', () => {
   });
 
   it('renders coverage table with valid data', async () => {
-    __mockReadData = JSON.stringify({
+    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({
       total: { lines: { pct: 85.7 }, branches: { pct: 72.3 }, functions: { pct: 91.2 }, statements: { pct: 83.1 } },
       'src/github.ts': { lines: { pct: 97.14 }, branches: { pct: 87.27 }, functions: { pct: 100 }, statements: { pct: 97.14 } },
       'src/commands/watch.ts': { lines: { pct: 72.72 }, branches: { pct: 61.29 }, functions: { pct: 78.57 }, statements: { pct: 72.72 } },
-    });
+    }));
 
     const { coverageCommand } = await import('../commands/coverage.js');
     await coverageCommand({ run: false });
@@ -70,20 +71,18 @@ describe('coverageCommand', () => {
   });
 
   it('errors when coverage file not found', async () => {
-    __mockExists = false;
+    vi.mocked(fs.existsSync).mockReturnValue(false);
 
     const { coverageCommand } = await import('../commands/coverage.js');
-    // coverageCommand calls process.exit(1) when file not found;
-    // our spy throws EXIT_CALLED to halt execution
     await expect(coverageCommand({ run: false })).rejects.toThrow('EXIT_CALLED');
 
     expect(errorSpy).toHaveBeenCalled();
   });
 
   it('renders overall summary at top', async () => {
-    __mockReadData = JSON.stringify({
+    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({
       total: { lines: { pct: 85.7 }, branches: { pct: 72.3 }, functions: { pct: 91.2 }, statements: { pct: 83.1 } },
-    });
+    }));
     const { coverageCommand } = await import('../commands/coverage.js');
     await coverageCommand({ run: false });
 
@@ -94,9 +93,9 @@ describe('coverageCommand', () => {
   });
 
   it('handles empty file list (only total, no file-level data)', async () => {
-    __mockReadData = JSON.stringify({
+    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({
       total: { lines: { pct: 50.0 }, branches: { pct: 40.0 }, functions: { pct: 50.0 }, statements: { pct: 50.0 } },
-    });
+    }));
 
     const { coverageCommand } = await import('../commands/coverage.js');
     await coverageCommand({ run: false });
@@ -105,9 +104,9 @@ describe('coverageCommand', () => {
   });
 
   it('calls vitest when --run is true', async () => {
-    __mockReadData = JSON.stringify({
+    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({
       total: { lines: { pct: 80 }, branches: { pct: 70 }, functions: { pct: 90 }, statements: { pct: 80 } },
-    });
+    }));
 
     const cp = await import('child_process');
     const { coverageCommand } = await import('../commands/coverage.js');
@@ -127,8 +126,18 @@ describe('renderCoverage (standalone)', () => {
   let logSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    __mockExists = true;
-    __mockReadData = '';
+    vi.clearAllMocks();
+    // Default: vitest.config.ts exists with known thresholds
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    vi.mocked(fs.readFileSync).mockReturnValue([
+      "import { defineConfig } from 'vitest/config';",
+      "export default defineConfig({",
+      "  test: { coverage: { thresholds: {",
+      "    lines: 80, branches: 70, functions: 60, statements: 50,",
+      "  }}}",
+      "});",
+    ].join('\n'));
+
     logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
   });
 
@@ -137,7 +146,7 @@ describe('renderCoverage (standalone)', () => {
   });
 
   it('renders with no threshold config file (vitest.config.ts missing)', async () => {
-    __mockExists = false;
+    vi.mocked(fs.existsSync).mockReturnValue(false);
 
     const { renderCoverage } = await import('../commands/coverage.js');
     const summary = {
@@ -149,16 +158,7 @@ describe('renderCoverage (standalone)', () => {
   });
 
   it('renders with threshold config warnings when below thresholds', async () => {
-    __mockExists = true;
-    __mockReadData = [
-      "import { defineConfig } from 'vitest/config';",
-      'export default defineConfig({',
-      '  test: { coverage: { thresholds: {',
-      '    lines: 80, branches: 70, functions: 60, statements: 50,',
-      '  }}}',
-      '});',
-    ].join('\n');
-
+    // Using default mock from beforeEach — vitest.config.ts exists
     const { renderCoverage } = await import('../commands/coverage.js');
     const summary = {
       total: { lines: { pct: 50 }, branches: { pct: 60 }, functions: { pct: 70 }, statements: { pct: 80 } },
@@ -170,6 +170,7 @@ describe('renderCoverage (standalone)', () => {
   });
 
   it('filters out non-src/ files from table', async () => {
+    vi.mocked(fs.existsSync).mockReturnValue(false); // No threshold config
     const { renderCoverage } = await import('../commands/coverage.js');
     const summary = {
       total: { lines: { pct: 90 }, branches: { pct: 90 }, functions: { pct: 90 }, statements: { pct: 90 } },
