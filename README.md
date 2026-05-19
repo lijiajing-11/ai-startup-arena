@@ -12,78 +12,71 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/li1050109098/beta-project-arena/ci.yml?style=flat-square&logo=githubactions&label=CI)](https://github.com/li1050109098/beta-project-arena/actions)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square)](http://makeapullrequest.com)
 
-🔥 **Zero config · Real-time · Terminal-native** ⚡
+🔥 **Zero config · Live refresh · Terminal-native** ⚡
+
+> One command to watch, battle, and monitor your GitHub repos — no web UI, no config file, no BS.
 
 </div>
 
 ---
 
-## 🔮 What is repo-sense?
+## 🧩 At a Glance
 
-> Watch stars tick up **live**. Battle repos **head-to-head**. Monitor your whole landscape at a glance.
+| You type | You get |
+|----------|---------|
+| `npx repo-sense watch facebook/react` | Live dashboard that refreshes every 30s |
+| `npx repo-sense battle facebook/react vercel/next.js` | Side-by-side smackdown with a winner |
+| `npx repo-sense watch-multi react next.js tailwindcss` | Whole landscape at a glance |
+| `rs --help` | Full command reference |
 
-A sleek CLI that turns raw GitHub stats into a living dashboard — no config files, no web UIs, no nonsense. Just you, your terminal, and the pulse of the repos you care about.
+**60 req/hr** without auth, **5,000 req/hr** with a `GITHUB_TOKEN` — more on that below.
+
+---
+
+## 📦 Install (pick one)
 
 ```bash
-# Watch a repo live — auto-refresh every 30s
-npx repo-sense watch facebook/react
+# Run instantly — no install needed
+npx repo-sense watch torvalds/linux
+
+# Or go global for the short alias
+npm install -g repo-sense
+rs watch facebook/react
 ```
 
 ---
 
 ## 🚀 Quick Start
 
-### 👁️ Watch a repo — live dashboard
+### 👁️ `watch` — Live Dashboard
+
+See stars, forks, and issues tick up in real time:
+
 ```bash
 npx repo-sense watch facebook/react
 ```
-Opens an auto-refreshing dashboard that polls the GitHub API every 30 seconds. See stars, forks, issues, language, license, and the last update time — with **live deltas** so you never miss a tick.
 
-Press `Ctrl+C` to stop. A summary of how many stars you watched fly by prints on exit.
+The dashboard refreshes every 30 seconds by default. Pass `-i 5` for every 5 seconds. Every delta is highlighted so you never miss a beat. Press `Ctrl+C` to stop — it prints a summary of how many events happened while you watched.
 
-### ⚔️ Battle two repos
+### ⚔️ `battle` — Who's Hotter Right Now?
+
+Put two repos head-to-head across every metric:
+
 ```bash
 npx repo-sense battle facebook/react vercel/next.js
 ```
-Side-by-side comparison across every metric. Stars, forks, issues, language — and a **winner is crowned** based on the star gap. Perfect for settling those "which repo is hotter right now?" debates.
 
-### 📡 Watch multiple repos
+Stars, forks, issues, language, license — side by side. A winner is crowned based on star gap. Perfect for settling "which repo is hotter right now?" debates at your desk.
+
+### 📡 `watch-multi` — The Whole Landscape
+
+Track your competitive set at once:
+
 ```bash
 npx repo-sense watch-multi facebook/react vercel/next.js tailwindlabs/tailwindcss
 ```
-Monitor your entire competitive landscape at once. One table, all the data, live updates.
 
-```bash
-# JSON output for piping into your own tools
-npx repo-sense watch-multi facebook/react vercel/next.js -j
-```
-
----
-
-## 📦 Installation
-
-### No install (just run it)
-```bash
-npx repo-sense watch torvalds/linux
-```
-`npx` pulls the latest version automatically. That's it.
-
-### Global install
-```bash
-npm install -g repo-sense
-
-# Use the short alias
-rs watch facebook/react
-rs --help
-```
-
-### From source
-```bash
-git clone https://github.com/li1050109098/beta-project-arena.git
-cd beta-project-arena
-npm install && npm run build
-node dist/index.js --help
-```
+All repos, one table, live updates. Add `-j` for JSON output you can pipe into your own dashboards or Slack bots.
 
 ---
 
@@ -91,95 +84,100 @@ node dist/index.js --help
 
 | Command | Description |
 |---------|-------------|
-| `rs watch <repo>` | Live dashboard — stars, forks, issues and more (auto-refresh every 30s) |
-| `rs watch <repo> -i 10` | Same, but refresh every 10 seconds |
-| `rs battle <repo1> <repo2>` | Side-by-side comparison with a winner |
-| `rs watch-multi <repos...>` | Monitor multiple repos simultaneously |
-| `rs watch-multi <repos...> -j` | Multi-watch with JSON output |
-| `rs --help` | Show all commands and options |
+| `rs watch <repo>` | Live dashboard — stars, forks, issues (auto-refresh 30s) |
+| `rs watch <repo> -i <sec>` | Same with custom refresh interval |
+| `rs battle <a> <b>` | Side-by-side comparison, winner declared |
+| `rs watch-multi <repos...>` | Multi-repo live monitoring |
+| `rs watch-multi <repos...> -j` | JSON output for programmatic use |
+| `rs --help` | All commands and options |
 | `rs --version` | Show version |
 
-### 🔐 Authentication (optional)
+### 🔐 Auth (optional)
+
 Without a token you get **60 requests/hour**. Set `GITHUB_TOKEN` for **5,000/hr**:
 
 ```bash
 export GITHUB_TOKEN=ghp_your_token_here
 ```
 
-Or create a `.env` file in the project root (see `.env.example`).
+Or drop a `.env` file in the project root (see `.env.example`).
 
 ---
 
-## 🎬 What It Looks Like
+## 🎬 Gallery
 
 ### 👁️ Watch Dashboard
+
 ```
   ┌──────────────────────────────────────┐
-  │        🧬  repo-sense  WATCH        │
+  │        🧬  repo-sense  WATCH         │
   └──────────────────────────────────────┘
 
 ┌────────────────────┬──────────────────────────────┐
 │ Repository         │ facebook/react               │
 │ Description        │ A declarative UI library     │
-│ ⭐ Stars           │ 245.1K (+12)                 │
+│ ⭐ Stars           │ 245.1K (+12) ▲               │
 │ ⑂ Forks            │ 51.1K  (+1)                  │
-│ ⚠ Issues           │ 1.3K   (-2)                  │
+│ ⚠ Issues           │ 1.3K   (-2) ▼               │
 │ 🔤 Language        │ JavaScript                   │
 │ 📜 License         │ MIT                          │
 │ 🕐 Updated         │ 5/19/2026, 8:30:15 AM        │
 │ 📅 Created         │ 5/29/2013                    │
 └────────────────────┴──────────────────────────────┘
 
-  Last updated: 8:30:15 AM  |  Press Ctrl+C to stop
+  Last updated: 8:30:15 AM  ·  Press Ctrl+C to stop
+  Watched 12 new stars tick by ✨
 ```
 
 ### ⚔️ Repo Battle
+
 ```
   ╔══════════════════════════════════════════════════════════╗
   ║            ⚔️   REPO BATTLE  ⚔️                        ║
   ╚══════════════════════════════════════════════════════════╝
 
-┌──────────────┬──────────────────────┬──────────────────────┬──────────────────────┐
-│ Metric       │ facebook/react       │ vercel/next.js       │ Victor               │
-├──────────────┼──────────────────────┼──────────────────────┼──────────────────────┤
-│ ⭐ Stars     │ 245.1K               │ 139.5K               │ 🏆                   │
-│ ⑂ Forks      │ 51.1K                │ 31.1K                │ 🏆                   │
-│ ⚠ Issues     │ 1.3K                 │ 4.0K                 │ 🏆 (fewer)           │
-│ 🔤 Language  │ JavaScript           │ JavaScript           │ ✓ Same               │
-│ 📜 License   │ MIT                  │ MIT                  │ ✓ Same               │
-└──────────────┴──────────────────────┴──────────────────────┴──────────────────────┘
+┌──────────────┬──────────────────────┬──────────────────────┬──────────────┐
+│ Metric       │ facebook/react       │ vercel/next.js       │ Victor       │
+├──────────────┼──────────────────────┼──────────────────────┼──────────────┤
+│ ⭐ Stars     │ 245.1K               │ 139.5K               │ 🏆 react     │
+│ ⑂ Forks      │ 51.1K                │ 31.1K                │ 🏆 react     │
+│ ⚠ Issues     │ 1.3K                 │ 4.0K                 │ 🏆 react      │
+│ 🔤 Language  │ JavaScript           │ JavaScript           │ ✓ Same       │
+│ 📜 License   │ MIT                  │ MIT                  │ ✓ Same       │
+└──────────────┴──────────────────────┴──────────────────────┴──────────────┘
 
   🏆 facebook/react WINS!
      Leads by 105.6K stars over vercel/next.js
 ```
 
 ### 📡 Multi-Watch Dashboard
+
 ```
-  ┌────────────────────────────────────────────────────────────────┐
-  │           📡  repo-sense  MULTI-WATCH  📡                     │
-  └────────────────────────────────────────────────────────────────┘
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │              📡  repo-sense  MULTI-WATCH  📡                          │
+  └─────────────────────────────────────────────────────────────────────────┘
 
-┌──────────────────────────┬──────────────┬──────────────┬──────────────┬──────────┬──────────────┐
-│ Repository               │ ⭐ Stars     │ ⑂ Forks       │ ⚠ Issues    │ 🔤 Lang   │ 📜 License   │
-├──────────────────────────┼──────────────┼──────────────┼──────────────┼──────────┼──────────────┤
-│ facebook/react           │ 245.1K +12   │ 51.1K +1     │ 1.3K -2      │ JS       │ MIT          │
-│ vercel/next.js           │ 139.5K +5    │ 31.1K +0     │ 4.0K +1      │ JS       │ MIT          │
-│ tailwindlabs/tailwindcss │ 87.2K +3     │ 4.5K +0      │ 521 -1       │ CSS      │ MIT          │
-└──────────────────────────┴──────────────┴──────────────┴──────────────┴──────────┴──────────────┘
+┌──────────────────────────┬──────────────┬──────────┬──────────┬────────┬──────────────┐
+│ Repository               │ ⭐ Stars      │ ⑂ Forks │ ⚠ Issues │ Lang   │ License      │
+├──────────────────────────┼──────────────┼──────────┼──────────┼────────┼──────────────┤
+│ facebook/react           │ 245.1K +12   │ 51.1K +1 │ 1.3K -2  │ JS     │ MIT          │
+│ vercel/next.js           │ 139.5K +5    │ 31.1K +0 │ 4.0K +1  │ JS     │ MIT          │
+│ tailwindlabs/tailwindcss │ 87.2K +3     │ 4.5K +0  │ 521 -1   │ CSS    │ MIT          │
+└──────────────────────────┴──────────────┴──────────┴──────────┴────────┴──────────────┘
 
-  Watching 3 repos  ·  8:30:15 AM  ·  Ctrl+C to stop
+  Watching 3 repos  ·  8:30:15 AM  ·  Ctrl+C to stop  ·  JSON mode: rs ... -j
 ```
 
 ---
 
 ## 🗺️ Roadmap
 
-- [x] `watch` — live dashboard with deltas
-- [x] `battle` — head-to-head comparison
-- [x] `watch-multi` — multi-repo monitoring
-- [ ] Star history charts
-- [ ] Multi-repo tournament mode
-- [ ] Export to SVG/PNG
+- [x] `watch` — live dashboard with real-time deltas
+- [x] `battle` — head-to-head repo comparison
+- [x] `watch-multi` — multi-repo landscape monitoring
+- [ ] Star history sparklines
+- [ ] Multi-repo tournament (bracket mode)
+- [ ] Export snapshot to SVG
 - [ ] Trending repos explorer
 - [ ] GitHub Actions badge generator
 
@@ -188,21 +186,30 @@ Or create a `.env` file in the project root (see `.env.example`).
 ## 🛠 Development
 
 ```bash
-# Install dependencies
-npm install
-
-# Build
-npm run build
+# Install & build
+npm install && npm run build
 
 # Watch mode
 npx tsup --watch
 
-# Run tests
+# Tests
 npm test
 
 # Run locally
 node dist/index.js battle facebook/react vercel/next.js
 ```
+
+---
+
+## ⚙️ How It Works
+
+1. You pass a GitHub repo slug (e.g. `facebook/react`)
+2. repo-sense calls the **GitHub REST API** via Octokit
+3. Data hits your terminal as a **beautiful CLI table** — no web browser needed
+4. On `watch` and `watch-multi`, it **polls every N seconds** and highlights what changed
+5. On `battle`, it compares every metric and declares a winner
+
+That's it. No config files, no Docker, no cloud service. Just you and the terminal.
 
 ---
 
@@ -216,4 +223,6 @@ MIT © β-Labs Corp.
   <sub>Built with ❤️ by <a href="https://github.com/li1050109098">β-Labs Corp.</a> — because your terminal deserves better.</sub>
   <br>
   <sub>⭐ Star this repo if you find it useful!</sub>
+  <br><br>
+  <sub>Made with 🧬 by MarketBeta @ β-Labs</sub>
 </div>
