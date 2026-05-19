@@ -48,7 +48,7 @@ vi.mock('cli-table3', () => ({
 
 // ── Tests ──────────────────────────────────────────────────────────────
 
-import type { RepoData, BattleResult } from '../models.js';
+import type { RepoData, RepoSnapshot, BattleResult } from '../models.js';
 
 describe('watch command', () => {
   it('should export watchRepo function', async () => {
@@ -163,5 +163,72 @@ describe('index CLI', () => {
     const indexModule = await import('../index.js');
     // index.ts exports { run }, and the auto-run is guarded by VITEST env check
     expect(typeof indexModule.run).toBe('function');
+  });
+});
+
+describe('renderDashboard', () => {
+  const makeRepo = (overrides: Partial<RepoData> = {}): RepoData => ({
+    owner: 'facebook',
+    name: 'react',
+    fullName: 'facebook/react',
+    description: 'A UI library',
+    language: 'TypeScript',
+    license: 'MIT',
+    stars: 100000,
+    forks: 10000,
+    openIssues: 500,
+    createdAt: '2013-05-29T21:18:12Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+    pushedAt: '2024-01-01T00:00:00Z',
+    topics: [],
+    homepage: null,
+    defaultBranch: 'main',
+    ...overrides,
+  });
+
+  it('renders dashboard without previous (initial state)', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const clearSpy = vi.spyOn(console, 'clear').mockImplementation(() => {});
+    const { renderDashboard } = await import('../commands/watch.js');
+    const snapshot: RepoSnapshot = { repo: makeRepo(), timestamp: new Date() };
+    renderDashboard(snapshot);
+    expect(logSpy).toHaveBeenCalled();
+    logSpy.mockRestore();
+    clearSpy.mockRestore();
+  });
+
+  it('renders dashboard with delta display', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const clearSpy = vi.spyOn(console, 'clear').mockImplementation(() => {});
+    const { renderDashboard } = await import('../commands/watch.js');
+    const current: RepoSnapshot = {
+      repo: makeRepo({ stars: 100010 }),
+      timestamp: new Date(),
+    };
+    const previous: RepoSnapshot = {
+      repo: makeRepo({ stars: 100000 }),
+      timestamp: new Date(Date.now() - 30000),
+    };
+    renderDashboard(current, previous);
+    expect(logSpy).toHaveBeenCalled();
+    logSpy.mockRestore();
+    clearSpy.mockRestore();
+  });
+
+  it('handles null description/license/language', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const clearSpy = vi.spyOn(console, 'clear').mockImplementation(() => {});
+    const { renderDashboard } = await import('../commands/watch.js');
+    const snapshot: RepoSnapshot = {
+      repo: makeRepo({
+        description: null,
+        language: null,
+        license: null,
+      }),
+      timestamp: new Date(),
+    };
+    expect(() => renderDashboard(snapshot)).not.toThrow();
+    logSpy.mockRestore();
+    clearSpy.mockRestore();
   });
 });

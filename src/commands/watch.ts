@@ -40,9 +40,23 @@ export async function watchRepo(
   if (signal?.aborted) return;
 
   return new Promise((resolve) => {
+    const onAbort = () => {
+      clearInterval(timer);
+      const elapsed = Math.round((Date.now() - startTime) / 1000);
+      const mins = Math.floor(elapsed / 60);
+      const secs = elapsed % 60;
+      console.log(chalk.cyan(`\n📊 Watch summary: ${mins}m ${secs}s watched, ${totalGrowth > 0 ? '+' : ''}${totalGrowth} new stars`));
+      resolve();
+    };
+
+    if (signal) {
+      signal.addEventListener('abort', onAbort, { once: true });
+    }
+
     const timer = setInterval(async () => {
       if (signal?.aborted) {
         clearInterval(timer);
+        if (signal) signal.removeEventListener('abort', onAbort);
         const elapsed = Math.round((Date.now() - startTime) / 1000);
         const mins = Math.floor(elapsed / 60);
         const secs = elapsed % 60;
@@ -236,9 +250,23 @@ export async function watchMultiRepos(
   if (signal?.aborted) return;
 
   return new Promise((resolve) => {
+    const onAbort = () => {
+      clearInterval(timer);
+      const elapsed = Math.round((Date.now() - startTime) / 1000);
+      const mins = Math.floor(elapsed / 60);
+      const secs = elapsed % 60;
+      console.log(chalk.cyan(`\n📊 Multi-watch summary: ${mins}m ${secs}s watched for ${repoStrs.length} repos`));
+      resolve();
+    };
+
+    if (signal) {
+      signal.addEventListener('abort', onAbort, { once: true });
+    }
+
     const timer = setInterval(async () => {
       if (signal?.aborted) {
         clearInterval(timer);
+        if (signal) signal.removeEventListener('abort', onAbort);
         const elapsed = Math.round((Date.now() - startTime) / 1000);
         const mins = Math.floor(elapsed / 60);
         const secs = elapsed % 60;
