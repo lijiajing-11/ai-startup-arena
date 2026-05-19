@@ -21,6 +21,7 @@ vi.mock('@octokit/rest', () => {
 
 // These must be imported AFTER the mock is set up
 import * as githubModule from '../github.js';
+import { withRetry } from '../github.js';
 
 describe('formatNumber', () => {
   it('formats numbers under 1000 as-is', () => {
@@ -337,5 +338,42 @@ describe('getStarHistory', () => {
     for (let i = 1; i < history.length; i++) {
       expect(history[i].stars).toBeGreaterThanOrEqual(history[i - 1].stars);
     }
+  });
+});
+
+describe('withRetry', () => {
+  it('succeeds on first attempt', async () => {
+    const fn = vi.fn().mockResolvedValue('success');
+    const result = await withRetry(fn, { maxAttempts: 3 });
+    expect(result).toBe('success');
+    expect(fn).toHaveBeenCalledTimes(1);
+  });
+
+  it('retries on retryable error then succeeds', async () => {
+    const fn = vi.fn()
+      .mockRejectedValueOnce(Object.assign(new Error('Rate limited'), { status: 429 }))
+      .mockRejectedValueOnce(Object.assign(new Error('Server error'), { status: 500 }))
+      .mockResolvedValueOnce('finally success');
+    const result = await withRetry(fn, { maxAttempts: 3, baseDelayMs: 10 });
+    expect(result).toBe('finally success');
+    expect(fn).toHaveBeenCalledTimes(3);
+  });
+
+  it('exhausts retries on persistent errors', async () => {
+    const fn = vi.fn().mockRejectedValue(Object.assign(new Error('Server Error'), { status: 500 }));
+    await expect(withRetry(fn, { maxAttempts: 3, baseDelayMs: 10 })).rejects.toThrow('Server Error');
+    expect(fn).toHaveBeenCalledTimes(3);
+  });
+
+  it('does not retry on non-retryable error (403)', async () => {
+    const fn = vi.fn().mockRejectedValue(Object.assign(new Error('Forbidden'), { status: 403 }));
+    await expect(withRetry(fn, { maxAttempts: 3, baseDelayMs: 10 })).rejects.toThrow('Forbidden');
+    expect(fn).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not retry on 404', async () => {
+    const fn = vi.fn().mockRejectedValue(Object.assign(new Error('Not Found'), { status: 404 }));
+    await expect(withRetry(fn, { maxAttempts: 3, baseDelayMs: 10 })).rejects.toThrow('Not Found');
+    expect(fn).toHaveBeenCalledTimes(1);
   });
 });
