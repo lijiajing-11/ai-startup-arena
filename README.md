@@ -15,8 +15,6 @@ _Zero config. Zero bullshit. Just numbers that move._
 [![Bundle Size](https://img.shields.io/badge/minzipped-%3C10KB-success?style=for-the-badge)](#)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079?style=for-the-badge)](https://github.com/semantic-release/semantic-release)
 
-> 🚀 **repo-sense** is a zero-config, terminal-native GitHub intelligence tool — track stars, forks, and issues live without leaving your CLI. Compare repos head-to-head with `battle`, monitor a portfolio with `watch-multi`, or get deep insights with a single command. No web UI, no Docker, no config files. **60 req/hr free, 5,000/hr with a GitHub token.**
-
 ```
 ╔══════════════════════════════════════════════════════════════════╗
 ║           🧬  repo-sense — Sixth Sense for Your Repos           ║
@@ -26,6 +24,7 @@ _Zero config. Zero bullshit. Just numbers that move._
 ║     📡  npx repo-sense watch-multi a b c                         ║
 ║     🔍  npx repo-sense insight facebook/react                    ║
 ║     ⭐  npx repo-sense stars facebook/react                      ║
+║     📈  npx repo-sense history facebook/react                    ║
 ║                                                                  ║
 ║     Zero config · Live refresh · Terminal-native                 ║
 ║     🚀 npm installed · 0 dependencies to manage                  ║
@@ -53,6 +52,7 @@ _Thousands of devs have already ditched their browser tabs — here's why:_
 | 📊 "How's my portfolio doing?" | 📡 `rs watch-multi react next.js linux` — all at a glance |
 | 🔍 "Is this repo hypersonic or stale?" | 🧬 `rs insight react` → star velocity & topics |
 | ⭐ "Just the numbers, quick" | ⚡ `rs stars react` → instant bare stats |
+| ⏳ "How fast is this repo really growing?" | 📈 `rs history react` → velocity periods & milestones |
 
 > 📢 *"I used to keep 6 tabs open just to watch stars. Now I have one terminal pane. And my browser doesn't lag."*  
 > — **A dev who hasn't pressed ⌘+R in weeks**
@@ -96,13 +96,17 @@ The dashboard refreshes every 30 seconds by default. Pass `-i 5` for every 5 sec
 
 ### ⚔️ `battle` — Who's Hotter Right Now?
 
-Put two repos head-to-head across every metric:
+Put two or more repos head-to-head across every metric:
 
 ```bash
 npx repo-sense battle facebook/react vercel/next.js
 ```
 
-Stars, forks, issues, language, license — side by side. A winner is crowned based on star gap.
+Stars, forks, issues, language, license — side by side. A winner is crowned based on star gap. Works with 2+ repos for a multi-way showdown.
+
+```bash
+npx repo-sense battle react vue svelte solid
+```
 
 ### 📡 `watch-multi` — Your Own Monitor Wall
 
@@ -117,6 +121,16 @@ A compact dashboard shows all repos in a single view with live deltas. Also supp
 ```bash
 npx repo-sense watch-multi facebook/react vercel/next.js -j | jq '.repos[].stars'
 ```
+
+### 📈 `history` — Star Growth Timeline
+
+See how a repo got to where it is — velocity periods, milestones, and growth phases:
+
+```bash
+npx repo-sense history facebook/react
+```
+
+Output includes a **growth velocity bar chart** (latest 3mo / last year / all time) with speed labels, plus star milestones showing when the repo hit 1 → 10 → 100 → 1K → 10K → 100K+ stars. Perfect for understanding whether a repo's growth is accelerating, steady, or stalling.
 
 ### 🔍 `insight` — Deep Repo Intelligence
 
@@ -148,10 +162,11 @@ Ideal for CI/CD scripts, shell aliases, or when you only need a bare-bones glanc
 | `👁️ watch` | Live dashboard — stars, forks, issues (auto-refresh 30s) | `rs watch facebook/react` |
 | &nbsp;&nbsp;&nbsp;`-i <sec>` | Custom refresh interval | `rs watch facebook/react -i 5` |
 | &nbsp;&nbsp;&nbsp;`-j` | JSON output (NDJSON, pipe-friendly) | `rs watch facebook/react -j` |
-| `🏆 battle <a> <b>` | Side-by-side repo showdown, winner declared | `rs battle react vue` |
+| `🏆 battle <a> <b>...` | Side-by-side repo showdown (2+ repos), winner declared | `rs battle react vue` |
 | `📡 watch-multi` | Multi-repo monitor wall | `rs watch-multi react vue svelte` |
 | &nbsp;&nbsp;&nbsp;`-i <sec>` | Custom interval for multi-watch | `rs watch-multi react vue -i 10` |
 | &nbsp;&nbsp;&nbsp;`-j` | JSON output for multi-watch | `rs watch-multi react vue -j` |
+| `📈 history` | Star growth timeline — velocity bars & milestones | `rs history facebook/react` |
 | `🔍 insight` | Deep intelligence — star velocity, topics, speed label | `rs insight facebook/react` |
 | `⭐ stars` | Quick bare stats glance | `rs stars facebook/react` |
 | `📖 --help` | All commands and options | `rs --help` |
@@ -237,6 +252,27 @@ cp .env.example .env   # then edit .env with your token
   Watching 3 repos  ·  8:30:15 AM  ·  Ctrl+C to stop
 ```
 
+### 📈 Star History Timeline
+
+```
+  facebook/react — Star History
+  245,098 stars over 4,787 days · 51.2/day 🔥 Hypersonic
+
+  Growth Velocity:
+  ▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▱▱▱▱  Latest 3mo: 68/day 🔥 Hypersonic
+  ▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▱▱▱▱▱  Last year:   63/day 📈 Rapid
+  ▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▱▱▱▱▱▱▱▱▱  All time:   51/day 🔥 Hypersonic
+
+  Star Milestones:
+  ★       100  Day 2         (2013-05-31)
+  ★     1,000  Day 16        (2013-06-14)
+  ★    10,000  Day 162       (2013-11-07)
+  ★   100,000  Day 616       (2015-02-04)
+  ★   245,098  Today
+
+  Age: 13.1 years  |  Avg. 51.2 stars/day
+```
+
 ### 🔍 Repo Insight
 
 ```
@@ -263,6 +299,7 @@ cp .env.example .env   # then edit .env with your token
 | 🐙 **Open-source maintainer** | Track your repo's pulse without GitHub notifications | `rs watch your-org/your-repo` |
 | 🕵️ **Dev tool scout** | Compare two tools before picking one | `rs battle vitest jest` |
 | 📈 **OSS investor** | Monitor your portfolio of starred repos | `rs watch-multi a b c d` |
+| ⏳ **Growth analyst** | Understand a repo's growth trajectory | `rs history facebook/react` |
 | 🗣️ **Tech Twitter poster** | Grab a live stat for your hot take | `rs watch facebook/react -j` → `jq` |
 | 🧪 **CI/CD pipeline** | Assert star growth or fork count in a check | `rs watch-multi a -j` → parse |
 | 🦸 **Weekend hacker** | Flex "my repo blew up" without refreshing every 5 min | `rs watch your-org/your-repo` |
@@ -279,16 +316,18 @@ cp .env.example .env   # then edit .env with your token
 - ⏱️ Have better things to do than refresh GitHub pages
 - 📊 Love seeing numbers go up (⁠+⁠1⁠2⁠ ⁠⭐⁠ ⁠▲⁠🔥⁠)
 - 🏆 Need to settle debates the only way that matters: cold, hard, star data
+- 🎯 Want to know if a repo is accelerating or plateauing, not just its total
 
 ---
 
 ## 🗺️ Roadmap
 
 - [x] `watch` — live dashboard with real-time deltas
-- [x] `battle` — head-to-head repo comparison
+- [x] `battle` — head-to-head repo comparison (2+ repos)
 - [x] `watch-multi` — multi-repo landscape monitoring
 - [x] `insight` — deep repo intelligence (star velocity, topics, speed label)
 - [x] `stars` — quick bare stats glance
+- [x] `history` — star growth timeline with velocity bars & milestones
 - [ ] Executive insight summary (`format=sentence`)
 - [ ] Star history sparklines
 - [ ] Multi-repo tournament (bracket mode)
@@ -308,6 +347,7 @@ cp .env.example .env   # then edit .env with your token
 4. On `watch`, it **polls every N seconds** and highlights what changed
 5. On `battle`, it compares every metric and declares a winner
 6. On `watch-multi`, it batches all repos into a compact overview
+7. On `history`, it calculates velocity periods and milestone timelines
 
 That's it. No config files, no Docker, no cloud service. Just you and the terminal.
 
@@ -350,12 +390,12 @@ node dist/index.js battle facebook/react vercel/next.js
 
 ## 🏆 Repo-Sense vs the World
 
-| Tool | Config needed? | Keep browser open? | Docker? | Real-time deltas? | `battle` mode? |
-|------|:---:|:---:|:---:|:---:|:---:|
-| **repo-sense** | ❌ | ❌ | ❌ | ✅ | ✅ |
-| GitHub web | ❌ | ✅ | ❌ | ❌ | ❌ |
-| Stargazer CLI | ✅ | ❌ | ❌ | ❌ | ❌ |
-| gh CLI + jq | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Tool | Config needed? | Keep browser open? | Docker? | Real-time deltas? | `battle` mode? | Growth history? |
+|------|:---:|:---:|:---:|:---:|:---:|:---:|
+| **repo-sense** | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
+| GitHub web | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Stargazer CLI | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| gh CLI + jq | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 
 **Bottom line:** If you're still checking GitHub stars through a browser, you're doing it wrong. 😏
 
@@ -372,5 +412,5 @@ MIT © β-Labs Corp.
   <br>
   <sub>⭐ Star this repo if you find it useful!</sub>
   <br><br>
-  <sub>🧑‍🚀 Curated by MarketBeta @ β-Labs · v17</sub>
+  <sub>🧑‍🚀 Curated by MarketBeta @ β-Labs · v18</sub>
 </div>
