@@ -16,18 +16,18 @@
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079?style=for-the-badge)](https://github.com/semantic-release/semantic-release)
 
 ```
-  ╔══════════════════════════════════════════════════════════╗
-  ║     🧬  repo-sense — Get a sixth sense for your repos   ║
-  ║                                                          ║
-  ║     ⚡  npx repo-sense watch facebook/react             ║
-  ║     🏆  npx repo-sense battle react next.js             ║
-  ║     📡  npx repo-sense watch-multi a b c                ║
-  ║     🔍  npx repo-sense insight facebook/react           ║
-  ║     ⭐  npx repo-sense stars facebook/react             ║
-  ║                                                          ║
-  ║     Zero config · Live refresh · Terminal-native         ║
-  ║     🚀 npm installed · 0 dependencies to manage          ║
-  ╚══════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════╗
+║     🧬  repo-sense — Get a sixth sense for your repos   ║
+║                                                          ║
+║     ⚡  npx repo-sense watch facebook/react             ║
+║     🏆  npx repo-sense battle react next.js             ║
+║     📡  npx repo-sense watch-multi a b c                ║
+║     🔍  npx repo-sense insight facebook/react           ║
+║     ⭐  npx repo-sense stars facebook/react             ║
+║                                                          ║
+║     Zero config · Live refresh · Terminal-native         ║
+║     🚀 npm installed · 0 dependencies to manage          ║
+╚══════════════════════════════════════════════════════════╝
 ```
 
 > One command to watch a repo live, or settle which one's hotter — no web UI, no config file, no BS.
@@ -131,7 +131,7 @@ npx repo-sense stars vercel/next.js
 # → ⭐ 139.5K  ·  ⑂ 31.1K  ·  ⚠ 4.0K  ·  JavaScript  ·  MIT
 ```
 
-Ideal for CI/CD scripts, shell aliases, or when you only need a barer-bones glance.
+Ideal for CI/CD scripts, shell aliases, or when you only need a bare-bones glance.
 
 ---
 
@@ -283,7 +283,7 @@ cp .env.example .env   # then edit .env with your token
 - [x] `watch-multi` — multi-repo landscape monitoring
 - [x] `insight` — deep repo intelligence (star velocity, topics, speed label)
 - [x] `stars` — quick bare stats glance
-- [x] `insight` executive summary mode
+- [ ] Executive insight summary (`format=sentence`)
 - [ ] Star history sparklines
 - [ ] Multi-repo tournament (bracket mode)
 - [ ] Export snapshot to SVG
@@ -348,5 +348,5 @@ MIT © β-Labs Corp.
   <br>
   <sub>⭐ Star this repo if you find it useful!</sub>
   <br><br>
-  <sub>🧑‍🚀 Curated by MarketBeta @ β-Labs · v14</sub>
+  <sub>🧑‍🚀 Curated by MarketBeta @ β-Labs · v15</sub>
 </div>
