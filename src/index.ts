@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { watchRepo, renderDashboard, battleRepos, renderBattle, watchMultiRepos } from './commands/watch.js';
+import { watchRepo, watchSingleRepoJson, renderDashboard, battleRepos, renderBattle, watchMultiRepos } from './commands/watch.js';
 
 export async function run(): Promise<void> {
   const program = new Command();
@@ -13,7 +13,8 @@ export async function run(): Promise<void> {
     .command('watch <repo>')
     .description('Watch a repository with live-updating metrics dashboard')
     .option('-i, --interval <seconds>', 'Polling interval in seconds', '30')
-    .action(async (repo: string, options: { interval: string }) => {
+    .option('-j, --json', 'Output JSON instead of dashboard', false)
+    .action(async (repo: string, options: { interval: string; json: boolean }) => {
       const interval = parseInt(options.interval, 10) || 30;
       const abortController = new AbortController();
 
@@ -22,12 +23,16 @@ export async function run(): Promise<void> {
       });
 
       try {
-        await watchRepo(
-          repo,
-          (snapshot, previous) => renderDashboard(snapshot, previous),
-          interval,
-          abortController.signal
-        );
+        if (options.json) {
+          await watchSingleRepoJson(repo, interval, abortController.signal);
+        } else {
+          await watchRepo(
+            repo,
+            (snapshot, previous) => renderDashboard(snapshot, previous),
+            interval,
+            abortController.signal
+          );
+        }
       } catch (err: any) {
         console.error(`✗ Error: ${err.message}`);
         process.exit(1);

@@ -13,7 +13,7 @@
 
 🔥 **Zero config · Live refresh · Terminal-native** ⚡
 
-> One command to watch, battle, and monitor your GitHub repos — no web UI, no config file, no BS.
+> One command to watch a repo live, or settle which one's hotter — no web UI, no config file, no BS.
 
 </div>
 
@@ -25,8 +25,7 @@
 |----------|---------|
 | `npx repo-sense watch facebook/react` | Live dashboard that refreshes every 30s |
 | `npx repo-sense battle facebook/react vercel/next.js` | Side-by-side smackdown with a winner |
-| `npx repo-sense watch-multi react next.js tailwindcss` | Whole landscape at a glance |
-| `rs summary facebook/react` | Markdown-friendly one-liner for your README |
+| `rs summary facebook/react` | Markdown-friendly one-liner for your README (coming soon) |
 
 **60 req/hr** without auth, **5,000 req/hr** with a `GITHUB_TOKEN` — details below.
 
@@ -42,6 +41,8 @@ npx repo-sense watch torvalds/linux
 npm install -g repo-sense
 rs watch facebook/react
 ```
+
+> 💡 Pro tip: add `alias repo-sense=rs` to your `.zshrc` or `.bashrc` for even less typing.
 
 ---
 
@@ -67,26 +68,14 @@ npx repo-sense battle facebook/react vercel/next.js
 
 Stars, forks, issues, language, license — side by side. A winner is crowned based on star gap. Perfect for settling "which repo is hotter right now?" debates at your desk.
 
-### 📡 `watch-multi` — The Whole Landscape
+### 📝 `summary` — README One-Liner *(coming soon)*
 
-Track your competitive set at once:
-
-```bash
-npx repo-sense watch-multi facebook/react vercel/next.js tailwindlabs/tailwindcss
-```
-
-All repos, one table, live updates. Add `-j` for JSON output you can pipe into your own dashboards or Slack bots.
-
-### 📝 `summary` — README Badge
-
-Drop a live-regenerating badge into your own project's README:
+Drop a living badge into your own project's README:
 
 ```bash
 npx repo-sense summary vercel/next.js
 # → ⭐ 139.5K · ⑂ 31.1K · ⚠ 4.0K · 🔤 JavaScript · 📜 MIT
 ```
-
-Great for project pages, pitch decks, and YouTrack dashboards.
 
 ---
 
@@ -97,9 +86,7 @@ Great for project pages, pitch decks, and YouTrack dashboards.
 | `rs watch <repo>` | Live dashboard — stars, forks, issues (auto-refresh 30s) |
 | `rs watch <repo> -i <sec>` | Same with custom refresh interval |
 | `rs battle <a> <b>` | Side-by-side comparison, winner declared |
-| `rs watch-multi <repos...>` | Multi-repo live monitoring |
-| `rs watch-multi <repos...> -j` | JSON output for programmatic use |
-| `rs summary <repo>` | One-liner badge for your own README |
+| `rs summary <repo>` | One-liner badge for your own README *(coming soon)* |
 | `rs --help` | All commands and options |
 | `rs --version` | Show version |
 
@@ -111,7 +98,7 @@ Without a token you get **60 requests/hour**. Set `GITHUB_TOKEN` for **5,000/hr*
 export GITHUB_TOKEN=ghp_your_token_here
 ```
 
-Or drop a `.env` file in the project root (see `.env.example`).
+Or drop a `.env` file in the project root with `GITHUB_TOKEN=ghp_...`.
 
 ---
 
@@ -161,36 +148,21 @@ Or drop a `.env` file in the project root (see `.env.example`).
      Leads by 105.6K stars over vercel/next.js
 ```
 
-### 📡 Multi-Watch Dashboard
-
-```
-  ┌─────────────────────────────────────────────────────────────────────────┐
-  │              📡  repo-sense  MULTI-WATCH  📡                          │
-  └─────────────────────────────────────────────────────────────────────────┘
-
-┌──────────────────────────┬──────────────┬──────────┬──────────┬────────┬──────────────┐
-│ Repository               │ ⭐ Stars      │ ⑂ Forks │ ⚠ Issues │ Lang   │ License      │
-├──────────────────────────┼──────────────┼──────────┼──────────┼────────┼──────────────┤
-│ facebook/react           │ 245.1K +12   │ 51.1K +1 │ 1.3K -2  │ JS     │ MIT          │
-│ vercel/next.js           │ 139.5K +5    │ 31.1K +0 │ 4.0K +1  │ JS     │ MIT          │
-│ tailwindlabs/tailwindcss │ 87.2K +3     │ 4.5K +0  │ 521 -1   │ CSS    │ MIT          │
-└──────────────────────────┴──────────────┴──────────┴──────────┴────────┴──────────────┘
-
-  Watching 3 repos  ·  8:30:15 AM  ·  Ctrl+C to stop  ·  JSON mode: rs ... -j
-```
-
 ---
 
 ## 🗺️ Roadmap
 
 - [x] `watch` — live dashboard with real-time deltas
 - [x] `battle` — head-to-head repo comparison
-- [x] `watch-multi` — multi-repo landscape monitoring
+- [ ] `summary` — one-liner badge for your README
+- [ ] `watch-multi` — multi-repo landscape monitoring
 - [ ] Star history sparklines
 - [ ] Multi-repo tournament (bracket mode)
 - [ ] Export snapshot to SVG
 - [ ] Trending repos explorer
 - [ ] GitHub Actions badge generator
+
+> 👣 Following semantic versioning — `summary` ships as v0.2.0, `watch-multi` as v0.3.0.
 
 ---
 
@@ -217,7 +189,7 @@ node dist/index.js battle facebook/react vercel/next.js
 1. You pass a GitHub repo slug (e.g. `facebook/react`)
 2. repo-sense calls the **GitHub REST API** via Octokit
 3. Data hits your terminal as a **beautiful CLI table** — no web browser needed
-4. On `watch` and `watch-multi`, it **polls every N seconds** and highlights what changed
+4. On `watch`, it **polls every N seconds** and highlights what changed
 5. On `battle`, it compares every metric and declares a winner
 
 That's it. No config files, no Docker, no cloud service. Just you and the terminal.
@@ -249,5 +221,5 @@ MIT © β-Labs Corp.
   <br>
   <sub>⭐ Star this repo if you find it useful!</sub>
   <br><br>
-  <sub>🧑‍🚀 Refined by MarketBeta @ β-Labs · v5</sub>
+  <sub>🧑‍🚀 Refined by MarketBeta @ β-Labs · v6</sub>
 </div>

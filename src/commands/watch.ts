@@ -1,11 +1,11 @@
 import chalk from 'chalk';
 import Table from 'cli-table3';
-import type { RepoData, RepoSnapshot, BattleResult, JsonSnapshot } from '../models.js';
+import type { RepoData, RepoSnapshot, BattleResult, JsonSnapshot, SingleJsonSnapshot } from '../models.js';
 import { formatNumber, getRepo, clearCache, getRepos } from '../github.js';
 
 export async function watchRepo(
   repoStr: string,
-  onUpdate: (snapshot: RepoSnapshot, previous?: RepoSnapshot) => void,
+  onUpdate: (snapshot: RepoSnapshot | SingleJsonSnapshot, previous?: RepoSnapshot) => void,
   interval: number = 30,
   signal?: AbortSignal
 ): Promise<void> {
@@ -61,6 +61,66 @@ export async function watchRepo(
         const mins = Math.floor(elapsed / 60);
         const secs = elapsed % 60;
         console.log(chalk.cyan(`\n📊 Watch summary: ${mins}m ${secs}s watched, ${totalGrowth > 0 ? '+' : ''}${totalGrowth} new stars`));
+        resolve();
+        return;
+      }
+      await tick();
+    }, interval * 1000);
+  });
+}
+
+/**
+ * Single-repo watch with JSON output mode.
+ * Prints JSON to stdout, no summary on abort.
+ * Only the `lastUpdated` key changes between ticks — each line is valid NDJSON.
+ */
+export async function watchSingleRepoJson(
+  repoStr: string,
+  interval: number = 30,
+  signal?: AbortSignal
+): Promise<void> {
+  let startTime = Date.now();
+
+  const tick = async (): Promise<void> => {
+    if (signal?.aborted) return;
+    try {
+      clearCache();
+      const repo = await getRepo(repoStr);
+      const snapshot: SingleJsonSnapshot = {
+        timestamp: new Date().toISOString(),
+        repo,
+      };
+      console.log(JSON.stringify(snapshot));
+    } catch (err: any) {
+      console.error(JSON.stringify({ error: err.message }));
+    }
+  };
+
+  await tick();
+  if (signal?.aborted) return;
+
+  return new Promise((resolve) => {
+    const onAbort = () => {
+      clearInterval(timer);
+      const elapsed = Math.round((Date.now() - startTime) / 1000);
+      const mins = Math.floor(elapsed / 60);
+      const secs = elapsed % 60;
+      console.log(chalk.cyan(`\n📊 Watch summary: ${mins}m ${secs}s watched (JSON mode)`));
+      resolve();
+    };
+
+    if (signal) {
+      signal.addEventListener('abort', onAbort, { once: true });
+    }
+
+    const timer = setInterval(async () => {
+      if (signal?.aborted) {
+        clearInterval(timer);
+        if (signal) signal.removeEventListener('abort', onAbort);
+        const elapsed = Math.round((Date.now() - startTime) / 1000);
+        const mins = Math.floor(elapsed / 60);
+        const secs = elapsed % 60;
+        console.log(chalk.cyan(`\n📊 Watch summary: ${mins}m ${secs}s watched (JSON mode)`));
         resolve();
         return;
       }

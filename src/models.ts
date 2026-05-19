@@ -79,8 +79,14 @@ export interface MultiWatchOptions {
   json: boolean;
 }
 
-/** JSON-serializable snapshot for --json output */
+/** JSON-serializable snapshot for multi-repo --json output */
 export interface JsonSnapshot {
   timestamp: string;
   repos: RepoData[];
+}
+
+/** JSON-serializable snapshot for single-repo --json output */
+export interface SingleJsonSnapshot {
+  timestamp: string;
+  repo: RepoData;
 }
