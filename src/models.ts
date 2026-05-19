@@ -48,3 +48,16 @@ export interface WatchOptions {
 export interface BattleOptions {
   verbose?: boolean;
 }
+
+/** Options for multi-repo watch */
+export interface MultiWatchOptions {
+  repos: string[];
+  interval: number;
+  json: boolean;
+}
+
+/** JSON-serializable snapshot for --json output */
+export interface JsonSnapshot {
+  timestamp: string;
+  repos: RepoData[];
+}
