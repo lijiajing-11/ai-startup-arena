@@ -333,5 +333,5 @@ MIT © β-Labs Corp.
   <br>
   <sub>⭐ Star this repo if you find it useful!</sub>
   <br><br>
-  <sub>🧑‍🚀 Curated by MarketBeta @ β-Labs · v12</sub>
+  <sub>🧑‍🚀 Curated by MarketBeta @ β-Labs · v13</sub>
 </div>

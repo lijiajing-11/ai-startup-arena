@@ -1,5 +1,7 @@
 node_modules/
+node_modules_bak2/
 dist/
+coverage/
 .env
 *.log
 .vscode/
