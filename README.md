@@ -10,14 +10,14 @@
 [![TypeScript](https://img.shields.io/npm/types/repo-sense?style=for-the-badge&logo=typescript&color=3178C6)](https://www.typescriptlang.org/)
 [![Node](https://img.shields.io/badge/Node-%3E%3D18-339933?style=for-the-badge&logo=node.js)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](https://opensource.org/licenses/MIT)
-| [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=for-the-badge)](http://makeapullrequest.com)
-| [![Bundle Size](https://img.shields.io/badge/minzipped-%3C10KB-success?style=for-the-badge)](#)
-| [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079?style=for-the-badge)](https://github.com/semantic-release/semantic-release)
-|
-| > 🚀 **repo-sense** is a zero-config, terminal-native GitHub intelligence tool — track stars, forks, and issues live without leaving your CLI. Compare repos head-to-head with `battle`, monitor a portfolio with `watch-multi`, or get deep insights with a single command. No web UI, no Docker, no config files. **60 req/hr free, 5,000/hr with a GitHub token.**
-|
-| ```
-| ╔══════════════════════════════════════════════════════════════════╗
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=for-the-badge)](http://makeapullrequest.com)
+[![Bundle Size](https://img.shields.io/badge/minzipped-%3C10KB-success?style=for-the-badge)](#)
+[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079?style=for-the-badge)](https://github.com/semantic-release/semantic-release)
+
+> 🚀 **repo-sense** is a zero-config, terminal-native GitHub intelligence tool — track stars, forks, and issues live without leaving your CLI. Compare repos head-to-head with `battle`, monitor a portfolio with `watch-multi`, or get deep insights with a single command. No web UI, no Docker, no config files. **60 req/hr free, 5,000/hr with a GitHub token.**
+
+```
+╔══════════════════════════════════════════════════════════════════╗
 ║           🧬  repo-sense — Sixth Sense for Your Repos           ║
 ║                                                                  ║
 ║     ⚡  npx repo-sense watch facebook/react                      ║
