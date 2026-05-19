@@ -21,20 +21,9 @@ vi.mock('@octokit/rest', () => {
 });
 
 // Shared chainable chalk mock — supports arbitrary chaining like chalk.bold.cyan('x')
-import chalkMock from './__mocks__/chalk.js';
+import { createChalkMock } from './__mocks__/chalk.js';
 
-vi.mock('chalk', () => ({
-  default: chalkMock,
-  red: chalkMock,
-  green: chalkMock,
-  yellow: chalkMock,
-  cyan: chalkMock,
-  blue: chalkMock,
-  gray: chalkMock,
-  white: chalkMock,
-  magenta: chalkMock,
-  bold: chalkMock,
-}));
+vi.mock('chalk', () => createChalkMock());
 
 vi.mock('cli-table3', () => ({
   default: vi.fn().mockImplementation(() => ({
