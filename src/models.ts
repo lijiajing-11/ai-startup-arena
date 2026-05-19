@@ -41,15 +41,6 @@ export interface BattleResult {
 }
 
 /** CLI command options */
-export interface WatchOptions {
-  interval?: number; // seconds between polls (default: 30)
-}
-
-export interface BattleOptions {
-  verbose?: boolean;
-}
-
-/** JSON-serializable snapshot for multi-repo --json output */
 export interface JsonSnapshot {
   timestamp: string;
   repos: RepoData[];
