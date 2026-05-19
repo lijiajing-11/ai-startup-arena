@@ -5,10 +5,11 @@
 **Get a sixth sense for your repos** — real-time GitHub intelligence, right in your terminal.
 
 [![npm version](https://img.shields.io/npm/v/repo-sense?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/repo-sense)
+[![npm downloads](https://img.shields.io/npm/dm/repo-sense?style=flat-square&color=blueviolet)](https://www.npmjs.com/package/repo-sense)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![Node](https://img.shields.io/badge/Node-%3E%3D18-339933?style=flat-square&logo=node.js)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](https://opensource.org/licenses/MIT)
 [![GitHub Stars](https://img.shields.io/github/stars/li1050109098/beta-project-arena?style=flat-square&logo=github)](https://github.com/li1050109098/beta-project-arena)
-[![npm downloads](https://img.shields.io/npm/dm/repo-sense?style=flat-square&color=blueviolet)](https://www.npmjs.com/package/repo-sense)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square)](http://makeapullrequest.com)
 
 🔥 **Zero config · Live refresh · Terminal-native** ⚡
@@ -25,7 +26,8 @@
 |----------|---------|
 | `npx repo-sense watch facebook/react` | Live dashboard that refreshes every 30s |
 | `npx repo-sense battle facebook/react vercel/next.js` | Side-by-side smackdown with a winner |
-| `rs summary facebook/react` | Markdown-friendly one-liner for your README (coming soon) |
+| `npx repo-sense watch-multi facebook/react vercel/next.js` | Multi-repo landscape at a glance |
+| `rs summary facebook/react` | Markdown-friendly one-liner for your README *(coming soon)* |
 
 **60 req/hr** without auth, **5,000 req/hr** with a `GITHUB_TOKEN` — details below.
 
@@ -68,6 +70,20 @@ npx repo-sense battle facebook/react vercel/next.js
 
 Stars, forks, issues, language, license — side by side. A winner is crowned based on star gap. Perfect for settling "which repo is hotter right now?" debates at your desk.
 
+### 📡 `watch-multi` — Your Own Monitor Wall
+
+Keep an eye on multiple repos simultaneously:
+
+```bash
+npx repo-sense watch-multi facebook/react vercel/next.js torvalds/linux
+```
+
+A compact dashboard shows all repos in a single view with live deltas. Also supports `-j` for JSON output, making it easy to pipe into your own tooling.
+
+```bash
+npx repo-sense watch-multi facebook/react vercel/next.js -j | jq '.repos[].stars'
+```
+
 ### 📝 `summary` — README One-Liner *(coming soon)*
 
 Drop a living badge into your own project's README:
@@ -85,7 +101,11 @@ npx repo-sense summary vercel/next.js
 |---------|-------------|
 | `rs watch <repo>` | Live dashboard — stars, forks, issues (auto-refresh 30s) |
 | `rs watch <repo> -i <sec>` | Same with custom refresh interval |
+| `rs watch <repo> -j` | JSON output (NDJSON, each line is a snapshot) |
 | `rs battle <a> <b>` | Side-by-side comparison, winner declared |
+| `rs watch-multi <a> <b> ...` | Multi-repo landscape watch |
+| `rs watch-multi <a> <b> ... -i <sec>` | Multi-repo with custom interval |
+| `rs watch-multi <a> <b> ... -j` | Multi-repo JSON output for piping |
 | `rs summary <repo>` | One-liner badge for your own README *(coming soon)* |
 | `rs --help` | All commands and options |
 | `rs --version` | Show version |
@@ -98,7 +118,11 @@ Without a token you get **60 requests/hour**. Set `GITHUB_TOKEN` for **5,000/hr*
 export GITHUB_TOKEN=ghp_your_token_here
 ```
 
-Or drop a `.env` file in the project root with `GITHUB_TOKEN=ghp_...`.
+Or copy the `.env.example` template in the repo root:
+
+```bash
+cp .env.example .env   # then edit .env with your token
+```
 
 ---
 
@@ -148,21 +172,39 @@ Or drop a `.env` file in the project root with `GITHUB_TOKEN=ghp_...`.
      Leads by 105.6K stars over vercel/next.js
 ```
 
+### 📡 Multi-Watch Dashboard
+
+```
+  ┌────────────────────────────────────────────────────────────────┐
+  │           📡  repo-sense  MULTI-WATCH  📡                   │
+  └────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────┬──────────────┬──────────────┬──────────────┬──────────────┬──────────────┐
+│ Repository               │ ⭐ Stars     │ ⑂ Forks      │ ⚠ Issues     │ 🔤 Lang      │ 📜 License   │
+├──────────────────────────┼──────────────┼──────────────┼──────────────┼──────────────┼──────────────┤
+│ facebook/react           │ 245.1K +3    │ 51.1K        │ 1.3K -1      │ JavaScript   │ MIT          │
+│ vercel/next.js           │ 139.5K       │ 31.1K        │ 4.0K         │ JavaScript   │ MIT          │
+│ torvalds/linux           │ 197.3K +1    │ 86.3K        │ 1.7K -2      │ C            │ GPL-2.0      │
+└──────────────────────────┴──────────────┴──────────────┴──────────────┴──────────────┴──────────────┘
+
+  Watching 3 repos  ·  8:30:15 AM  ·  Ctrl+C to stop
+```
+
 ---
 
 ## 🗺️ Roadmap
 
 - [x] `watch` — live dashboard with real-time deltas
 - [x] `battle` — head-to-head repo comparison
+- [x] `watch-multi` — multi-repo landscape monitoring
 - [ ] `summary` — one-liner badge for your README
-- [ ] `watch-multi` — multi-repo landscape monitoring
 - [ ] Star history sparklines
 - [ ] Multi-repo tournament (bracket mode)
 - [ ] Export snapshot to SVG
 - [ ] Trending repos explorer
 - [ ] GitHub Actions badge generator
 
-> 👣 Following semantic versioning — `summary` ships as v0.2.0, `watch-multi` as v0.3.0.
+> 👣 Following semantic versioning — `summary` ships as v0.2.0.
 
 ---
 
@@ -191,6 +233,7 @@ node dist/index.js battle facebook/react vercel/next.js
 3. Data hits your terminal as a **beautiful CLI table** — no web browser needed
 4. On `watch`, it **polls every N seconds** and highlights what changed
 5. On `battle`, it compares every metric and declares a winner
+6. On `watch-multi`, it batches all repos into a compact overview
 
 That's it. No config files, no Docker, no cloud service. Just you and the terminal.
 
@@ -221,5 +264,5 @@ MIT © β-Labs Corp.
   <br>
   <sub>⭐ Star this repo if you find it useful!</sub>
   <br><br>
-  <sub>🧑‍🚀 Refined by MarketBeta @ β-Labs · v6</sub>
+  <sub>🧑‍🚀 Refined by MarketBeta @ β-Labs · v7</sub>
 </div>
