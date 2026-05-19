@@ -11,23 +11,22 @@
 [![Node](https://img.shields.io/badge/Node-%3E%3D18-339933?style=for-the-badge&logo=node.js)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=for-the-badge)](http://makeapullrequest.com)
-[![Built with](https://img.shields.io/badge/Built%20with-Octokit-0d1117?style=for-the-badge&logo=github)](https://github.com/octokit)
 [![Bundle Size](https://img.shields.io/badge/minzipped-%3C10KB-success?style=for-the-badge)](#)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079?style=for-the-badge)](https://github.com/semantic-release/semantic-release)
 
 ```
-╔══════════════════════════════════════════════════════════╗
-║     🧬  repo-sense — Get a sixth sense for your repos   ║
-║                                                          ║
-║     ⚡  npx repo-sense watch facebook/react             ║
-║     🏆  npx repo-sense battle react next.js             ║
-║     📡  npx repo-sense watch-multi a b c                ║
-║     🔍  npx repo-sense insight facebook/react           ║
-║     ⭐  npx repo-sense stars facebook/react             ║
-║                                                          ║
-║     Zero config · Live refresh · Terminal-native         ║
-║     🚀 npm installed · 0 dependencies to manage          ║
-╚══════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════╗
+║           🧬  repo-sense — Sixth Sense for Your Repos           ║
+║                                                                  ║
+║     ⚡  npx repo-sense watch facebook/react                      ║
+║     🏆  npx repo-sense battle react next.js                      ║
+║     📡  npx repo-sense watch-multi a b c                         ║
+║     🔍  npx repo-sense insight facebook/react                    ║
+║     ⭐  npx repo-sense stars facebook/react                      ║
+║                                                                  ║
+║     Zero config · Live refresh · Terminal-native                 ║
+║     🚀 npm installed · 0 dependencies to manage                  ║
+╚══════════════════════════════════════════════════════════════════╝
 ```
 
 > One command to watch a repo live, or settle which one's hotter — no web UI, no config file, no BS.
@@ -137,19 +136,19 @@ Ideal for CI/CD scripts, shell aliases, or when you only need a bare-bones glanc
 
 ## 📖 Command Reference
 
-| Command | Description |
-|---------|-------------|
-| `rs watch <repo>` | Live dashboard — stars, forks, issues (auto-refresh 30s) |
-| `rs watch <repo> -i <sec>` | Same with custom refresh interval |
-| `rs watch <repo> -j` | JSON output (NDJSON, each line is a snapshot) |
-| `rs insight <repo>` | Deep intelligence — star velocity, topics, age, speed label |
-| `rs stars <repo>` | Quick bare stats — stars, forks, issues, language, license |
-| `rs battle <a> <b>` | Side-by-side comparison, winner declared |
-| `rs watch-multi <a> <b> ...` | Multi-repo landscape watch |
-| `rs watch-multi <a> <b> ... -i <sec>` | Multi-repo with custom interval |
-| `rs watch-multi <a> <b> ... -j` | Multi-repo JSON output for piping |
-| `rs --help` | All commands and options |
-| `rs --version` | Show version |
+| Command | Description | Quick Copy |
+|---------|-------------|------------|
+| `rs watch <repo>` | Live dashboard — stars, forks, issues (auto-refresh 30s) | `rs watch facebook/react` |
+| `rs watch <repo> -i <sec>` | Same with custom refresh interval | `rs watch facebook/react -i 5` |
+| `rs watch <repo> -j` | JSON output (NDJSON, each line is a snapshot) | `rs watch facebook/react -j` |
+| `rs insight <repo>` | Deep intelligence — star velocity, topics, age, speed label | `rs insight facebook/react` |
+| `rs stars <repo>` | Quick bare stats — stars, forks, issues, language, license | `rs stars facebook/react` |
+| `rs battle <a> <b>` | Side-by-side comparison, winner declared | `rs battle react vue` |
+| `rs watch-multi <a> <b> ...` | Multi-repo landscape watch | `rs watch-multi react vue svelte` |
+| `rs watch-multi <a> <b> ... -i <sec>` | Multi-repo with custom interval | `rs watch-multi react vue -i 10` |
+| `rs watch-multi <a> <b> ... -j` | Multi-repo JSON output for piping | `rs watch-multi react vue -j` |
+| `rs --help` | All commands and options | `rs --help` |
+| `rs --version` | Show version | `rs --version` |
 
 ### 🔐 Auth (optional)
 
@@ -233,7 +232,7 @@ cp .env.example .env   # then edit .env with your token
 
 ### 🔍 Repo Insight
 
-```text
+```
   ┌──────────────────────────────────────┐
   │     🧬  repo-sense  INSIGHT          │
   └──────────────────────────────────────┘
@@ -290,7 +289,7 @@ cp .env.example .env   # then edit .env with your token
 - [ ] Trending repos explorer
 - [ ] GitHub Actions badge generator
 
-> 🚀 **v0.2.0 is live on npm** — `npx repo-sense` it now, no waiting.
+> 🚀 **v0.2.1 is live on npm** — `npx repo-sense` it now, no waiting.
 
 ---
 
@@ -348,5 +347,5 @@ MIT © β-Labs Corp.
   <br>
   <sub>⭐ Star this repo if you find it useful!</sub>
   <br><br>
-  <sub>🧑‍🚀 Curated by MarketBeta @ β-Labs · v15</sub>
+  <sub>🧑‍🚀 Curated by MarketBeta @ β-Labs · v16</sub>
 </div>

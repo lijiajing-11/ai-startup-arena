@@ -589,6 +589,7 @@ describe('battleMultiRepos', () => {
 
   it('renderBattleMulti renders without throwing', async () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
     const { renderBattleMulti } = await import('../commands/watch.js');
 
     const makeRepo = (name: string, stars: number) => ({
