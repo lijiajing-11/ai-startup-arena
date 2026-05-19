@@ -5,9 +5,20 @@ vi.mock('child_process', () => ({
   execSync: vi.fn(),
 }));
 
+// Mock fs — coverage.ts will check existsSync and readFileSync
+// Use a shared `__mockExists` variable so tests can control behavior
+let __mockExists = true;
+const __mockReadMap: Record<string, string> = {};
+
 vi.mock('fs', () => ({
-  existsSync: vi.fn(),
-  readFileSync: vi.fn(),
+  existsSync: vi.fn(() => __mockExists),
+  readFileSync: vi.fn((path: string, encoding: string) => {
+    if (!__mockExists) {
+      throw new Error(`ENOENT: ${path}`);
+    }
+    if (__mockReadMap[path]) return __mockReadMap[path];
+    return '';
+  }),
 }));
 
 // Also mock chalk and cli-table3 since coverage.ts uses them
@@ -29,13 +40,27 @@ vi.mock('cli-table3', () => {
   return { default: MockTable };
 });
 
-describe('coverageCommand', () => {
+function setupSpies() {
   const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
   const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
   const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+  return { logSpy, errorSpy, exitSpy };
+}
+
+describe('coverageCommand', () => {
+  let logSpy: ReturnType<typeof vi.spyOn>;
+  let errorSpy: ReturnType<typeof vi.spyOn>;
+  let exitSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    const spies = setupSpies();
+    logSpy = spies.logSpy;
+    errorSpy = spies.errorSpy;
+    exitSpy = spies.exitSpy;
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('renders coverage table with valid data', async () => {
@@ -115,15 +140,17 @@ describe('coverageCommand', () => {
 // ── renderCoverage standalone tests ────────────────────────────────────
 
 describe('renderCoverage (standalone)', () => {
+  const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('renders with no threshold config file (vitest.config.ts missing)', () => {
-    const fsModule = require('fs');
-    fsModule.existsSync.mockReturnValue(false);
+  it('renders with no threshold config file (vitest.config.ts missing)', async () => {
+    const fsModule = await import('fs');
+    vi.mocked(fsModule).existsSync.mockReturnValue(false);
 
-    const { renderCoverage } = require('../commands/coverage.js');
+    const { renderCoverage } = await import('../commands/coverage.js');
     const summary = {
       total: { lines: { pct: 80 }, branches: { pct: 80 }, functions: { pct: 80 }, statements: { pct: 80 } },
     };
@@ -132,8 +159,8 @@ describe('renderCoverage (standalone)', () => {
     expect(logSpy).toHaveBeenCalled();
   });
 
-  it('filters out non-src/ files from table', () => {
-    const { renderCoverage } = require('../commands/coverage.js');
+  it('filters out non-src/ files from table', async () => {
+    const { renderCoverage } = await import('../commands/coverage.js');
     const summary = {
       total: { lines: { pct: 90 }, branches: { pct: 90 }, functions: { pct: 90 }, statements: { pct: 90 } },
       'node_modules/foo/index.js': { lines: { pct: 100 }, branches: { pct: 100 }, functions: { pct: 100 }, statements: { pct: 100 } },
