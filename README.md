@@ -4,13 +4,13 @@
 
 **Get a sixth sense for your repos**
 
+[![npm version](https://img.shields.io/npm/v/repo-sense?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/repo-sense)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
-[![npm version](https://img.shields.io/badge/npm-v0.1.0-red?style=flat-square&logo=npm)](https://www.npmjs.com/package/repo-sense)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](https://opensource.org/licenses/MIT)
 [![GitHub Stars](https://img.shields.io/github/stars/li1050109098/beta-project-arena?style=flat-square&logo=github)](https://github.com/li1050109098/beta-project-arena)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
-[![npm downloads](https://img.shields.io/badge/dynamic/json?url=https://api.npmjs.org/downloads/point/last-month/repo-sense&query=downloads&label=downloads&style=flat-square&color=blueviolet)](https://www.npmjs.com/package/repo-sense)
-[![CI](https://img.shields.io/badge/CI-passing-success?style=flat-square&logo=githubactions)](https://github.com/li1050109098/beta-project-arena/actions)
+[![npm downloads](https://img.shields.io/npm/dm/repo-sense?style=flat-square&color=blueviolet)](https://www.npmjs.com/package/repo-sense)
+[![CI](https://img.shields.io/github/actions/workflow/status/li1050109098/beta-project-arena/ci.yml?style=flat-square&logo=githubactions&label=CI)](https://github.com/li1050109098/beta-project-arena/actions)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square)](http://makeapullrequest.com)
 
 🔥 **Zero config · Real-time · Terminal-native**
 
@@ -18,13 +18,9 @@
 
 ---
 
-## Why repo-sense?
+## 👀 One-liner
 
-You spend all day in the terminal. Why open a browser just to check a repo?
-
-**repo-sense** (short: `rs`) turns your terminal into a GitHub intelligence dashboard. Watch stars tick up live. Battle repos head-to-head. Monitor multiple repos at once. All without leaving the command line.
-
-Built with TypeScript. Powered by the [GitHub API](https://docs.github.com/en/rest). Zero configuration needed.
+> **Get a sixth sense for your repos** — watch stars tick up live, battle repos head-to-head, monitor your whole landscape. All from the command line.
 
 ---
 
@@ -122,8 +118,8 @@ Or create a `.env` file in the project root (see `.env.example`).
 │ Repository         │ facebook/react               │
 │ Description        │ A declarative UI library     │
 │ ⭐ Stars           │ 245.1K (+12)                 │
-│ ⑂ Forks            │ 51.1K (+1)                   │
-│ ⚠ Issues           │ 1.3K  (-2)                   │
+│ ⑂ Forks            │ 51.1K  (+1)                  │
+│ ⚠ Issues           │ 1.3K   (-2)                  │
 │ 🔤 Language        │ JavaScript                   │
 │ 📜 License         │ MIT                          │
 │ 🕐 Updated         │ 5/19/2026, 8:30:15 AM        │

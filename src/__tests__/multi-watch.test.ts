@@ -1,36 +1,39 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { RepoData } from '../models.js';
+
+// ── Mocks with shared state ────────────────────────────────────────────
+// We expose mock controllers on the mocked module itself so tests can
+// configure them. This avoids the closure-variable capture issue.
 
 vi.mock('@octokit/rest', () => {
   const __mockGet = vi.fn();
   const __mockGetAllTopics = vi.fn();
-  return {
-    Octokit: vi.fn(() => ({
-      rest: {
-        repos: { get: __mockGet, getAllTopics: __mockGetAllTopics },
+  const MockOctokit = vi.fn(() => ({
+    rest: {
+      repos: {
+        get: __mockGet,
+        getAllTopics: __mockGetAllTopics,
       },
-    })),
-    __mockGet,
-    __mockGetAllTopics,
-  };
+    },
+  }));
+
+  return { Octokit: MockOctokit, __mockGet, __mockGetAllTopics };
 });
 
-function makeChalkChain(): any {
-  return new Proxy((s: string) => s, {
-    apply(_t, _thisArg, args) { return args[0] ?? ''; },
-    get() { return makeChalkChain(); },
-  });
-}
+// Shared chainable chalk mock — supports arbitrary chaining like chalk.bold.cyan('x')
+import chalkMock from './__mocks__/chalk.js';
+
 vi.mock('chalk', () => ({
-  default: makeChalkChain(),
-  red: makeChalkChain(),
-  green: makeChalkChain(),
-  yellow: makeChalkChain(),
-  cyan: makeChalkChain(),
-  blue: makeChalkChain(),
-  gray: makeChalkChain(),
-  white: makeChalkChain(),
-  magenta: makeChalkChain(),
-  bold: makeChalkChain(),
+  default: chalkMock,
+  red: chalkMock,
+  green: chalkMock,
+  yellow: chalkMock,
+  cyan: chalkMock,
+  blue: chalkMock,
+  gray: chalkMock,
+  white: chalkMock,
+  magenta: chalkMock,
+  bold: chalkMock,
 }));
 
 vi.mock('cli-table3', () => ({
@@ -40,7 +43,30 @@ vi.mock('cli-table3', () => ({
   })),
 }));
 
-import { __mockGet as mockGet, __mockGetAllTopics as mockGetAllTopics } from '@octokit/rest';
+// Get the mock controllers from the mock factory
+import { Octokit } from '@octokit/rest';
+const MockOctokit = vi.mocked(Octokit);
+
+function getMockGet() {
+  // Each call to MockOctokit() creates a new instance, but it always
+  // returns the same __mockGet / __mockGetAllTopics from the factory
+  const instance = (MockOctokit as any).mock.results[0]?.value;
+  if (!instance) {
+    // Force creation
+    new (Octokit as any)();
+    return (MockOctokit as any).mock.results[0]?.value?.rest?.repos?.get;
+  }
+  return instance.rest.repos.get;
+}
+
+function getMockGetAllTopics() {
+  const instance = (MockOctokit as any).mock.results[0]?.value;
+  if (!instance) {
+    new (Octokit as any)();
+    return (MockOctokit as any).mock.results[0]?.value?.rest?.repos?.getAllTopics;
+  }
+  return instance.rest.repos.getAllTopics;
+}
 
 const makeApiResponse = (owner: string, name: string, stars: number) => ({
   data: {
@@ -64,27 +90,44 @@ const makeTopicsResponse = (topics: string[] = []) => ({
 });
 
 describe('getRepos', () => {
-  beforeEach(() => { vi.clearAllMocks(); delete process.env.GITHUB_TOKEN; });
+  beforeEach(() => {
+    vi.clearAllMocks();
+    delete process.env.GITHUB_TOKEN;
+  });
 
   it('fetches multiple repos in parallel and returns data in order', async () => {
+    const mockGet = getMockGet();
+    const mockTopics = getMockGetAllTopics();
+
     mockGet
       .mockResolvedValueOnce(makeApiResponse('facebook', 'react', 200000))
       .mockResolvedValueOnce(makeApiResponse('vercel', 'next.js', 120000))
       .mockResolvedValueOnce(makeApiResponse('microsoft', 'vscode', 150000));
-    mockGetAllTopics.mockResolvedValue(makeTopicsResponse());
+    mockTopics.mockResolvedValue(makeTopicsResponse());
 
     const { getRepos, clearCache } = await import('../github.js');
     clearCache();
     const repos = await getRepos(['facebook/react', 'vercel/next.js', 'microsoft/vscode']);
+
     expect(repos).toHaveLength(3);
     expect(repos[0].fullName).toBe('facebook/react');
     expect(repos[0].stars).toBe(200000);
+    expect(repos[1].fullName).toBe('vercel/next.js');
+    expect(repos[1].stars).toBe(120000);
+    expect(repos[2].fullName).toBe('microsoft/vscode');
+    expect(repos[2].stars).toBe(150000);
     expect(mockGet).toHaveBeenCalledTimes(3);
   });
 
   it('throws on first failure with invalid repo', async () => {
-    mockGet.mockRejectedValue(Object.assign(new Error('Not Found'), { status: 404 }));
-    mockGetAllTopics.mockResolvedValue(makeTopicsResponse());
+    const mockGet = getMockGet();
+    const mockTopics = getMockGetAllTopics();
+
+    mockGet.mockRejectedValue(
+      Object.assign(new Error('Not Found'), { status: 404 })
+    );
+    mockTopics.mockResolvedValue(makeTopicsResponse());
+
     const { getRepos, clearCache } = await import('../github.js');
     clearCache();
     await expect(getRepos(['unknown/ghost'])).rejects.toThrow('Not Found');
@@ -92,10 +135,106 @@ describe('getRepos', () => {
 });
 
 describe('watchMultiRepos', () => {
-  beforeEach(() => { vi.clearAllMocks(); delete process.env.GITHUB_TOKEN; });
+  beforeEach(() => {
+    vi.clearAllMocks();
+    delete process.env.GITHUB_TOKEN;
+  });
 
   it('exports watchMultiRepos function', async () => {
     const { watchMultiRepos } = await import('../commands/watch.js');
     expect(typeof watchMultiRepos).toBe('function');
   });
+
+  it('single tick with JSON output does not throw', async () => {
+    const mockGet = getMockGet();
+    const mockTopics = getMockGetAllTopics();
+
+    mockGet
+      .mockResolvedValueOnce(makeApiResponse('facebook', 'react', 200000))
+      .mockResolvedValueOnce(makeApiResponse('vercel', 'next.js', 120000));
+    mockTopics.mockResolvedValue(makeTopicsResponse());
+
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const abortController = new AbortController();
+
+    const { watchMultiRepos } = await import('../commands/watch.js');
+    const promise = watchMultiRepos(
+      ['facebook/react', 'vercel/next.js'],
+      9999,
+      true, // JSON mode
+      abortController.signal
+    );
+
+    // Let the first tick go through, then abort
+    await new Promise((r) => setTimeout(r, 100));
+    abortController.abort();
+    await promise;
+
+    expect(logSpy).toHaveBeenCalled();
+    const firstCall = logSpy.mock.calls[0][0];
+    expect(typeof firstCall).toBe('string');
+    const parsed = JSON.parse(firstCall);
+    expect(parsed.repos).toHaveLength(2);
+
+    logSpy.mockRestore();
+  }, 15000);
+
+  it('multi-watch calls getRepos internally', async () => {
+    const mockGet = getMockGet();
+    const mockTopics = getMockGetAllTopics();
+
+    mockGet
+      .mockResolvedValueOnce(makeApiResponse('facebook', 'react', 200000))
+      .mockResolvedValueOnce(makeApiResponse('vercel', 'next.js', 120000));
+    mockTopics.mockResolvedValue(makeTopicsResponse());
+
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const abortController = new AbortController();
+
+    const { watchMultiRepos } = await import('../commands/watch.js');
+    const promise = watchMultiRepos(
+      ['facebook/react', 'vercel/next.js'],
+      9999,
+      false, // dashboard mode
+      abortController.signal
+    );
+
+    await new Promise((r) => setTimeout(r, 100));
+    abortController.abort();
+    await promise;
+
+    expect(logSpy).toHaveBeenCalled();
+    logSpy.mockRestore();
+  }, 15000);
+});
+
+// ── renderMultiDashboard tests ─────────────────────────────────────────
+
+describe('renderMultiDashboard', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    delete process.env.GITHUB_TOKEN;
+  });
+
+  it('renders multi-dashboard without crashing', async () => {
+    const mockGet = getMockGet();
+    const mockTopics = getMockGetAllTopics();
+
+    mockGet
+      .mockResolvedValueOnce(makeApiResponse('test', 'repo1', 1000))
+      .mockResolvedValueOnce(makeApiResponse('test', 'repo2', 500));
+    mockTopics.mockResolvedValue(makeTopicsResponse());
+
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const abort = new AbortController();
+
+    const { watchMultiRepos } = await import('../commands/watch.js');
+    const promise = watchMultiRepos(['test/repo1', 'test/repo2'], 9999, false, abort.signal);
+    await new Promise((r) => setTimeout(r, 50));
+    abort.abort();
+    await promise.catch(() => {});
+
+    expect(logSpy).toHaveBeenCalled();
+    logSpy.mockRestore();
+  }, 5000);
 });
