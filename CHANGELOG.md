@@ -5,45 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.0] - 2026-05-19
+## [0.2.0] — 2026-05-19
 
 ### Added
 
-- AbortSignal support for instant cancellation of watch/watch-multi commands
-- `AbortController` integration — press Ctrl+C instantly stops watching with a summary
-- Shared chalk mock (`__mocks__/chalk.ts`) for test files
-- `renderDashboard` tests with delta display and null field coverage
-- `renderBattle` tests for winner/tie/null fields scenarios
-- Retry logic with exponential backoff (429, 5xx recovery)
-- `withRetry` — configurable maxAttempts, jitter, and maxDelay
-- GitHub Actions CI workflow (Node 18, 20, 22)
-- CHANGELOG.md and RELEASE.md for release management
-- `getRepos` batch-fetch function with `Promise.allSettled`
+- `watch-multi` command — monitor multiple repos simultaneously with a compact dashboard
+- `--json` / `-j` flag on `watch-multi` for programmatic JSON output
+- `AbortSignal` support — clean Ctrl+C handling with summary output
+- `battle` command — head-to-head comparison across stars, forks, issues, language, and license
+- `renderDashboard` tests — initial, delta display, and null field edge cases
+- `renderBattle` tests — winner, tie, and null field edge cases
+- `exponentialBackoff` tests — `maxDelay` cap and jitter bounds verification
+- `watchMultiRepos` edge case tests — empty repo list and JSON validity
+- Shared chalk mock in `__mocks__/chalk.ts` — chainable mock shared across test files
+- `formatDelta` helper with zero/negative/large delta coverage
+- Internal `parseRepo` caching and exports for testing
 
 ### Changed
 
-- Consolidated chalk mocking across all test files to use shared `__mocks__/chalk.ts`
-- `watchRepo` uses AbortSignal instead of raw interval-based cleanup
-- `watchMultiRepos` uses AbortSignal for clean cancellation
-- Improved error messages for stale-data scenarios in watch
+- Unified chalk mocking across all test files to use shared `createChalkMock()`
+- CI badge in README now points to the actual workflow
+- Retry logic uses exponential backoff with jitter (capped at `maxDelayMs`)
+- Octokit mocking pattern refactored for cleaner per-test control
 
 ### Fixed
 
-- Duplicate summary output on abort path in `watchRepo`
-- Tests now use `console.clear()` mock to prevent UI pollution
-- Timer leak when abort fires during tick in `watchMultiRepos`
+- Duplicate abort handler code in `watchRepo` and `watchMultiRepos` cleaned up
+- `renderBattle` no longer throws on `null` description/language/license
+- Stale data handling in watch commands shows `last updated` timestamp
 
-## [0.1.0] - 2026-05-18
+## [0.1.0] — 2026-05-19
 
 ### Added
 
-- Initial CLI with `rs` binary
-- `rs watch <repo>` — real-time GitHub repo monitoring with periodic polling
-- `rs battle <repo1> <repo2>` — side-by-side comparison of two repos
-- `rs watch-multi <repos...>` — simultaneous multi-repo dashboard
-- `--json` flag for watch-multi machine-readable output
-- `--interval` flag for configurable polling frequency
-- Star history estimation via linear time-distribution model
+- Initial release with `watch` command — live repo dashboard with auto-refresh
+- `rs` binary alias for quick terminal usage
+- GitHub REST API integration via `@octokit/rest`
 - Cache layer with 60-second TTL to avoid redundant API calls
-- Rate-limit handling with retry mechanism
-- Color-coded terminal UI using chalk and cli-table3
+- Retry with exponential backoff for rate limits and server errors
+- `formatNumber` helper with K/M suffixes
+- `getStarHistory` — estimated linear star history based on repo age
+- `npx repo-sense` zero-install support
+- `GITHUB_TOKEN` authentication for higher rate limits (5,000 req/hr)
+- README with usage examples, gallery, and roadmap
