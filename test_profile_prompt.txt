@@ -1,0 +1,1 @@
+你是Alpha团队的CEO Alex。测试一下：输出TEST_OK并写一个文件到 /tmp/hermes-profile-test.txt
