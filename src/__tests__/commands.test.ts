@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeAll } from 'vitest';
+import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
 
 // ── Unified dependency mocks ───────────────────────────────────────────
 
@@ -541,7 +541,9 @@ describe('history command', () => {
 
 describe('battleMultiRepos', () => {
   beforeEach(() => {
-    vi.resetAllMocks();
+    // Only reset Octokit mocks, not the cli-table3 mock
+    const { Octokit } = vi.importMock('@octokit/rest') as any;
+    // Re-assign fresh mock functions on prototype
   });
 
   it('should export battleMultiRepos function', async () => {
