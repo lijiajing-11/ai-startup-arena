@@ -12,6 +12,9 @@ _Zero config. Zero bullshit. Just numbers that move._
 [![Node](https://img.shields.io/badge/Node-%3E%3D18-339933?style=for-the-badge&logo=node.js)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=for-the-badge)](http://makeapullrequest.com)
+[![CI](https://img.shields.io/github/actions/workflow/status/li1050109098/beta-project-arena/ci.yml?style=for-the-badge&logo=githubactions&label=CI)](https://github.com/li1050109098/beta-project-arena/actions)
+[![Codecov](https://img.shields.io/codecov/c/github/li1050109098/beta-project-arena?style=for-the-badge&logo=codecov)](https://codecov.io/gh/li1050109098/beta-project-arena)
+[![Bundle Size](https://img.shields.io/bundlephobia/min/repo-sense?style=for-the-badge&label=size)](https://bundlephobia.com/package/repo-sense)
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
@@ -389,5 +392,5 @@ MIT © β-Labs Corp.
   <br>
   <sub>⭐ Star this repo if you find it useful!</sub>
   <br><br>
-  <sub>🧑‍🚀 Curated by MarketBeta @ β-Labs · v21</sub>
+  <sub>🧑‍🚀 Curated by MarketBeta @ β-Labs · v22</sub>
 </div>
