@@ -3,6 +3,27 @@ import Table from 'cli-table3';
 import type { RepoData, RepoSnapshot, BattleResult, JsonSnapshot, SingleJsonSnapshot } from '../models.js';
 import { formatNumber, getRepo, clearCache, getRepos } from '../github.js';
 
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+function formatElapsed(startTime: number): string {
+  const elapsed = Math.round((Date.now() - startTime) / 1000);
+  const mins = Math.floor(elapsed / 60);
+  const secs = elapsed % 60;
+  return `${mins}m ${secs}s`;
+}
+
+function onAbortSummary(
+  startTime: number,
+  totalGrowth: number,
+  extra?: string
+): void {
+  const elapsed = formatElapsed(startTime);
+  const growth =
+    totalGrowth > 0 ? `+${totalGrowth} new stars` : `${totalGrowth} new stars`;
+  const suffix = extra ? ` (${extra})` : '';
+  console.log(chalk.cyan(`\n📊 Watch summary: ${elapsed} watched, ${growth}${suffix}`));
+}
+
 export async function watchRepo(
   repoStr: string,
   onUpdate: (snapshot: RepoSnapshot, previous?: RepoSnapshot) => void,
@@ -42,10 +63,7 @@ export async function watchRepo(
   return new Promise((resolve) => {
     const onAbort = () => {
       clearInterval(timer);
-      const elapsed = Math.round((Date.now() - startTime) / 1000);
-      const mins = Math.floor(elapsed / 60);
-      const secs = elapsed % 60;
-      console.log(chalk.cyan(`\n📊 Watch summary: ${mins}m ${secs}s watched, ${totalGrowth > 0 ? '+' : ''}${totalGrowth} new stars`));
+      onAbortSummary(startTime, totalGrowth);
       resolve();
     };
 
@@ -57,10 +75,7 @@ export async function watchRepo(
       if (signal?.aborted) {
         clearInterval(timer);
         if (signal) signal.removeEventListener('abort', onAbort);
-        const elapsed = Math.round((Date.now() - startTime) / 1000);
-        const mins = Math.floor(elapsed / 60);
-        const secs = elapsed % 60;
-        console.log(chalk.cyan(`\n📊 Watch summary: ${mins}m ${secs}s watched, ${totalGrowth > 0 ? '+' : ''}${totalGrowth} new stars`));
+        onAbortSummary(startTime, totalGrowth);
         resolve();
         return;
       }
@@ -102,10 +117,7 @@ export async function watchSingleRepoJson(
   return new Promise((resolve) => {
     const onAbort = () => {
       clearInterval(timer);
-      const elapsed = Math.round((Date.now() - startTime) / 1000);
-      const mins = Math.floor(elapsed / 60);
-      const secs = elapsed % 60;
-      console.log(chalk.cyan(`\n📊 Watch summary: ${mins}m ${secs}s watched (JSON mode)`));
+      onAbortSummary(startTime, 0, 'JSON mode');
       resolve();
     };
 
@@ -117,10 +129,7 @@ export async function watchSingleRepoJson(
       if (signal?.aborted) {
         clearInterval(timer);
         if (signal) signal.removeEventListener('abort', onAbort);
-        const elapsed = Math.round((Date.now() - startTime) / 1000);
-        const mins = Math.floor(elapsed / 60);
-        const secs = elapsed % 60;
-        console.log(chalk.cyan(`\n📊 Watch summary: ${mins}m ${secs}s watched (JSON mode)`));
+        onAbortSummary(startTime, 0, 'JSON mode');
         resolve();
         return;
       }
@@ -312,10 +321,7 @@ export async function watchMultiRepos(
   return new Promise((resolve) => {
     const onAbort = () => {
       clearInterval(timer);
-      const elapsed = Math.round((Date.now() - startTime) / 1000);
-      const mins = Math.floor(elapsed / 60);
-      const secs = elapsed % 60;
-      console.log(chalk.cyan(`\n📊 Multi-watch summary: ${mins}m ${secs}s watched for ${repoStrs.length} repos`));
+      onAbortSummary(startTime, 0, `${repoStrs.length} repos`);
       resolve();
     };
 
@@ -327,10 +333,7 @@ export async function watchMultiRepos(
       if (signal?.aborted) {
         clearInterval(timer);
         if (signal) signal.removeEventListener('abort', onAbort);
-        const elapsed = Math.round((Date.now() - startTime) / 1000);
-        const mins = Math.floor(elapsed / 60);
-        const secs = elapsed % 60;
-        console.log(chalk.cyan(`\n📊 Multi-watch summary: ${mins}m ${secs}s watched for ${repoStrs.length} repos`));
+        onAbortSummary(startTime, 0, `${repoStrs.length} repos`);
         resolve();
         return;
       }

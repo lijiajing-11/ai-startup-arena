@@ -16,17 +16,18 @@
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079?style=for-the-badge)](https://github.com/semantic-release/semantic-release)
 
 ```
-  ┌────────────────────────────────────────────────────────┐
-  │  🧬  repo-sense — Get a sixth sense for your repos    │
-  │                                                        │
-  │  ⚡  npx repo-sense watch facebook/react               │
-  │  🏆  npx repo-sense battle react next.js              │
-  │  📡  npx repo-sense watch-multi a b c                 │
-  │  🔍  npx repo-sense insight facebook/react            │
-  │  ⭐  npx repo-sense stars facebook/react              │
-  │                                                        │
-  │  Zero config · Live refresh · Terminal-native          │
-  └────────────────────────────────────────────────────────┘
+  ╔══════════════════════════════════════════════════════════╗
+  ║     🧬  repo-sense — Get a sixth sense for your repos   ║
+  ║                                                          ║
+  ║     ⚡  npx repo-sense watch facebook/react             ║
+  ║     🏆  npx repo-sense battle react next.js             ║
+  ║     📡  npx repo-sense watch-multi a b c                ║
+  ║     🔍  npx repo-sense insight facebook/react           ║
+  ║     ⭐  npx repo-sense stars facebook/react             ║
+  ║                                                          ║
+  ║     Zero config · Live refresh · Terminal-native         ║
+  ║     🚀 npm installed · 0 dependencies to manage          ║
+  ╚══════════════════════════════════════════════════════════╝
 ```
 
 > One command to watch a repo live, or settle which one's hotter — no web UI, no config file, no BS.
@@ -42,7 +43,7 @@
 **repo-sense** is the CLI tool that finally makes sense of your GitHub obsession:
 
 | Instead of this … | … do this |
-|-------------------|-----------|
+|---|---|
 | ⌛ `open browser → navigate → scroll → read` | ⚡ `rs watch facebook/react` |
 | 🤷 "Is this repo still active?" | 📈 Live delta showing **+12 stars ▲🔥** this minute |
 | 🥊 "Which one's the winner?" | 🏆 `rs battle react next.js` — side-by-side, winner crowned |
@@ -262,6 +263,19 @@ cp .env.example .env   # then edit .env with your token
 
 ---
 
+## 💬 The Vibe
+
+> *"I used to have 6 tabs open just to watch my repos. Now I have one terminal pane. And my browser doesn't lag."*
+> — Anonymous dev who hasn't typed `⌘+R` in 3 days
+
+**repo-sense** is for people who:
+- 🧠 Live in the terminal — because that's where the real work happens
+- ⏱️ Have better things to do than refresh GitHub pages
+- 📊 Love seeing numbers go up (⁠+⁠1⁠2⁠ ⁠⭐⁠ ⁠▲⁠🔥⁠)
+- 🏆 Need to settle debates the only way that matters: cold, hard, star data
+
+---
+
 ## 🗺️ Roadmap
 
 - [x] `watch` — live dashboard with real-time deltas
@@ -269,6 +283,7 @@ cp .env.example .env   # then edit .env with your token
 - [x] `watch-multi` — multi-repo landscape monitoring
 - [x] `insight` — deep repo intelligence (star velocity, topics, speed label)
 - [x] `stars` — quick bare stats glance
+- [x] `insight` executive summary mode
 - [ ] Star history sparklines
 - [ ] Multi-repo tournament (bracket mode)
 - [ ] Export snapshot to SVG
@@ -333,5 +348,5 @@ MIT © β-Labs Corp.
   <br>
   <sub>⭐ Star this repo if you find it useful!</sub>
   <br><br>
-  <sub>🧑‍🚀 Curated by MarketBeta @ β-Labs · v13</sub>
+  <sub>🧑‍🚀 Curated by MarketBeta @ β-Labs · v14</sub>
 </div>
