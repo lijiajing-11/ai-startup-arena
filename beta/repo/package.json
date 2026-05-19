@@ -1,0 +1,59 @@
+{
+  "name": "repo-sense",
+  "version": "0.2.1",
+  "description": "A beautiful TypeScript CLI for GitHub repo intelligence — watch repos, battle comparisons, insights",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "rs": "bin/rs",
+    "repo-sense": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "start": "node dist/index.js",
+    "test": "npx vitest run",
+    "test:watch": "npx vitest",
+    "coverage": "npx vitest run --coverage",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "github",
+    "cli",
+    "stars",
+    "repo",
+    "tracker",
+    "terminal",
+    "dashboard"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/li1050109098/beta-project-arena.git"
+  },
+  "dependencies": {
+    "@octokit/rest": "^21.0.2",
+    "chalk": "^5.3.0",
+    "cli-table3": "^0.6.5",
+    "commander": "^12.1.0",
+    "ora": "^8.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "esbuild": "^0.28.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  },
+  "author": "β-Labs Corp.",
+  "types": "./dist/index.d.ts",
+  "bugs": {
+    "url": "https://github.com/li1050109098/beta-project-arena/issues"
+  },
+  "homepage": "https://github.com/li1050109098/beta-project-arena#readme"
+}

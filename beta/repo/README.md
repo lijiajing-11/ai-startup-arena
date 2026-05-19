@@ -20,13 +20,14 @@
 ╔══════════════════════════════════════════════════════════════════╗
 ║           🧬  repo-sense — Sixth Sense for Your Repos           ║
 ║                                                                  ║
-║     ⚡  npx repo-sense watch facebook/react                      ║
-║     🏆  npx repo-sense battle react next.js                      ║
-║     📡  npx repo-sense watch-multi a b c                         ║
-║     🔍  npx repo-sense insight facebook/react                    ║
-║     ⭐  npx repo-sense stars facebook/react                      ║
-║     📈  npx repo-sense history facebook/react                    ║
-║     📸  npx repo-sense snapshot facebook/react                   ║
+|     ⚡  npx repo-sense watch facebook/react                      ║
+|     🏆  npx repo-sense battle react next.js                      ║
+|     📡  npx repo-sense watch-multi a b c                         ║
+|     🔍  npx repo-sense insight facebook/react                    ║
+|     ⭐  npx repo-sense stars facebook/react                      ║
+|     📈  npx repo-sense history facebook/react                    ║
+|     📸  npx repo-sense snapshot facebook/react                   ║
+|     📊  npx repo-sense coverage                                  ║
 ║                                                                  ║
 ║     Zero config · Live refresh · Terminal-native                 ║
 ║     🚀 npm installed · 0 dependencies to manage                  ║
@@ -77,6 +78,7 @@ rs watch facebook/react
 | ⭐ "Just the numbers, quick" | ⚡ `rs stars react` → instant bare stats |
 | ⏳ "How fast is this repo really growing?" | 📈 `rs history react` → velocity periods & milestones |
 | 📸 "Give me a JSON snapshot" | ⚡ `rs snapshot react -j` → pipe it anywhere |
+| 📊 "What's my test coverage?" | ⚡ `rs coverage` → instant coverage report |
 
 No browser. No config files. No Docker. Just you and your terminal.
 
@@ -142,6 +144,20 @@ npx repo-sense snapshot facebook/react
 npx repo-sense snapshot facebook/react -j > react-snapshot.json
 ```
 
+### 📊 `coverage` — Test Coverage Dashboard
+
+```bash
+npx repo-sense coverage
+```
+
+Auto-runs `vitest --coverage`, parses the report, and renders a color-coded table per file (lines, branches, functions, statements). Pass `--no-run` to skip tests and use an existing report.
+
+```bash
+npx repo-sense coverage --no-run
+```
+
+Each metric gets a 🟢🟡🔴 status light against project thresholds. Pass/fail per file at a glance.
+
 ---
 
 ## 📖 Command Reference
@@ -161,6 +177,8 @@ npx repo-sense snapshot facebook/react -j > react-snapshot.json
 | `⭐ stars` | Quick bare stats | `rs stars facebook/react` |
 | `📸 snapshot` | One-shot repo data (table or JSON) | `rs snapshot f/react` |
 | &nbsp;&nbsp;`-j` | JSON snapshot | `rs snapshot f/react -j` |
+| `📊 coverage` | Test coverage dashboard | `rs coverage` |
+| &nbsp;&nbsp;`--no-run` | Skip tests, parse existing report | `rs coverage --no-run` |
 | `📖 --help` | All commands & options | `rs --help` |
 | `ℹ️ --version` | Show version | `rs --version` |
 
@@ -300,6 +318,30 @@ export GITHUB_TOKEN=ghp_your_token_here
 └────────────────────┴──────────────────────────────┘
 ```
 
+### 📊 Coverage Dashboard
+
+```text
+  📊  Test Coverage Report
+
+  Overall:
+    Lines:      82.5% 🟢
+    Branches:   67.3% 🟡
+    Functions:  81.1% 🟢
+    Statements: 83.0% 🟢
+
+  ┌──────────────────────────┬──────────┬──────────┬──────────┬──────────┐
+  │ File                     │ Lines    │ Branches │ Funcs    │ Stmts    │
+  ├──────────────────────────┼──────────┼──────────┼──────────┼──────────┤
+  │ commands/watch.ts        │ 85.0% 🟢 │ 70.0% 🟡 │ 88.9% 🟢 │ 85.4% 🟢 │
+  │ commands/insight.ts      │ 90.9% 🟢 │ 85.7% 🟢 │ 80.0% 🟢 │ 90.9% 🟢 │
+  │ commands/history.ts      │ 78.9% 🟡 │ 62.5% 🟡 │ 72.7% 🟡 │ 78.9% 🟡 │
+  │ commands/stars.ts        │ 100% 🟢  │ 100% 🟢  │ 100% 🟢  │ 100% 🟢  │
+  │ github.ts                │ 64.0% 🟡 │ 40.0% 🔴 │ 55.6% 🔴 │ 64.0% 🟡 │
+  └──────────────────────────┴──────────┴──────────┴──────────┴──────────┘
+
+  ✅  All coverage thresholds met!
+```
+
 ---
 
 ## 💡 In the Wild — How People Actually Use It
@@ -333,12 +375,12 @@ export GITHUB_TOKEN=ghp_your_token_here
 
 ## 🏆 repo-sense vs the World
 
-| Tool | Config? | Browser? | Docker? | Live deltas? | `battle`? | History? | JSON? |
-|------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **repo-sense** | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ |
-| GitHub web | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Stargazer CLI | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| gh CLI + jq | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Tool | Config? | Browser? | Docker? | Live deltas? | `battle`? | History? | Coverage? | JSON? |
+|------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **repo-sense** | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| GitHub web | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Stargazer CLI | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| gh CLI + jq | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 
 **Bottom line:** If you're still checking GitHub stars through a browser, you're doing it wrong. 😏
 
@@ -346,7 +388,7 @@ export GITHUB_TOKEN=ghp_your_token_here
 
 ## 🗺️ Roadmap
 
-- [x] `watch`, `battle`, `watch-multi`, `insight`, `stars`, `history`, `snapshot` — all shipped
+- [x] `watch`, `battle`, `watch-multi`, `insight`, `stars`, `history`, `snapshot`, `coverage` — all shipped
 - [ ] 🔥 Executive insight summary (`format=sentence`)
 - [ ] 🔥 Star history sparklines
 - [ ] 🏆 Multi-repo tournament (bracket mode)
@@ -367,6 +409,7 @@ export GITHUB_TOKEN=ghp_your_token_here
 5. On `battle`, it compares every metric and declares a winner
 6. On `history`, it calculates velocity periods and milestone timelines
 7. On `snapshot`, it grabs everything in one shot — table or JSON
+8. On `coverage`, it runs vitest, parses the report, and renders color-coded per-file metrics
 
 No config files. No Docker. No cloud service. Just you and the terminal.
 
@@ -399,7 +442,9 @@ node dist/index.js battle facebook/react vercel/next.js  # Local run
 > 💬 *"I've got `rs watch-multi X Y Z` in a tmux pane on my second monitor. It's my GitHub Bloomberg terminal."*
 >
 > 💬 *"`rs snapshot facebook/react -j | jq '.stars'` in CI → Slack webhook. Now I get pinged when something blows up."*
-
+>
+> 💬 *"`rs coverage` before every PR. I get a color-coded table in 2 seconds — no more guessing if my tests are good enough."*
+>
 ---
 
 ## 📄 License
@@ -413,5 +458,5 @@ MIT © β-Labs Corp.
   <br>
   <sub>⭐ Star this repo if you find it useful!</sub>
   <br><br>
-  <sub>🧑‍🚀 Curated by MarketBeta @ β-Labs · v24</sub>
+  <sub>🧑‍🚀 Curated by MarketBeta @ β-Labs · v25</sub>
 </div>
