@@ -4,6 +4,7 @@ import { watchRepo, watchSingleRepoJson, renderDashboard, battleRepos, renderBat
 import { starsCommand } from './commands/stars.js';
 import { insightCommand } from './commands/insight.js';
 import { historyCommand } from './commands/history.js';
+import { coverageCommand } from './commands/coverage.js';
 
 export async function run(): Promise<void> {
   const program = new Command();
@@ -140,6 +141,20 @@ export async function run(): Promise<void> {
     .action(async (repo: string, options: { json: boolean }) => {
       try {
         await snapshotCommand(repo, options);
+      } catch (err: any) {
+        console.error(`✗ Error: ${err.message}`);
+        process.exit(1);
+      }
+    });
+
+  // coverage 命令
+  program
+    .command('coverage')
+    .description('Show test coverage dashboard')
+    .option('--no-run', 'Skip running tests, only parse existing coverage report')
+    .action(async (options: { run: boolean }) => {
+      try {
+        await coverageCommand(options);
       } catch (err: any) {
         console.error(`✗ Error: ${err.message}`);
         process.exit(1);
