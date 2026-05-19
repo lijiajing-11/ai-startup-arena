@@ -153,6 +153,8 @@ describe('watchMultiRepos', () => {
     const mockGet = getMockGet();
     const mockTopics = getMockGetAllTopics();
 
+    console.error('DEBUG mockGet:', typeof mockGet, mockGet?.getMockName?.() || 'no name');
+
     mockGet
       .mockResolvedValueOnce(makeApiResponse('facebook', 'react', 200000))
       .mockResolvedValueOnce(makeApiResponse('vercel', 'next.js', 120000));
