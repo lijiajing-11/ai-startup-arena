@@ -96,7 +96,9 @@ describe('getRepos', () => {
   });
 
   it('throws on first failure with invalid repo', async () => {
-    mockGet.mockRejectedValueOnce(new Error('Not Found'));
+    mockGet.mockRejectedValue(
+      Object.assign(new Error('Not Found'), { status: 404 })
+    );
     mockGetAllTopics.mockResolvedValue(makeTopicsResponse());
 
     const { getRepos, clearCache } = await import('../github.js');

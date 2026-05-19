@@ -10,28 +10,24 @@ vi.mock('@octokit/rest', () => {
   return { Octokit: MockOctokit };
 });
 
+// Chalk mock that supports chained calls like chalk.bold.cyan('text')
+const chalkIdentity = (s: string) => s;
+chalkIdentity.bold = new Proxy(chalkIdentity, {
+  get: () => chalkIdentity,
+  apply: () => '',
+}) as any;
+
 vi.mock('chalk', () => ({
-  default: new Proxy(
-    {},
-    {
-      get: () => (s: string) => s,
-      apply: () => '',
-    }
-  ),
-  red: (s: string) => s,
-  green: (s: string) => s,
-  yellow: (s: string) => s,
-  cyan: (s: string) => s,
-  blue: (s: string) => s,
-  gray: (s: string) => s,
-  white: (s: string) => s,
-  bold: new Proxy(
-    {},
-    {
-      get: () => (s: string) => s,
-      apply: () => '',
-    }
-  ),
+  default: chalkIdentity,
+  red: chalkIdentity,
+  green: chalkIdentity,
+  yellow: chalkIdentity,
+  cyan: chalkIdentity,
+  blue: chalkIdentity,
+  gray: chalkIdentity,
+  white: chalkIdentity,
+  magenta: chalkIdentity,
+  bold: chalkIdentity,
 }));
 
 vi.mock('cli-table3', () => {
@@ -52,6 +48,9 @@ vi.mock('ora', () => ({
     text: '',
   }),
 }));
+
+// Prevent index.ts run() from auto-executing during import
+vi.mock('../index.js', () => ({}));
 
 import type { RepoData, BattleResult } from '../models.js';
 
@@ -166,6 +165,7 @@ describe('battle command', () => {
 
 describe('index CLI', () => {
   it('should export run function', async () => {
+    // Use direct import with auto-run suppressed
     const indexModule = await import('../index.js');
     expect(typeof indexModule.run).toBe('function');
   });
