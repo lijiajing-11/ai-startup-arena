@@ -1,9 +1,9 @@
-# 🧬 repo-sense <sub>rs · Get a sixth sense for your repos</sub>
+# 🧬 repo-sense
+
+> **Get a sixth sense for your repos** — real-time GitHub intelligence, right in your terminal.
+> _Zero config. Zero bullshit. Just numbers that move._
 
 <div align="center">
-
-**Get a sixth sense for your repos** — real-time GitHub intelligence, right in your terminal.  
-_Zero config. Zero bullshit. Just numbers that move._
 
 [![npm version](https://img.shields.io/npm/v/repo-sense?style=for-the-badge&logo=npm&color=cb3837)](https://www.npmjs.com/package/repo-sense)
 [![npm downloads](https://img.shields.io/npm/dm/repo-sense?style=for-the-badge&color=blueviolet)](https://www.npmjs.com/package/repo-sense)
@@ -16,7 +16,7 @@ _Zero config. Zero bullshit. Just numbers that move._
 [![Codecov](https://img.shields.io/codecov/c/github/li1050109098/beta-project-arena?style=for-the-badge&logo=codecov)](https://codecov.io/gh/li1050109098/beta-project-arena)
 [![Bundle Size](https://img.shields.io/bundlephobia/min/repo-sense?style=for-the-badge&label=size)](https://bundlephobia.com/package/repo-sense)
 
-```
+```text
 ╔══════════════════════════════════════════════════════════════════╗
 ║           🧬  repo-sense — Sixth Sense for Your Repos           ║
 ║                                                                  ║
@@ -39,14 +39,14 @@ _Zero config. Zero bullshit. Just numbers that move._
 
 ---
 
-## ⚡ Quickstart
+## 🎯 30-Second Quickstart
 
 ```bash
-# See if React is trending RIGHT NOW — zero friction
+# Instantly. Just run it.
 npx repo-sense@latest watch facebook/react
 ```
 
-One command. Your terminal becomes a live GitHub dashboard. Stars tick up. Issues close. Fork counts grow.  
+That's it. One command. Your terminal becomes a live GitHub dashboard — stars tick up, issues close, forks grow.
 You'll never open a browser to check stars again. 🎯
 
 **Prefer a native install?**
@@ -179,7 +179,7 @@ export GITHUB_TOKEN=ghp_your_token_here
 
 ### 👁️ Watch Dashboard
 
-```
+```text
   ┌──────────────────────────────────────┐
   │        🧬  repo-sense  WATCH         │
   └──────────────────────────────────────┘
@@ -202,7 +202,7 @@ export GITHUB_TOKEN=ghp_your_token_here
 
 ### ⚔️ Repo Battle
 
-```
+```text
   ╔══════════════════════════════════════════════════════════╗
   ║            ⚔️   REPO BATTLE  ⚔️                        ║
   ╚══════════════════════════════════════════════════════════╝
@@ -223,7 +223,7 @@ export GITHUB_TOKEN=ghp_your_token_here
 
 ### 📡 Multi-Watch Dashboard
 
-```
+```text
   ┌────────────────────────────────────────────────────────────────┐
   │           📡  repo-sense  MULTI-WATCH  📡                   │
   └────────────────────────────────────────────────────────────────┘
@@ -241,7 +241,7 @@ export GITHUB_TOKEN=ghp_your_token_here
 
 ### 📈 Star History Timeline
 
-```
+```text
   facebook/react — Star History
   245,098 stars over 4,787 days · 51.2/day 🔥 Hypersonic
 
@@ -262,7 +262,7 @@ export GITHUB_TOKEN=ghp_your_token_here
 
 ### 🔍 Repo Insight
 
-```
+```text
   ┌──────────────────────────────────────┐
   │     🧬  repo-sense  INSIGHT          │
   └──────────────────────────────────────┘
@@ -279,7 +279,7 @@ export GITHUB_TOKEN=ghp_your_token_here
 
 ### 📸 Snapshot
 
-```
+```text
   ┌──────────────────────────────────────────────┐
   │        🧬  repo-sense  SNAPSHOT              │
   └──────────────────────────────────────────────┘
@@ -392,5 +392,5 @@ MIT © β-Labs Corp.
   <br>
   <sub>⭐ Star this repo if you find it useful!</sub>
   <br><br>
-  <sub>🧑‍🚀 Curated by MarketBeta @ β-Labs · v22</sub>
+  <sub>🧑‍🚀 Curated by MarketBeta @ β-Labs · v23</sub>
 </div>
