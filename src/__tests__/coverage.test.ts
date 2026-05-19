@@ -1,30 +1,28 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-// Mock child_process and fs at module scope so coverage.ts can import them
+// Mock child_process — coverage.ts in import scope would try execSync
 vi.mock('child_process', () => ({
   execSync: vi.fn(),
 }));
 
-// Mock fs — coverage.ts will check existsSync and readFileSync
-// Use a shared `__mockExists` variable so tests can control behavior
+// Shared state for fs mock — tests set these, mock factory reads them
 let __mockExists = true;
-const __mockReadMap: Record<string, string> = {};
+let __mockReadData = '';
 
 vi.mock('fs', () => ({
   existsSync: vi.fn(() => __mockExists),
-  readFileSync: vi.fn((path: string, encoding: string) => {
+  readFileSync: vi.fn((_path: string, _encoding: string) => {
     if (!__mockExists) {
-      throw new Error(`ENOENT: ${path}`);
+      throw new Error('ENOENT');
     }
-    if (__mockReadMap[path]) return __mockReadMap[path];
-    return '';
+    return __mockReadData;
   }),
 }));
 
 // Also mock chalk and cli-table3 since coverage.ts uses them
 vi.mock('chalk', () => {
   const makeChalkFn = (): any => {
-    const fn: any = (s: string) => (typeof s === 'string' ? s : '');
+    const fn: any = (s: string) => s;
     return new Proxy(fn, { get: () => makeChalkFn() });
   };
   const mock = makeChalkFn();
@@ -32,20 +30,11 @@ vi.mock('chalk', () => {
   return { default: mock };
 });
 
+// Make cli-table3 actually render content so we can assert on output
 vi.mock('cli-table3', () => {
-  function MockTable() {
-    this.push = () => {};
-    this.toString = () => '';
-  }
-  return { default: MockTable };
+  const actualTable = require('cli-table3');
+  return { default: actualTable.default || actualTable };
 });
-
-function setupSpies() {
-  const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-  const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-  const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
-  return { logSpy, errorSpy, exitSpy };
-}
 
 describe('coverageCommand', () => {
   let logSpy: ReturnType<typeof vi.spyOn>;
@@ -53,10 +42,13 @@ describe('coverageCommand', () => {
   let exitSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    const spies = setupSpies();
-    logSpy = spies.logSpy;
-    errorSpy = spies.errorSpy;
-    exitSpy = spies.exitSpy;
+    __mockExists = true;
+    __mockReadData = '';
+    logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => {
+      throw new Error('EXIT_CALLED');
+    });
   });
 
   afterEach(() => {
@@ -64,44 +56,37 @@ describe('coverageCommand', () => {
   });
 
   it('renders coverage table with valid data', async () => {
-    const fsModule = await import('fs');
-    vi.mocked(fsModule.existsSync).mockReturnValue(true);
-    vi.mocked(fsModule.readFileSync).mockReturnValue(JSON.stringify({
+    __mockReadData = JSON.stringify({
       total: { lines: { pct: 85.7 }, branches: { pct: 72.3 }, functions: { pct: 91.2 }, statements: { pct: 83.1 } },
       'src/github.ts': { lines: { pct: 97.14 }, branches: { pct: 87.27 }, functions: { pct: 100 }, statements: { pct: 97.14 } },
       'src/commands/watch.ts': { lines: { pct: 72.72 }, branches: { pct: 61.29 }, functions: { pct: 78.57 }, statements: { pct: 72.72 } },
-    }));
+    });
 
     const { coverageCommand } = await import('../commands/coverage.js');
     await coverageCommand({ run: false });
 
     expect(logSpy).toHaveBeenCalled();
-    // Should have called console.log for header and table
     expect(logSpy.mock.calls.length).toBeGreaterThanOrEqual(3);
   });
 
   it('errors when coverage file not found', async () => {
-    const fsModule = await import('fs');
-    vi.mocked(fsModule.existsSync).mockReturnValue(false);
+    __mockExists = false;
 
     const { coverageCommand } = await import('../commands/coverage.js');
-    await coverageCommand({ run: false });
+    // coverageCommand calls process.exit(1) when file not found;
+    // our spy throws EXIT_CALLED to halt execution
+    await expect(coverageCommand({ run: false })).rejects.toThrow('EXIT_CALLED');
 
-    expect(exitSpy).toHaveBeenCalledWith(1);
     expect(errorSpy).toHaveBeenCalled();
   });
 
   it('renders overall summary at top', async () => {
-    const fsModule = await import('fs');
-    vi.mocked(fsModule.existsSync).mockReturnValue(true);
-    vi.mocked(fsModule.readFileSync).mockReturnValue(JSON.stringify({
+    __mockReadData = JSON.stringify({
       total: { lines: { pct: 85.7 }, branches: { pct: 72.3 }, functions: { pct: 91.2 }, statements: { pct: 83.1 } },
-    }));
-
+    });
     const { coverageCommand } = await import('../commands/coverage.js');
     await coverageCommand({ run: false });
 
-    // Overall coverage header should be present
     const allOutput = logSpy.mock.calls.map(c => String(c[0])).join('\n');
     expect(allOutput).toContain('Overall');
     expect(allOutput).toContain('Lines');
@@ -109,30 +94,29 @@ describe('coverageCommand', () => {
   });
 
   it('handles empty file list (only total, no file-level data)', async () => {
-    const fsModule = await import('fs');
-    vi.mocked(fsModule.existsSync).mockReturnValue(true);
-    vi.mocked(fsModule.readFileSync).mockReturnValue(JSON.stringify({
+    __mockReadData = JSON.stringify({
       total: { lines: { pct: 50.0 }, branches: { pct: 40.0 }, functions: { pct: 50.0 }, statements: { pct: 50.0 } },
-    }));
+    });
 
     const { coverageCommand } = await import('../commands/coverage.js');
     await coverageCommand({ run: false });
 
-    // Should render overall without crashing, no file-level entries
     expect(logSpy).toHaveBeenCalled();
-    expect(exitSpy).not.toHaveBeenCalled();
   });
 
-  it('applies color coding based on percentage thresholds', async () => {
-    // Render coverage with data across all tiers
-    const { renderCoverage } = await import('../commands/coverage.js');
+  it('calls vitest when --run is true', async () => {
+    __mockReadData = JSON.stringify({
+      total: { lines: { pct: 80 }, branches: { pct: 70 }, functions: { pct: 90 }, statements: { pct: 80 } },
+    });
 
-    const summary = {
-      total: { lines: { pct: 85 }, branches: { pct: 65 }, functions: { pct: 45 }, statements: { pct: 75 } },
-      'src/test.ts': { lines: { pct: 95 }, branches: { pct: 70 }, functions: { pct: 55 }, statements: { pct: 80 } },
-    };
+    const cp = await import('child_process');
+    const { coverageCommand } = await import('../commands/coverage.js');
+    await coverageCommand({ run: true });
 
-    expect(() => renderCoverage(summary)).not.toThrow();
+    expect(cp.execSync).toHaveBeenCalledWith(
+      expect.stringContaining('vitest'),
+      expect.any(Object)
+    );
     expect(logSpy).toHaveBeenCalled();
   });
 });
@@ -140,15 +124,20 @@ describe('coverageCommand', () => {
 // ── renderCoverage standalone tests ────────────────────────────────────
 
 describe('renderCoverage (standalone)', () => {
-  const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+  let logSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    __mockExists = true;
+    __mockReadData = '';
+    logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('renders with no threshold config file (vitest.config.ts missing)', async () => {
-    const fsModule = await import('fs');
-    vi.mocked(fsModule).existsSync.mockReturnValue(false);
+    __mockExists = false;
 
     const { renderCoverage } = await import('../commands/coverage.js');
     const summary = {
@@ -157,6 +146,27 @@ describe('renderCoverage (standalone)', () => {
 
     expect(() => renderCoverage(summary)).not.toThrow();
     expect(logSpy).toHaveBeenCalled();
+  });
+
+  it('renders with threshold config warnings when below thresholds', async () => {
+    __mockExists = true;
+    __mockReadData = [
+      "import { defineConfig } from 'vitest/config';",
+      'export default defineConfig({',
+      '  test: { coverage: { thresholds: {',
+      '    lines: 80, branches: 70, functions: 60, statements: 50,',
+      '  }}}',
+      '});',
+    ].join('\n');
+
+    const { renderCoverage } = await import('../commands/coverage.js');
+    const summary = {
+      total: { lines: { pct: 50 }, branches: { pct: 60 }, functions: { pct: 70 }, statements: { pct: 80 } },
+    };
+
+    renderCoverage(summary);
+    const allOutput = logSpy.mock.calls.map(c => String(c[0])).join('\n');
+    expect(allOutput).toContain('Threshold');
   });
 
   it('filters out non-src/ files from table', async () => {
