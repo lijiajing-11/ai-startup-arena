@@ -1,5 +1,6 @@
 import { Command } from 'commander';
-import { watchRepo, watchSingleRepoJson, renderDashboard, battleRepos, renderBattle, battleMultiRepos, renderBattleMulti, watchMultiRepos } from './commands/watch.js';
+import { snapshotCommand } from './commands/snapshot.js';
+import { watchRepo, watchSingleRepoJson, renderDashboard, battleRepos, renderBattle, battleMultiRepos, renderBattleMulti, watchMultiRepos, battleJsonOutput, battleMultiJsonOutput } from './commands/watch.js';
 import { starsCommand } from './commands/stars.js';
 import { insightCommand } from './commands/insight.js';
 import { historyCommand } from './commands/history.js';
@@ -45,14 +46,25 @@ export async function run(): Promise<void> {
   program
     .command('battle <repos...>')
     .description('Compare repositories head-to-head (2+ repos)')
-    .action(async (repos: string[]) => {
+    .option('-j, --json', 'Output as JSON', false)
+    .action(async (repos: string[], options: { json: boolean }) => {
       try {
-        if (repos.length === 2) {
-          const result = await battleRepos(repos[0], repos[1]);
-          renderBattle(result);
+        if (options.json) {
+          if (repos.length === 2) {
+            const result = await battleRepos(repos[0], repos[1]);
+            battleJsonOutput(repos, result);
+          } else {
+            const result = await battleMultiRepos(repos);
+            battleMultiJsonOutput(repos, result.repos.map(s => s.repo), result.winner);
+          }
         } else {
-          const result = await battleMultiRepos(repos);
-          renderBattleMulti(result.repos.map((s) => s.repo), result.winner);
+          if (repos.length === 2) {
+            const result = await battleRepos(repos[0], repos[1]);
+            renderBattle(result);
+          } else {
+            const result = await battleMultiRepos(repos);
+            renderBattleMulti(result.repos.map((s) => s.repo), result.winner);
+          }
         }
       } catch (err: any) {
         console.error(`✗ Error: ${err.message}`);
@@ -114,6 +126,20 @@ export async function run(): Promise<void> {
     .action(async (repo: string) => {
       try {
         await historyCommand(repo);
+      } catch (err: any) {
+        console.error(`✗ Error: ${err.message}`);
+        process.exit(1);
+      }
+    });
+
+  // snapshot 命令
+  program
+    .command('snapshot <repo>')
+    .description('Grab a single repo snapshot with metrics')
+    .option('-j, --json', 'Output as JSON', false)
+    .action(async (repo: string, options: { json: boolean }) => {
+      try {
+        await snapshotCommand(repo, options);
       } catch (err: any) {
         console.error(`✗ Error: ${err.message}`);
         process.exit(1);

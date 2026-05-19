@@ -25,6 +25,7 @@ _Zero config. Zero bullshit. Just numbers that move._
 ║     🔍  npx repo-sense insight facebook/react                    ║
 ║     ⭐  npx repo-sense stars facebook/react                      ║
 ║     📈  npx repo-sense history facebook/react                    ║
+║     📸  npx repo-sense snapshot facebook/react                   ║
 ║                                                                  ║
 ║     Zero config · Live refresh · Terminal-native                 ║
 ║     🚀 npm installed · 0 dependencies to manage                  ║
@@ -67,6 +68,7 @@ _Thousands of devs have already ditched their browser tabs — here's why:_
 | 🔍 "Is this repo hypersonic or stale?" | 🧬 `rs insight react` → star velocity & topics |
 | ⭐ "Just the numbers, quick" | ⚡ `rs stars react` → instant bare stats |
 | ⏳ "How fast is this repo really growing?" | 📈 `rs history react` → velocity periods & milestones |
+| 📸 "Give me a JSON snapshot for my pipeline" | ⚡ `rs snapshot react -j` → pipe it anywhere |
 
 > 📢 *"I used to keep 6 tabs open just to watch stars. Now I have one terminal pane. And my browser doesn't lag."*  
 > — **A dev who hasn't pressed ⌘+R in weeks**
@@ -88,7 +90,7 @@ npm install -g repo-sense
 rs watch facebook/react
 ```
 
-> 💡 Pro tip: add `alias repo-sense=rs` to your `.zshrc` or `.bashrc` for even less typing.
+> 💡 Pro tip: add `alias rs=repo-sense` to your `.zshrc` or `.bashrc` for even less typing.
 
 **60 req/hr** without auth, **5,000 req/hr** with a `GITHUB_TOKEN` — details in [Auth](#-auth-optional).
 
@@ -116,10 +118,12 @@ Put two or more repos head-to-head across every metric:
 npx repo-sense battle facebook/react vercel/next.js
 ```
 
-Stars, forks, issues, language, license — side by side. A winner is crowned based on star gap. Works with 2+ repos for a multi-way showdown.
+Stars, forks, issues, language, license — side by side. A winner is crowned based on star gap. Works with 2+ repos for a multi-way showdown. Pass `-j` for JSON output — pipe `battle` data into your own dashboards.
 
 ```bash
 npx repo-sense battle react vue svelte solid
+# or JSON mode
+npx repo-sense battle react vue -j | jq '.winner'
 ```
 
 ### 📡 `watch-multi` — Your Own Monitor Wall
@@ -167,6 +171,20 @@ npx repo-sense stars vercel/next.js
 
 Ideal for CI/CD scripts, shell aliases, or when you only need a bare-bones glance.
 
+### 📸 `snapshot` — One-Shot Repo Data
+
+Grab a complete repo snapshot in one command — same data as `watch` but no polling:
+
+```bash
+npx repo-sense snapshot facebook/react
+```
+
+Pass `-j` for JSON output — perfect for logging, pipelines, or feeding data into other tools:
+
+```bash
+npx repo-sense snapshot facebook/react -j > react-snapshot.json
+```
+
 ---
 
 ## 📖 Command Reference
@@ -177,12 +195,15 @@ Ideal for CI/CD scripts, shell aliases, or when you only need a bare-bones glanc
 | &nbsp;&nbsp;&nbsp;`-i <sec>` | Custom refresh interval | `rs watch facebook/react -i 5` |
 | &nbsp;&nbsp;&nbsp;`-j` | JSON output (NDJSON, pipe-friendly) | `rs watch facebook/react -j` |
 | `🏆 battle <a> <b>...` | Side-by-side repo showdown (2+ repos), winner declared | `rs battle react vue` |
+| &nbsp;&nbsp;&nbsp;`-j` | JSON output for battle results | `rs battle react vue -j` |
 | `📡 watch-multi` | Multi-repo monitor wall | `rs watch-multi react vue svelte` |
 | &nbsp;&nbsp;&nbsp;`-i <sec>` | Custom interval for multi-watch | `rs watch-multi react vue -i 10` |
 | &nbsp;&nbsp;&nbsp;`-j` | JSON output for multi-watch | `rs watch-multi react vue -j` |
 | `📈 history` | Star growth timeline — velocity bars & milestones | `rs history facebook/react` |
 | `🔍 insight` | Deep intelligence — star velocity, topics, speed label | `rs insight facebook/react` |
 | `⭐ stars` | Quick bare stats glance | `rs stars facebook/react` |
+| `📸 snapshot` | One-shot repo data (rich table or JSON) | `rs snapshot facebook/react` |
+| &nbsp;&nbsp;&nbsp;`-j` | JSON output for snapshot | `rs snapshot facebook/react -j` |
 | `📖 --help` | All commands and options | `rs --help` |
 | `ℹ️ --version` | Show version | `rs --version` |
 
@@ -304,6 +325,29 @@ cp .env.example .env   # then edit .env with your token
   📅 Created 2013-05-29  ·  Last updated Today
 ```
 
+### 📸 Snapshot
+
+```
+  ┌──────────────────────────────────────────────┐
+  │        🧬  repo-sense  SNAPSHOT              │
+  └──────────────────────────────────────────────┘
+
+┌────────────────────┬──────────────────────────────┐
+│ Repository         │ facebook/react               │
+│ Description        │ A declarative UI library     │
+│ ⭐ Stars           │ 245,098                      │
+│ ⑂ Forks            │ 51,042                       │
+│ ⚠ Issues           │ 1,292                        │
+│ 🔤 Language        │ JavaScript                   │
+│ 📜 License         │ MIT                          │
+│ 🏷 Topics           │ #react #ui #frontend #js     │
+│ 📅 Created         │ 5/29/2013                    │
+│ 🕐 Updated         │ 5/19/2026, 8:30:15 AM        │
+│ 🌐 Homepage        │ https://react.dev            │
+│ ⎇ Branch           │ main                         │
+└────────────────────┴──────────────────────────────┘
+```
+
 ---
 
 ## 💡 Use Cases
@@ -316,18 +360,19 @@ cp .env.example .env   # then edit .env with your token
 | ⏳ **Growth analyst** | Understand a repo's growth trajectory | `rs history facebook/react` |
 | 🗣️ **Tech Twitter poster** | Grab a live stat for your hot take | `rs watch facebook/react -j` → `jq` |
 | 🧪 **CI/CD pipeline** | Assert star growth or fork count in a check | `rs watch-multi a -j` → parse |
+| 📊 **Data pipeline** | Snapshot repo data as JSON for logging | `rs snapshot a -j > data.json` |
 | 🦸 **Weekend hacker** | Flex "my repo blew up" without refreshing every 5 min | `rs watch your-org/your-repo` |
 
 ---
 
 ## 🏆 repo-sense vs the World
 
-| Tool | Config needed? | Keep browser open? | Docker? | Real-time deltas? | `battle` mode? | Growth history? |
-|------|:---:|:---:|:---:|:---:|:---:|:---:|
-| **repo-sense** | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
-| GitHub web | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Stargazer CLI | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| gh CLI + jq | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Tool | Config needed? | Keep browser open? | Docker? | Real-time deltas? | `battle` mode? | Growth history? | JSON output? |
+|------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **repo-sense** | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ |
+| GitHub web | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Stargazer CLI | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| gh CLI + jq | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 
 **Bottom line:** If you're still checking GitHub stars through a browser, you're doing it wrong. 😏
 
@@ -350,11 +395,12 @@ cp .env.example .env   # then edit .env with your token
 ## 🗺️ Roadmap
 
 - [x] `watch` — live dashboard with real-time deltas
-- [x] `battle` — head-to-head repo comparison (2+ repos)
+- [x] `battle` — head-to-head repo comparison (2+ repos) with JSON output
 - [x] `watch-multi` — multi-repo landscape monitoring
 - [x] `insight` — deep repo intelligence (star velocity, topics, speed label)
 - [x] `stars` — quick bare stats glance
 - [x] `history` — star growth timeline with velocity bars & milestones
+- [x] `snapshot` — one-shot repo data (rich table or JSON)
 - [ ] 🔥 Executive insight summary (`format=sentence`)
 - [ ] 🔥 Star history sparklines
 - [ ] 🏆 Multi-repo tournament (bracket mode)
@@ -375,6 +421,7 @@ cp .env.example .env   # then edit .env with your token
 5. On `battle`, it compares every metric and declares a winner
 6. On `watch-multi`, it batches all repos into a compact overview
 7. On `history`, it calculates velocity periods and milestone timelines
+8. On `snapshot`, it grabs everything in one shot — table or JSON
 
 That's it. No config files, no Docker, no cloud service. Just you and the terminal.
 
@@ -391,6 +438,9 @@ npx tsup --watch
 
 # Tests
 npm test
+
+# Coverage
+npm run coverage
 
 # Run locally
 node dist/index.js battle facebook/react vercel/next.js
@@ -426,5 +476,5 @@ MIT © β-Labs Corp.
   <br>
   <sub>⭐ Star this repo if you find it useful!</sub>
   <br><br>
-  <sub>🧑‍🚀 Curated by MarketBeta @ β-Labs · v19</sub>
+  <sub>🧑‍🚀 Curated by MarketBeta @ β-Labs · v20</sub>
 </div>

@@ -170,6 +170,33 @@ export function renderDashboard(snapshot: RepoSnapshot, previous?: RepoSnapshot)
   console.log(chalk.gray(`  Last updated: ${snapshot.timestamp.toLocaleTimeString()}  |  Press Ctrl+C to stop\n`));
 }
 
+/**
+ * Serialize a BattleResult to a plain JSON-safe object.
+ */
+export function serializeBattleResult(result: BattleResult): Record<string, unknown> {
+  return {
+    repo1: result.repo1.repo.fullName,
+    repo2: result.repo2.repo.fullName,
+    winner: result.winner,
+    starDiff: result.starDiff,
+    forkDiff: result.forkDiff,
+    issueDiff: result.issueDiff,
+    scores: result.scores,
+  };
+}
+
+/**
+ * JSON output for battle. Writes JSON and doesn't render tables.
+ */
+export function battleJsonOutput(repoStrs: string[], result: BattleResult): void {
+  const output = {
+    command: 'battle',
+    repos: repoStrs,
+    ...serializeBattleResult(result),
+  };
+  console.log(JSON.stringify(output, null, 2));
+}
+
 export async function battleRepos(repo1: string, repo2: string): Promise<BattleResult> {
   const [r1, r2] = await Promise.all([getRepo(repo1), getRepo(repo2)]);
 
@@ -373,6 +400,28 @@ export function renderBattleMulti(results: RepoData[], winnerName: string): void
   console.log(chalk.bold.cyan('  ╚══════════════════════════════════════════════════════════╝\n'));
   console.log(table.toString());
   console.log(chalk.bold(`\n  🏆 Overall Winner: ${chalk.green(winnerName)}\n`));
+}
+
+/** JSON output for multi-repo battle — sorted standings */
+export function battleMultiJsonOutput(repoStrs: string[], repos: RepoData[], winnerName: string): void {
+  const standings = repos
+    .map(r => ({
+      repo: r.fullName,
+      stars: r.stars,
+      forks: r.forks,
+      openIssues: r.openIssues,
+      language: r.language,
+      license: r.license,
+    }))
+    .sort((a, b) => b.stars - a.stars || b.forks - a.forks);
+
+  const output = {
+    command: 'battle-multi',
+    repos: repoStrs,
+    standings,
+    winner: winnerName,
+  };
+  console.log(JSON.stringify(output, null, 2));
 }
 
 /**
