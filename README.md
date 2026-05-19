@@ -10,12 +10,14 @@
 [![TypeScript](https://img.shields.io/npm/types/repo-sense?style=for-the-badge&logo=typescript&color=3178C6)](https://www.typescriptlang.org/)
 [![Node](https://img.shields.io/badge/Node-%3E%3D18-339933?style=for-the-badge&logo=node.js)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](https://opensource.org/licenses/MIT)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=for-the-badge)](http://makeapullrequest.com)
-[![Bundle Size](https://img.shields.io/badge/minzipped-%3C10KB-success?style=for-the-badge)](#)
-[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079?style=for-the-badge)](https://github.com/semantic-release/semantic-release)
-
-```
-╔══════════════════════════════════════════════════════════════════╗
+| [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=for-the-badge)](http://makeapullrequest.com)
+| [![Bundle Size](https://img.shields.io/badge/minzipped-%3C10KB-success?style=for-the-badge)](#)
+| [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079?style=for-the-badge)](https://github.com/semantic-release/semantic-release)
+|
+| > 🚀 **repo-sense** is a zero-config, terminal-native GitHub intelligence tool — track stars, forks, and issues live without leaving your CLI. Compare repos head-to-head with `battle`, monitor a portfolio with `watch-multi`, or get deep insights with a single command. No web UI, no Docker, no config files. **60 req/hr free, 5,000/hr with a GitHub token.**
+|
+| ```
+| ╔══════════════════════════════════════════════════════════════════╗
 ║           🧬  repo-sense — Sixth Sense for Your Repos           ║
 ║                                                                  ║
 ║     ⚡  npx repo-sense watch facebook/react                      ║
@@ -137,18 +139,18 @@ Ideal for CI/CD scripts, shell aliases, or when you only need a bare-bones glanc
 ## 📖 Command Reference
 
 | Command | Description | Quick Copy |
-|---------|-------------|------------|
-| `rs watch <repo>` | Live dashboard — stars, forks, issues (auto-refresh 30s) | `rs watch facebook/react` |
-| `rs watch <repo> -i <sec>` | Same with custom refresh interval | `rs watch facebook/react -i 5` |
-| `rs watch <repo> -j` | JSON output (NDJSON, each line is a snapshot) | `rs watch facebook/react -j` |
-| `rs insight <repo>` | Deep intelligence — star velocity, topics, age, speed label | `rs insight facebook/react` |
-| `rs stars <repo>` | Quick bare stats — stars, forks, issues, language, license | `rs stars facebook/react` |
-| `rs battle <a> <b>` | Side-by-side comparison, winner declared | `rs battle react vue` |
-| `rs watch-multi <a> <b> ...` | Multi-repo landscape watch | `rs watch-multi react vue svelte` |
-| `rs watch-multi <a> <b> ... -i <sec>` | Multi-repo with custom interval | `rs watch-multi react vue -i 10` |
-| `rs watch-multi <a> <b> ... -j` | Multi-repo JSON output for piping | `rs watch-multi react vue -j` |
-| `rs --help` | All commands and options | `rs --help` |
-| `rs --version` | Show version | `rs --version` |
+|:--------|:------------|:-----------|
+| `👁️ watch` | Live dashboard — stars, forks, issues (auto-refresh 30s) | `rs watch facebook/react` |
+| &nbsp;&nbsp;&nbsp;`-i <sec>` | Custom refresh interval | `rs watch facebook/react -i 5` |
+| &nbsp;&nbsp;&nbsp;`-j` | JSON output (NDJSON, pipe-friendly) | `rs watch facebook/react -j` |
+| `🏆 battle <a> <b>` | Side-by-side repo showdown, winner declared | `rs battle react vue` |
+| `📡 watch-multi` | Multi-repo monitor wall | `rs watch-multi react vue svelte` |
+| &nbsp;&nbsp;&nbsp;`-i <sec>` | Custom interval for multi-watch | `rs watch-multi react vue -i 10` |
+| &nbsp;&nbsp;&nbsp;`-j` | JSON output for multi-watch | `rs watch-multi react vue -j` |
+| `🔍 insight` | Deep intelligence — star velocity, topics, speed label | `rs insight facebook/react` |
+| `⭐ stars` | Quick bare stats glance | `rs stars facebook/react` |
+| `📖 --help` | All commands and options | `rs --help` |
+| `ℹ️ --version` | Show version | `rs --version` |
 
 ### 🔐 Auth (optional)
 
@@ -347,5 +349,5 @@ MIT © β-Labs Corp.
   <br>
   <sub>⭐ Star this repo if you find it useful!</sub>
   <br><br>
-  <sub>🧑‍🚀 Curated by MarketBeta @ β-Labs · v16</sub>
+  <sub>🧑‍🚀 Curated by MarketBeta @ β-Labs · v17</sub>
 </div>
