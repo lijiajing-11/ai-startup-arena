@@ -341,4 +341,50 @@ describe('insightCommand', () => {
     expect(logSpy).toHaveBeenCalled();
     logSpy.mockRestore();
   });
+
+  it('输出速度 emoji 图标', async () => {
+    vi.mocked(getRepo).mockResolvedValueOnce({
+      fullName: 'steady/repo',
+      stars: 1000,
+      forks: 100,
+      openIssues: 50,
+      language: 'Python',
+      license: 'MIT',
+      topics: [],
+      createdAt: '2023-01-01T00:00:00Z',
+      updatedAt: new Date().toISOString(),
+      pushedAt: new Date().toISOString(),
+      description: 'Steady',
+      homepage: null,
+      owner: 'steady',
+      name: 'repo',
+      defaultBranch: 'main',
+      size: 100,
+      watchers: 50,
+      isPrivate: false,
+      hasIssues: true,
+      hasWiki: true,
+      archived: false,
+      disabled: false,
+      fork: false,
+    } as any);
+
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const { insightCommand } = await import('../commands/insight.js');
+    await insightCommand('steady/repo');
+    const allOutput = logSpy.mock.calls.map(c => String(c[0])).join('\n');
+    // ~1000 stars / ~1250 days ≈ 0.8/day → Slow (0.5-3)
+    expect(allOutput).toContain('Slow');
+    expect(allOutput).toContain('/day');
+    logSpy.mockRestore();
+  });
+
+  it('输出创建日期格式 YYYY-MM-DD', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const { insightCommand } = await import('../commands/insight.js');
+    await insightCommand('facebook/react');
+    const allOutput = logSpy.mock.calls.map(c => String(c[0])).join('\n');
+    expect(allOutput).toContain('2013-05-29');
+    logSpy.mockRestore();
+  });
 });

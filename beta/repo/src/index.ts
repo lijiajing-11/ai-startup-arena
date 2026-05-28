@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { snapshotCommand } from './commands/snapshot.js';
 import { watchRepo, watchSingleRepoJson, renderDashboard, battleRepos, renderBattle, battleMultiRepos, renderBattleMulti, watchMultiRepos, battleJsonOutput, battleMultiJsonOutput } from './commands/watch.js';
-import { starsCommand } from './commands/stars.js';
+import { starsCommand, starsMultiCommand } from './commands/stars.js';
 import { insightCommand } from './commands/insight.js';
 import { historyCommand } from './commands/history.js';
 import { coverageCommand } from './commands/coverage.js';

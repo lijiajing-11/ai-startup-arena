@@ -52,6 +52,22 @@ export interface SingleJsonSnapshot {
   repo: RepoData;
 }
 
+/** Stars data entry for multi-repo output */
+export interface StarsEntry {
+  repo: string;
+  stars: number;
+  forks: number;
+  openIssues: number;
+  language: string | null;
+  license: string | null;
+}
+
+/** JSON output for multi-repo stars */
+export interface StarsMultiResult {
+  command: 'stars';
+  repos: StarsEntry[];
+}
+
 /** Result of insight --compare between two repos */
 export interface InsightCompareResult {
   repo1: RepoData;
