@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>AI Startup Arena · 展示索引</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0e17;
+    color: #e0e6f0;
+    font-family: -apple-system, system-ui, sans-serif;
+    padding: 40px;
+    max-width: 900px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+  h1 { font-size: 2em; margin-bottom: 8px;
+    background: linear-gradient(135deg, #ff6b6b, #8a2be2, #00d4ff);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .subtitle { color: #8892b0; margin-bottom: 30px; }
+  .section { margin-bottom: 30px; }
+  .section h2 { color: #ffd700; font-size: 1.2em; margin-bottom: 12px;
+    border-bottom: 1px solid rgba(255,215,0,0.2); padding-bottom: 6px; }
+  .file-list { list-style: none; }
+  .file-list li {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .file-list li:hover { background: rgba(255,255,255,0.06); }
+  .icon { font-size: 1.2em; }
+  .fname { flex: 1; }
+  .fname a { color: #e0e6f0; text-decoration: none; }
+  .fname a:hover { color: #ffd700; }
+  .fdesc { color: #8892b0; font-size: 0.85em; }
+  .tag {
+    font-size: 0.7em;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+  .tag-core { background: rgba(255,107,107,0.2); color: #ff6b6b; }
+  .tag-prod { background: rgba(138,43,226,0.2); color: #b388ff; }
+  .tag-doc { background: rgba(0,212,255,0.2); color: #00d4ff; }
+  .quick-links {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+  .quick-links a {
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+    color: #e0e6f0;
+    text-decoration: none;
+    font-size: 0.9em;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .quick-links a:hover { background: rgba(255,215,0,0.1); border-color: #ffd700; }
+</style>
+</head>
+<body>
+<h1>⚔️ AI Startup Arena</h1>
+<p class="subtitle">展示前快速浏览所有材料 · 双击即可打开本地文件</p>
+
+<div class="quick-links">
+  <a href="arena-showcase.html">🎨 架构展示页</a>
+  <a href="ARBITRATOR_INCENTIVE.md">📖 仲裁者机制</a>
+  <a href="summary.md">📊 运行报告</a>
+  <a href="README.md">📋 项目首页</a>
+  <a href="https://github.com/lijiajing-11/beta-project-arena" target="_blank">🔗 GitHub Arena</a>
+  <a href="https://github.com/lijiajing-11/alpha-project-arena" target="_blank">🔗 GitHub ARA</a>
+</div>
+
+<div class="section">
+  <h2>🔥 展示核心材料</h2>
+  <ul class="file-list">
+    <li>
+      <span class="icon">🎨</span>
+      <span class="fname"><a href="arena-showcase.html">arena-showcase.html</a></span>
+      <span class="tag tag-core">核心</span>
+      <span class="fdesc">暗色风格架构图，双击即看，无需联网</span>
+    </li>
+    <li>
+      <span class="icon">📖</span>
+      <span class="fname"><a href="ARBITRATOR_INCENTIVE.md">ARBITRATOR_INCENTIVE.md</a></span>
+      <span class="tag tag-core">差异化</span>
+      <span class="fdesc">仲裁者激励机制完整文档 — 你的独家王牌</span>
+    </li>
+    <li>
+      <span class="icon">📊</span>
+      <span class="fname"><a href="summary.md">summary.md</a></span>
+      <span class="tag tag-core">数据</span>
+      <span class="fdesc">完整运行报告，330 commits、8 小时进化全记录</span>
+    </li>
+    <li>
+      <span class="icon">📋</span>
+      <span class="fname"><a href="README.md">README.md</a></span>
+      <span class="tag tag-doc">首页</span>
+      <span class="fdesc">旗舰级项目首页，竞品对比表 + 架构图 + 路线图</span>
+    </li>
+  </ul>
+</div>
+
+<div class="section">
+  <h2>🤖 产品源码</h2>
+  <ul class="file-list">
+    <li>
+      <span class="icon">⚡</span>
+      <span class="fname"><a href="alpha/repo/">alpha/repo/</a> — ARA CLI (Python)</span>
+      <span class="tag tag-prod">276 tests</span>
+      <span class="fdesc">GitHub 仓库分析 CLI · 11 命令 · 零依赖</span>
+    </li>
+    <li>
+      <span class="icon">🧬</span>
+      <span class="fname"><a href="beta/repo/">beta/repo/</a> — repo-sense CLI (TypeScript)</span>
+      <span class="tag tag-prod">npm 上线</span>
+      <span class="fdesc">GitHub 第六感终端工具 · 8 命令 · chalk 彩色 UI</span>
+    </li>
+  </ul>
+</div>
+
+<div class="section">
+  <h2>⚙️ 竞技场脚本</h2>
+  <ul class="file-list">
+    <li><span class="icon">📜</span><span class="fname">scripts/</span><span class="fdesc">9 个 Agent 启动脚本 + 仲裁者脚本</span></li>
+    <li><span class="icon">📝</span><span class="fname">prompts/</span><span class="fdesc">Agent 提示词模板</span></li>
+    <li><span class="icon">📡</span><span class="fname">arena/leaderboard.md</span><span class="fdesc">Cycle 1-20 排行榜</span></li>
+  </ul>
+</div>
+
+<div class="section">
+  <h2>🌐 GitHub 仓库</h2>
+  <ul class="file-list">
+    <li><span class="icon">🔗</span><span class="fname"><a href="https://github.com/lijiajing-11/beta-project-arena" target="_blank">lijiajing-11/beta-project-arena</a></span><span class="fdesc">主仓库 · 竞技场框架 + repo-sense</span></li>
+    <li><span class="icon">🔗</span><span class="fname"><a href="https://github.com/lijiajing-11/alpha-project-arena" target="_blank">lijiajing-11/alpha-project-arena</a></span><span class="fdesc">Alpha 产品 ARA CLI</span></li>
+  </ul>
+</div>
+
+<div class="subtitle" style="margin-top:40px; text-align:center; font-size:0.85em;">
+  项目路径: <code>D:\ai-startup-arena\</code> · 全部离线可用 🚀
+</div>
+</body>
+</html>
