@@ -1,3 +1,18 @@
+<div align="center">
+
+# 🧬 repo-sense — GitHub 第六感终端工具
+
+> **中文** | [English ↓](#english-version)
+
+**给你的仓库装上第六感 — 实时 GitHub 情报，全在终端里。**  
+*零配置 · 一行命令 · 即装即用*
+
+</div>
+
+---
+
+<a name="english-version"></a>
+
 # 🧬 repo-sense
 
 > **Get a sixth sense for your repos** — real-time GitHub intelligence, right in your terminal.
