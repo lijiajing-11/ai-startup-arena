@@ -20,13 +20,15 @@ sop/
 
 ---
 
-## 🔗 与竞品融合对照
+## 🔗 与竞品融合对照（已落地 ✅）
 
-| 融合源 | 实现文件 | 核心改进 |
-|-------|---------|---------|
-| MetaGPT | `templates/*.md` | 每个角色有标准化 SOP，不再凭感觉干活 |
-| GenericAgent | `SKILL_TREE.md` | Agent 技能可追踪、跨轮次传承 |
-| OpenSpace | `EXPERIENCE_POOL.md` | Agent 间的经验可共享、可复用 |
+| 融合源 | 实现文件 | 核心改进 | 状态 |
+|-------|---------|---------|------|
+| MetaGPT | `templates/*.md` | 每个角色有标准化 SOP，不再凭感觉干活 | ✅ 已落地 |
+| GenericAgent | `SKILL_TREE.md` | Agent 技能可追踪、跨轮次传承 | ✅ 已落地 |
+| OpenSpace | `EXPERIENCE_POOL.md` | Agent 间的经验可共享、可复用 | ✅ 已落地 |
+| **OpenSpace 低 Token** | **所有 SOP** | **结构化通信协议，省 50-70% token** | ✅ **今日集成** |
+| **CAMEL 通信协议** | **所有 SOP** | **Agent 间固定格式消息，不废话** | ✅ **今日集成** |
 
 ---
 
