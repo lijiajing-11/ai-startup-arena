@@ -1,6 +1,6 @@
 # 🧠 CEO — 标准操作流程 (SOP)
 
-> **来源:** MetaGPT 角色驱动
+> **来源:** MetaGPT 角色驱动 + OpenSpace 低 token 通信协议
 > **作用:** CEO Agent 在每个进化 Cycle 中遵循的标准流程
 
 ---
