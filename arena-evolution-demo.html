@@ -919,11 +919,15 @@ async function startEvolution() {
   document.getElementById('totalDocs').textContent = '0';
 
   // Reset bars
-  for (let i = 1; i <= 7; i++) {
-    document.getElementById('d' + i + 'a').style.width = '0%';
-    document.getElementById('pct' + i).textContent = '0%';
+  const barIds = ['d1a','d2b','d3a','d4b','d5a','d6b','d7a'];
+  for (let i = 0; i < barIds.length; i++) {
+    const el = document.getElementById(barIds[i]);
+    if (el) el.style.width = '0%';
   }
-  for (let i = 1; i <= 7; i+=0) break; // dummy, bars below handle it
+  for (let i = 1; i <= 7; i++) {
+    const el = document.getElementById('pct' + i);
+    if (el) el.textContent = '0%';
+  }
 
   // Project
   const project = document.getElementById('projectInput').value || 'GitHub Star 趋势分析 CLI';
@@ -1129,9 +1133,14 @@ document.getElementById('resetBtn').addEventListener('click', () => {
   document.getElementById('totalDocs').textContent = '0';
   document.getElementById('alphaStratLabel').textContent = '⚖️ 均衡';
   document.getElementById('betaStratLabel').textContent = '⚖️ 均衡';
+  const resetBarIds = ['d1a','d2b','d3a','d4b','d5a','d6b','d7a'];
+  for (let i = 0; i < resetBarIds.length; i++) {
+    const el = document.getElementById(resetBarIds[i]);
+    if (el) el.style.width = '0%';
+  }
   for (let i = 1; i <= 7; i++) {
-    document.getElementById('d' + i + 'a').style.width = '0%';
-    document.getElementById('pct' + i).textContent = '0%';
+    const el = document.getElementById('pct' + i);
+    if (el) el.textContent = '0%';
   }
   document.getElementById('projectLabel').textContent = '';
 });
