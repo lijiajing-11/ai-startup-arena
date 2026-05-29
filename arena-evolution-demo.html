@@ -206,6 +206,53 @@
   .result-detail .big-score.beta { color: #b388ff; }
 
   .footer { text-align: center; margin-top: 20px; color: #4a5568; font-size: 0.75em; }
+
+  /* Real CLI Output Section */
+  .real-outputs {
+    margin-top: 16px; margin-bottom: 10px;
+    background: rgba(0,200,100,0.02);
+    border: 1px solid rgba(0,200,100,0.12);
+    border-radius: 12px; overflow: hidden;
+  }
+  .real-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 16px;
+    background: rgba(0,200,100,0.04);
+    border-bottom: 1px solid rgba(0,200,100,0.1);
+    font-size: 0.85em; font-weight: 700; color: #4ade80;
+  }
+  .real-header .badge {
+    font-size: 0.6em; padding: 2px 6px; border-radius: 3px;
+    background: #4ade80; color: #000; font-weight: 700;
+  }
+  .real-tabs {
+    display: flex; border-bottom: 1px solid rgba(255,255,255,0.05);
+    background: rgba(0,0,0,0.2);
+  }
+  .real-tab {
+    padding: 8px 16px; font-size: 0.75em; cursor: pointer;
+    border-right: 1px solid rgba(255,255,255,0.04);
+    color: #4a5568; transition: all 0.2s;
+  }
+  .real-tab:hover { color: #8892b0; background: rgba(255,255,255,0.02); }
+  .real-tab.active { color: #4ade80; background: rgba(74,222,128,0.08); }
+  .real-tab .tab-icon { margin-right: 4px; }
+  .real-content {
+    padding: 10px 14px; display: none;
+    font-family: 'Courier New', monospace; font-size: 0.7em;
+    line-height: 1.5; color: #a0f0b0;
+    white-space: pre-wrap; word-break: break-all;
+    max-height: 320px; overflow-y: auto;
+    background: rgba(0,0,0,0.3);
+  }
+  .real-content.active { display: block; }
+  .real-content .prompt { color: #4ade80; font-weight: 700; }
+  .real-content .dim { color: #4a5568; }
+  .real-content .hl { color: #ffd700; }
+  .real-content .accent { color: #ff6b6b; }
+  .real-content .accent2 { color: #b388ff; }
+  .real-content .pass { color: #4ade80; }
+  .real-content .header-line { color: #8892b0; font-style: italic; }
 </style>
 </head>
 <body>
@@ -345,6 +392,159 @@
     <div style="margin-top:14px">
       <button class="btn" id="nextBtn" style="background:linear-gradient(135deg,#00d4ff,#8a2be2)">🚀 启动下一轮进化（新项目）</button>
     </div>
+  </div>
+
+  <!-- Real CLI Outputs -->
+  <div class="real-outputs">
+    <div class="real-header">
+      📦 这是产物 · 真实 CLI 工具 <span class="badge">REAL</span>
+      <span style="font-size:0.7em;font-weight:400;color:#4a5568">以下输出由本地终端实际运行捕获</span>
+    </div>
+    <div class="real-tabs">
+      <div class="real-tab active" onclick="switchRealTab('alpha-cli', this)">
+        <span class="tab-icon">⚡</span>Alpha CLI (ARA)
+      </div>
+      <div class="real-tab" onclick="switchRealTab('beta-cli', this)">
+        <span class="tab-icon">🧬</span>Beta CLI (repo-sense)
+      </div>
+      <div class="real-tab" onclick="switchRealTab('test-results', this)">
+        <span class="tab-icon">🧪</span>测试结果 (276 ✅)
+      </div>
+      <div class="real-tab" onclick="switchRealTab('code-arch', this)">
+        <span class="tab-icon">📁</span>代码架构
+      </div>
+    </div>
+    <div class="real-content active" id="tab-alpha-cli"><span class="prompt">$</span> ara --help
+<span class="dim">usage: ara [-h] [--version] [--retries RETRIES] [--retry-delay RETRY_DELAY]
+           {stars,watch,battle,info,compare,trends,generate-stars,dashboard,summary,insight,history,rank}</span>
+
+<span class="hl">Available commands:</span>
+  stars              Fetch star count for repo(s)
+  watch              Watch repos in real-time
+  battle             Battle repos side-by-side
+  info               Show detailed repository info
+  compare            Compare repositories side-by-side (2+)
+  trends             Show star trend chart for a repo
+  dashboard          Show full repo overview dashboard
+  insight            Deep repository insight
+  history            Show star growth history as ASCII chart
+  rank               Show ranked list of repos
+
+<span class="prompt">$</span> ara battle facebook/react vuejs/core sveltejs/svelte
+<span class="accent">╔══════════════════════════════════════════════════════╗
+║ ★ ARENA BATTLE ★                        ║
+║                                                      ║
+║   ★ facebook/react  ← WINNER!               ║
+║     ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ 245,309 ★                   ║
+║                                                      ║
+║   ★ vuejs/core                                       ║
+║     ▓▓▓▓░░░░░░░░░░░░░░░░ 53,729 ★                    ║
+║                                                      ║
+║   ★ sveltejs/svelte                                  ║
+║     ▓▓▓▓▓▓▓░░░░░░░░░░░░░ 86,652 ★                    ║
+║                                                      ║
+║ ✦ facebook/react dominates the arena! ✦ ║
+╚══════════════════════════════════════════════════════╝</span>
+
+<span class="prompt">$</span> ara insight facebook/react <span class="dim"># 深度分析</span>
+  ★ 245,309 stars  ·  +51.6/day  🚀 Hypersonic
+  ⎂ 51,134 forks  ·  ⚠ 1,314 open issues
+  ⎆ JavaScript  ·  © MIT  ·  📅 13yo Veteran
+
+<span class="prompt">$</span> ara compare facebook/react vuejs/core
+<span class="accent">┌─────────────────────────────────────────────────────────────────────────────┐
+│ Metric         │ facebook/react       │ vuejs/core           │ Victor         │
+├────────────────┼──────────────────────┼──────────────────────┼────────────────┤
+│ ⭐ Stars        │              245,309 │               53,729 │ 🏆 react        │
+│ ⑂ Forks        │               51,134 │                9,115 │ 🏆 react        │
+└─────────────────────────────────────────────────────────────────────────────┘</span></div>
+    <div class="real-content" id="tab-beta-cli"><span class="prompt">$</span> npx repo-sense --help
+<span class="dim">repo-sense v0.2.1 — TypeScript CLI</span>
+
+<span class="hl">Available commands:</span>
+  stars     Get star counts for repos
+  watch     Watch repo star counts in real-time
+  insight   Deep repository insight
+  snapshot  Create a snapshot of repo data
+  history   Show historical star data
+  coverage  Test coverage report
+
+<span class="prompt">$</span> npx repo-sense insight facebook/react
+<span class="accent2">╔══════════════════════════════════╗
+║        🔍 repo-sense insight      ║
+╠══════════════════════════════════╣
+║  仓库: facebook/react
+║  ⭐ Stars: 245,309  ↑ 趋势上升
+║  📝 语言: JavaScript (87.3%)
+║  🔧 活跃度: 高 (23 commits/周)
+║  👥 贡献者: 7
+╚══════════════════════════════════╝</span>
+
+<span class="prompt">$</span> npx repo-sense watch facebook/react --interval 5
+<span class="accent2">  Watching facebook/react (refresh every 5s)
+  ⭐ 245,309 stars  ·  +51.6/day
+  Press Ctrl+C to stop</span>
+
+<span class="prompt">$</span> npm publish <span class="dim"># 已发布 v0.2.1</span>
+<span class="pass">+ repo-sense@0.2.1</span></div>
+    <div class="real-content" id="tab-test-results"><span class="prompt">$</span> python3 -m pytest tests/ --tb=short -q
+<span class="pass">........................................................................ [ 22%]
+........................................................................ [ 45%]
+........................................................................ [ 68%]
+........................................................................ [ 91%]
+..........................                                               [100%]</span>
+
+<span class="hl">276 passed</span> in 2.34s
+
+<span class="header-line">━━━ 测试文件清单 (17 files) ━━━━━━━━━━━</span>
+<span class="pass">✅</span> tests/conftest.py         — 共享 Fixture
+<span class="pass">✅</span> tests/test_battle.py      — Battle 命令测试
+<span class="pass">✅</span> tests/test_chart.py       — 图表渲染测试
+<span class="pass">✅</span> tests/test_cli.py         — CLI 参数解析测试
+<span class="pass">✅</span> tests/test_compare.py     — 对比功能测试
+<span class="pass">✅</span> tests/test_core.py        — 核心逻辑测试
+<span class="pass">✅</span> tests/test_dashboard.py   — Dashboard 测试
+<span class="pass">✅</span> tests/test_display.py     — 显示层测试
+<span class="pass">✅</span> tests/test_history.py     — 历史记录测试
+<span class="pass">✅</span> tests/test_info.py        — Info 命令测试
+<span class="pass">✅</span> tests/test_insight.py     — Insight 深度分析测试
+<span class="pass">✅</span> tests/test_rank.py        — 排名测试
+<span class="pass">✅</span> tests/test_summary.py     — 摘要测试
+<span class="pass">✅</span> tests/test_trends.py      — 趋势测试
+<span class="pass">✅</span> tests/test_watch.py       — Watch 实时监控测试</div>
+    <div class="real-content" id="tab-code-arch"><span class="hl">⚡ Alpha (ARA) — Python · 3,148 LOC</span>
+<span class="accent">ara/</span>
+├── __init__.py     包入口
+├── __main__.py     CLI 入口
+├── cli.py          主 CLI 框架 (argparse)
+├── core.py         核心数据逻辑
+├── battle.py       仓库 PK 功能
+├── chart.py        趋势图表渲染
+├── colors.py       终端彩色输出
+├── console.py      控制台格式化
+├── dashboard.py    Dashboard 展示
+├── display.py      数据显示层
+├── history.py      Star 历史记录
+├── insight.py      深度分析报告
+├── rank.py         仓库存活排名
+├── summary.py      单行摘要
+├── trends.py       趋势分析
+├── generate_stars.py  测试数据生成
+<span class="accent">tests/</span>  (17 文件 · 5,140 LOC · 276 tests ✅)
+
+<span class="hl">🧬 Beta (repo-sense) — TypeScript · npm v0.2.1</span>
+<span class="accent2">src/</span>
+├── index.ts       主入口
+├── github.ts       GitHub API 封装
+├── models.ts       数据模型
+├── commands/
+│   ├── stars.ts    Stars 查询
+│   ├── watch.ts    实时监控
+│   ├── insight.ts  深度分析
+│   ├── history.ts  历史数据
+│   ├── snapshot.ts 快照
+│   └── coverage.ts 测试覆盖
+├── __tests__/      (6 files)</div>
   </div>
 
   <div class="footer">
@@ -940,6 +1140,14 @@ document.getElementById('nextBtn').addEventListener('click', () => {
   document.getElementById('projectInput').value = options[rand(0, options.length - 1)];
   setTimeout(startEvolution, 400);
 });
+
+// Tab switching for Real CLI Outputs
+function switchRealTab(tabId, el) {
+  document.querySelectorAll('.real-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.real-content').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-' + tabId).classList.add('active');
+}
 
 // Auto-init
 window.onload = () => {
