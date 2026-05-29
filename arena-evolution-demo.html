@@ -6,196 +6,216 @@
 <title>AI Arena · 进化引擎现场演示</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #0a0e17; color: #e0e6f0; font-family: system-ui, sans-serif; padding: 20px; }
-  .container { max-width: 1200px; margin: 0 auto; }
-  
-  h1 { text-align: center; font-size: 2em; margin-bottom: 4px;
+  body { background: #0a0e17; color: #e0e6f0; font-family: system-ui, -apple-system, sans-serif; padding: 20px; }
+  .container { max-width: 1400px; margin: 0 auto; }
+
+  h1 { text-align: center; font-size: 2em; margin-bottom: 2px;
     background: linear-gradient(135deg, #ff6b6b, #ffd700);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .subtitle { text-align: center; color: #8892b0; margin-bottom: 24px; font-size: 0.9em; }
+  .subtitle { text-align: center; color: #8892b0; margin-bottom: 16px; font-size: 0.85em; }
 
   /* Engine panel */
   .engine-panel {
     background: rgba(255,215,0,0.03);
     border: 2px solid rgba(255,215,0,0.2);
     border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 20px;
+    padding: 16px 20px;
+    margin-bottom: 14px;
     text-align: center;
   }
-  .engine-title {
-    font-size: 1.5em; font-weight: 700;
+  .engine-title { font-size: 1.3em; font-weight: 700;
     background: linear-gradient(90deg, #ff6b6b, #ffd700);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  .engine-desc { color: #8892b0; font-size: 0.85em; margin: 8px 0 16px; }
-
-  .project-input-area {
-    display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
-  }
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .engine-desc { color: #8892b0; font-size: 0.8em; margin: 6px 0 12px; }
+  .project-input-area { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
   .project-input {
     background: rgba(255,255,255,0.05);
     border: 1px solid rgba(255,215,0,0.3);
-    border-radius: 8px;
-    padding: 10px 16px;
-    color: #e0e6f0;
-    font-size: 0.95em;
-    width: 350px;
-    outline: none;
+    border-radius: 8px; padding: 8px 14px;
+    color: #e0e6f0; font-size: 0.9em;
+    width: 320px; outline: none;
   }
   .project-input:focus { border-color: #ffd700; }
   .project-input::placeholder { color: #4a5568; }
   .btn {
     background: linear-gradient(135deg, #ff6b6b, #8a2be2);
-    border: none;
-    border-radius: 8px;
-    padding: 10px 24px;
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-    font-size: 0.95em;
-    transition: transform 0.2s;
+    border: none; border-radius: 8px; padding: 8px 20px;
+    color: white; font-weight: 600; cursor: pointer;
+    font-size: 0.9em; transition: transform 0.2s;
   }
   .btn:hover { transform: scale(1.03); }
   .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-  .btn-reset {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
+  .btn-reset { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
+  .preset-btns { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+  .preset-btn {
+    padding: 3px 10px; border-radius: 5px; font-size: 0.75em;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+    color: #8892b0; cursor: pointer;
   }
+  .preset-btn:hover { border-color: #ffd700; color: #e0e6f0; }
 
-  /* Arena layout */
-  .arena-row {
-    display: flex; gap: 16px; margin-bottom: 20px;
+  /* Top bar: cycle + metric badges */
+  .top-bar {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 14px; flex-wrap: wrap;
   }
+  .cycle-display { font-size: 1em; font-weight: 600; }
+  .cycle-num { color: #ffd700; font-size: 1.3em; }
+  .project-label { color: #4a5568; font-size: 0.8em; }
+  .metric-badges { display: flex; gap: 8px; flex: 1; justify-content: flex-end; flex-wrap: wrap; }
+  .metric-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 8px; border-radius: 5px; font-size: 0.7em;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+  }
+  .metric-badge .num { font-weight: 700; }
+  .metric-badge .num.gold { color: #ffd700; }
+  .metric-badge .num.red { color: #ff6b6b; }
+  .metric-badge .num.purple { color: #b388ff; }
+  .metric-badge .num.green { color: #4ade80; }
+
+  /* Main layout */
+  .main-row { display: flex; gap: 14px; margin-bottom: 14px; }
+  .team-col { flex: 1; min-width: 0; }
+
   .team-panel {
-    flex: 1;
     background: rgba(255,255,255,0.02);
-    border-radius: 12px;
-    padding: 16px;
+    border-radius: 12px; padding: 14px;
     border: 1px solid rgba(255,255,255,0.06);
-    min-height: 250px;
   }
   .team-panel.alpha { border-color: rgba(255,107,107,0.2); }
   .team-panel.beta { border-color: rgba(138,43,226,0.2); }
 
   .team-header {
     display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 12px; padding-bottom: 10px;
+    margin-bottom: 8px; padding-bottom: 6px;
     border-bottom: 1px solid rgba(255,255,255,0.05);
   }
-  .team-name { font-size: 1.1em; font-weight: 700; }
+  .team-name { font-size: 1em; font-weight: 700; }
   .team-name.alpha { color: #ff6b6b; }
   .team-name.beta { color: #b388ff; }
-  .team-score {
-    font-size: 1.3em; font-weight: 800;
-    padding: 2px 12px; border-radius: 6px;
-    background: rgba(255,255,255,0.05);
-  }
+  .team-score { font-size: 1.2em; font-weight: 800; padding: 1px 10px; border-radius: 5px; background: rgba(255,255,255,0.05); }
   .team-score.alpha { color: #ff6b6b; }
   .team-score.beta { color: #b388ff; }
 
-  .agent-row {
-    display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;
-  }
+  .agent-row { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
   .agent-badge {
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 0.75em;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.06);
+    padding: 2px 8px; border-radius: 4px; font-size: 0.65em;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
   }
+
+  /* Team sub-metrics */
+  .team-metrics {
+    display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap;
+  }
+  .team-metric {
+    font-size: 0.65em; padding: 2px 6px; border-radius: 3px;
+    background: rgba(255,255,255,0.03);
+  }
+  .team-metric .label { color: #4a5568; }
+  .team-metric .val { font-weight: 600; }
+  .team-metric .val.gold { color: #ffd700; }
 
   .log-area {
     background: rgba(0,0,0,0.3);
-    border-radius: 10px;
-    padding: 12px;
-    height: 200px;
-    overflow-y: auto;
+    border-radius: 8px; padding: 8px;
+    height: 150px; overflow-y: auto;
     font-family: 'Courier New', monospace;
-    font-size: 0.8em;
-    line-height: 1.5;
-    color: #8892b0;
-    margin-top: 10px;
-    border: 1px solid rgba(255,255,255,0.05);
+    font-size: 0.7em; line-height: 1.5;
+    color: #8892b0; margin-top: 8px;
+    border: 1px solid rgba(255,255,255,0.04);
   }
-  .log-area::-webkit-scrollbar { width: 4px; }
+  .log-area::-webkit-scrollbar { width: 3px; }
   .log-area::-webkit-scrollbar-track { background: transparent; }
-  .log-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
-  .log-line { animation: fadeIn 0.3s; }
+  .log-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+  .log-line { animation: fadeIn 0.3s; word-break: break-all; }
   .log-line.alpha { color: #ff6b6b; }
   .log-line.beta { color: #b388ff; }
   .log-line.arb { color: #ffd700; }
   .log-line.sys { color: #4a5568; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: translateY(0); } }
 
+  /* Arbitrator panel */
   .arbitrator-panel {
     background: linear-gradient(135deg, rgba(255,107,107,0.05), rgba(138,43,226,0.05));
     border: 1px solid rgba(255,215,0,0.15);
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 20px;
+    border-radius: 12px; padding: 14px; margin-bottom: 14px;
   }
-  .arb-row {
-    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  .arb-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .arb-label { color: #ffd700; font-weight: 600; font-size: 0.85em; white-space: nowrap; }
+
+  /* Dimension bars - smaller */
+  .dims-row { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+  .dimension-bar { flex: 1; min-width: 70px; max-width: 130px; }
+  .dimension-label {
+    font-size: 0.6em; color: #4a5568; margin-bottom: 1px;
+    display: flex; justify-content: space-between;
   }
-  .arb-label { color: #ffd700; font-weight: 600; font-size: 0.9em; }
-  .dimension-bar {
-    flex: 1; min-width: 60px;
-  }
-  .dimension-label { font-size: 0.7em; color: #4a5568; margin-bottom: 2px; }
-  .bar-track {
-    height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden;
-  }
-  .bar-fill {
-    height: 100%; border-radius: 3px; transition: width 0.5s ease;
-  }
+  .dimension-label .pct { color: #8892b0; font-weight: 600; }
+  .bar-track { height: 5px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
   .bar-fill.alpha { background: linear-gradient(90deg, #ff6b6b, #ff8e8e); }
   .bar-fill.beta { background: linear-gradient(90deg, #8a2be2, #b388ff); }
 
-  .cycle-display {
-    text-align: center; margin-bottom: 12px;
-    font-size: 1.1em; font-weight: 600;
-  }
-  .cycle-num { color: #ffd700; font-size: 1.4em; }
+  .arb-msg { color: #8892b0; font-size: 0.8em; flex: 1; }
+  .arb-log-small { height: 50px; margin-top: 6px; }
 
+  /* Output preview section */
+  .output-panel {
+    display: none;
+    background: rgba(0,200,100,0.03);
+    border: 1px solid rgba(0,200,100,0.15);
+    border-radius: 12px; padding: 14px; margin-bottom: 14px;
+  }
+  .output-panel.show { display: block; }
+  .output-title { font-size: 0.85em; font-weight: 700; color: #4ade80; margin-bottom: 8px; }
+  .output-content {
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px; padding: 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.75em; line-height: 1.6;
+    color: #a0f0b0;
+    max-height: 120px; overflow-y: auto;
+    white-space: pre-wrap;
+  }
+
+  /* Score history chart */
+  .chart-container {
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px; padding: 12px; margin-top: 10px;
+  }
+  .chart-title { font-size: 0.7em; color: #4a5568; margin-bottom: 6px; }
+  .chart-svg { width: 100%; height: 50px; }
+  .chart-svg line { stroke: #2a2a3a; stroke-width: 1; }
+
+  /* Result panel */
   .result-panel {
     display: none;
     text-align: center;
-    padding: 30px;
+    padding: 24px;
     background: rgba(255,215,0,0.03);
     border: 2px solid rgba(255,215,0,0.15);
-    border-radius: 16px;
-    margin-top: 20px;
+    border-radius: 16px; margin-top: 14px;
   }
   .result-panel.show { display: block; }
-  .result-title { font-size: 1.3em; font-weight: 700; color: #ffd700; margin-bottom: 10px; }
-  .result-detail { color: #8892b0; font-size: 0.9em; line-height: 1.8; }
+  .result-title { font-size: 1.2em; font-weight: 700; color: #ffd700; margin-bottom: 8px; }
+  .result-detail { color: #8892b0; font-size: 0.85em; line-height: 1.8; }
   .result-detail strong { color: #e0e6f0; }
+  .result-detail .big-score { font-size: 2em; font-weight: 800; margin: 10px 0; }
+  .result-detail .big-score.alpha { color: #ff6b6b; }
+  .result-detail .big-score.beta { color: #b388ff; }
 
-  .preset-btns {
-    display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 10px;
-  }
-  .preset-btn {
-    padding: 4px 12px; border-radius: 6px; font-size: 0.8em;
-    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
-    color: #8892b0; cursor: pointer;
-  }
-  .preset-btn:hover { border-color: #ffd700; color: #e0e6f0; }
-
-  .footer { text-align: center; margin-top: 30px; color: #4a5568; font-size: 0.8em; }
+  .footer { text-align: center; margin-top: 20px; color: #4a5568; font-size: 0.75em; }
 </style>
 </head>
 <body>
 <div class="container">
   <h1>⚙️ AI Arena · 进化引擎演示</h1>
-  <p class="subtitle">输入一个新项目需求，看 AI 团队如何竞争进化、产出代码</p>
+  <p class="subtitle">输入项目需求 → 仲裁者拆解 → 两支 AI 团队竞争进化 → 产出完整产品</p>
 
   <!-- Engine -->
   <div class="engine-panel">
     <div class="engine-title">🧬 自进化引擎 (Self-Evolution Engine)</div>
-    <div class="engine-desc">
-      输入任意项目需求 → 仲裁者自动拆解任务 → 两支 AI 公司团队竞争开发 → 仲裁评分 → 激励进化 → 产出完整项目
-    </div>
     <div class="project-input-area">
       <input class="project-input" id="projectInput" placeholder="例如: 一个 Markdown 转 PDF 的 CLI 工具" value="GitHub Star 趋势分析 CLI" />
       <button class="btn" id="startBtn">🚀 启动进化</button>
@@ -209,383 +229,687 @@
     </div>
   </div>
 
-  <!-- Cycle counter -->
-  <div class="cycle-display">
-    进化轮次: <span class="cycle-num" id="cycleNum">0</span> / 20
-    <span id="projectLabel" style="color:#4a5568;font-size:0.8em;margin-left:12px"></span>
+  <!-- Top bar -->
+  <div class="top-bar">
+    <div class="cycle-display">
+      进化轮次: <span class="cycle-num" id="cycleNum">0</span> / 20
+      <span class="project-label" id="projectLabel"></span>
+    </div>
+    <div class="metric-badges">
+      <span class="metric-badge">⏱️ 耗时 <span class="num" id="elapsedDisplay">0</span>s</span>
+      <span class="metric-badge">📝 总计 Commits <span class="num gold" id="totalCommits">0</span></span>
+      <span class="metric-badge">🧪 测试用例 <span class="num green" id="totalTests">0</span></span>
+      <span class="metric-badge">📄 文档页 <span class="num" id="totalDocs">0</span></span>
+    </div>
   </div>
 
-  <!-- Arena teams -->
-  <div class="arena-row">
-    <div class="team-panel alpha">
-      <div class="team-header">
-        <span class="team-name alpha">⚡ Alpha · A-Tech Inc.</span>
-        <span class="team-score alpha" id="alphaScore">-</span>
+  <!-- Teams -->
+  <div class="main-row">
+    <div class="team-col">
+      <div class="team-panel alpha">
+        <div class="team-header">
+          <span class="team-name alpha">⚡ Alpha · A-Tech Inc. <span style="font-size:0.7em;font-weight:400;color:#4a5568">(Python)</span></span>
+          <span class="team-score alpha" id="alphaScore">-</span>
+        </div>
+        <div class="agent-row">
+          <span class="agent-badge" style="color:#ff6b6b">🧠 CEO</span>
+          <span class="agent-badge" style="color:#ff6b6b">🏗️ 架构师</span>
+          <span class="agent-badge" style="color:#ff6b6b">💻 开发</span>
+          <span class="agent-badge" style="color:#ff6b6b">🧪 测试</span>
+          <span class="agent-badge" style="color:#ff6b6b">🔍 审查</span>
+          <span class="agent-badge" style="color:#ff6b6b">📋 产品</span>
+          <span class="agent-badge" style="color:#ff6b6b">📢 市场</span>
+        </div>
+        <div class="team-metrics" id="alphaMetrics">
+          <span class="team-metric"><span class="label">Commits</span> <span class="val gold" id="alphaCommits">0</span></span>
+          <span class="team-metric"><span class="label">Tests</span> <span class="val" id="alphaTests">0</span></span>
+          <span class="team-metric"><span class="label">策略</span> <span class="val" id="alphaStratLabel">⚖️ 均衡</span></span>
+        </div>
+        <div class="log-area" id="alphaLog"></div>
       </div>
-      <div class="agent-row">
-        <span class="agent-badge" style="color:#ff6b6b">🧠 CEO</span>
-        <span class="agent-badge" style="color:#ff6b6b">🏗️ 架构师</span>
-        <span class="agent-badge" style="color:#ff6b6b">💻 开发</span>
-        <span class="agent-badge" style="color:#ff6b6b">🧪 测试</span>
-        <span class="agent-badge" style="color:#ff6b6b">🔍 审查</span>
-        <span class="agent-badge" style="color:#ff6b6b">📋 产品</span>
-        <span class="agent-badge" style="color:#ff6b6b">📢 市场</span>
-      </div>
-      <div class="log-area" id="alphaLog"></div>
     </div>
-    <div class="team-panel beta">
-      <div class="team-header">
-        <span class="team-name beta">🧬 Beta · B-Labs Corp.</span>
-        <span class="team-score beta" id="betaScore">-</span>
+    <div class="team-col">
+      <div class="team-panel beta">
+        <div class="team-header">
+          <span class="team-name beta">🧬 Beta · B-Labs Corp. <span style="font-size:0.7em;font-weight:400;color:#4a5568">(TypeScript)</span></span>
+          <span class="team-score beta" id="betaScore">-</span>
+        </div>
+        <div class="agent-row">
+          <span class="agent-badge" style="color:#b388ff">🧠 CEO</span>
+          <span class="agent-badge" style="color:#b388ff">🏗️ 架构师</span>
+          <span class="agent-badge" style="color:#b388ff">💻 开发</span>
+          <span class="agent-badge" style="color:#b388ff">🧪 测试</span>
+          <span class="agent-badge" style="color:#b388ff">🔍 审查</span>
+          <span class="agent-badge" style="color:#b388ff">📋 产品</span>
+          <span class="agent-badge" style="color:#b388ff">📢 市场</span>
+        </div>
+        <div class="team-metrics" id="betaMetrics">
+          <span class="team-metric"><span class="label">Commits</span> <span class="val gold" id="betaCommits">0</span></span>
+          <span class="team-metric"><span class="label">Tests</span> <span class="val" id="betaTests">0</span></span>
+          <span class="team-metric"><span class="label">策略</span> <span class="val" id="betaStratLabel">⚖️ 均衡</span></span>
+        </div>
+        <div class="log-area" id="betaLog"></div>
       </div>
-      <div class="agent-row">
-        <span class="agent-badge" style="color:#b388ff">🧠 CEO</span>
-        <span class="agent-badge" style="color:#b388ff">🏗️ 架构师</span>
-        <span class="agent-badge" style="color:#b388ff">💻 开发</span>
-        <span class="agent-badge" style="color:#b388ff">🧪 测试</span>
-        <span class="agent-badge" style="color:#b388ff">🔍 审查</span>
-        <span class="agent-badge" style="color:#b388ff">📋 产品</span>
-        <span class="agent-badge" style="color:#b388ff">📢 市场</span>
-      </div>
-      <div class="log-area" id="betaLog"></div>
     </div>
   </div>
 
   <!-- Arbitrator -->
   <div class="arbitrator-panel">
-    <div class="arb-row" style="margin-bottom:12px">
-      <span class="arb-label">⚖️ 仲裁者评分</span>
-      <span id="arbMessage" style="color:#8892b0;font-size:0.85em;flex:1">等待启动...</span>
-    </div>
     <div class="arb-row">
+      <span class="arb-label">⚖️ 仲裁者</span>
+      <span class="arb-msg" id="arbMessage">等待启动...</span>
+    </div>
+    <div class="dims-row" id="dimsRow">
       <div class="dimension-bar">
-        <div class="dimension-label">🚀 功能完整度</div>
+        <div class="dimension-label">🚀 功能 <span class="pct" id="pct1">0%</span></div>
         <div class="bar-track"><div class="bar-fill alpha" id="d1a" style="width:0%"></div></div>
       </div>
       <div class="dimension-bar">
-        <div class="dimension-label">🧪 测试覆盖</div>
+        <div class="dimension-label">🧪 测试 <span class="pct" id="pct2">0%</span></div>
         <div class="bar-track"><div class="bar-fill beta" id="d2b" style="width:0%"></div></div>
       </div>
       <div class="dimension-bar">
-        <div class="dimension-label">💡 创新性</div>
+        <div class="dimension-label">💡 创新 <span class="pct" id="pct3">0%</span></div>
         <div class="bar-track"><div class="bar-fill alpha" id="d3a" style="width:0%"></div></div>
       </div>
       <div class="dimension-bar">
-        <div class="dimension-label">📖 文档质量</div>
+        <div class="dimension-label">📖 文档 <span class="pct" id="pct4">0%</span></div>
         <div class="bar-track"><div class="bar-fill beta" id="d4b" style="width:0%"></div></div>
       </div>
-    </div>
-    <div class="arb-row" style="margin-top:8px">
       <div class="dimension-bar">
-        <div class="dimension-label">🎨 用户体验</div>
+        <div class="dimension-label">🎨 UX <span class="pct" id="pct5">0%</span></div>
         <div class="bar-track"><div class="bar-fill alpha" id="d5a" style="width:0%"></div></div>
       </div>
       <div class="dimension-bar">
-        <div class="dimension-label">⚡ 代码质量</div>
+        <div class="dimension-label">⚡ 质量 <span class="pct" id="pct6">0%</span></div>
         <div class="bar-track"><div class="bar-fill beta" id="d6b" style="width:0%"></div></div>
       </div>
       <div class="dimension-bar">
-        <div class="dimension-label">📊 影响力</div>
+        <div class="dimension-label">📊 影响 <span class="pct" id="pct7">0%</span></div>
         <div class="bar-track"><div class="bar-fill alpha" id="d7a" style="width:0%"></div></div>
       </div>
     </div>
-    <div class="log-area" id="arbLog" style="height:80px;margin-top:10px"></div>
+    <div class="log-area arb-log-small" id="arbLog"></div>
+  </div>
+
+  <!-- Output preview -->
+  <div class="output-panel" id="outputPanel">
+    <div class="output-title">📦 本里程碑产出预览</div>
+    <div class="output-content" id="outputContent"></div>
   </div>
 
   <!-- Result -->
   <div class="result-panel" id="resultPanel">
     <div class="result-title">🏆 进化完成</div>
     <div class="result-detail" id="resultDetail"></div>
-    <div style="margin-top:16px">
+    <div style="margin-top:14px">
       <button class="btn" id="nextBtn" style="background:linear-gradient(135deg,#00d4ff,#8a2be2)">🚀 启动下一轮进化（新项目）</button>
     </div>
   </div>
 
   <div class="footer">
-    点击「启动进化」演示 AI Arena 进化引擎 · 每次运行模拟不同策略 · 结果不重复
+    点击「启动进化」演示 AI Arena 进化引擎 · 每轮展示真实竞争策略 · 结果不重复
   </div>
 </div>
 
 <script>
-const cycles = 20;
-let currentCycle = 0;
-let running = false;
-let alphaScore = 0, betaScore = 0;
-let alphaDims = [0,0,0,0,0,0,0];
-let betaDims = [0,0,0,0,0,0,0];
-// Each team's strategy can shift mid-run
-let alphaStrat = { focus: 0, aggressiveness: 1 };
-let betaStrat = { focus: 0, aggressiveness: 1 };
+// ===================== CONFIG =====================
+const MAX_CYCLE = 20;
+let currentCycle = 0, running = false;
+let elapsedTime = 0, elapsedTimer = null;
 
-const agents = ['CEO','架构师','开发','测试','审查','产品','市场'];
+// Team state
+let aScore = 0, bScore = 0;
+let aDims = [0,0,0,0,0,0,0];
+let bDims = [0,0,0,0,0,0,0];
+let aMetrics = { commits: 0, tests: 0, docs: 0, features: 0 };
+let bMetrics = { commits: 0, tests: 0, docs: 0, features: 0 };
+let aFocus = 0, bFocus = 0;
+let aMomentum = 1, bMomentum = 1;
+let aSkillLevel = 20, bSkillLevel = 20;
 
-const projectTemplates = [
-  { name: 'GitHub Star 趋势分析 CLI', desc: 'Python CLI · Stars趋势 · 历史图表 · JSON输出' },
-  { name: '终端 Markdown 转 PDF 工具', desc: 'Node.js CLI · Markdown解析 · PDF渲染 · 模板系统' },
-  { name: 'AI 论文每日摘要推送服务', desc: 'Python后端 · ArXiv API · LLM摘要 · 邮件推送' },
-  { name: 'Docker 容器监控仪表盘', desc: 'Go CLI · 实时指标 · 告警阈值 · JSON输出' },
-  { name: '命令行 AI 对话代理框架', desc: 'TypeScript CLI · 多模型支持 · 插件系统 · 会话管理' },
-];
+// Score history for chart
+let scoreHistory = [];
 
-function setProject(text) {
-  document.getElementById('projectInput').value = text;
+const DIM_NAMES = ['功能', '测试', '创新', '文档', 'UX', '质量', '影响'];
+const STRAT_NAMES = ['⚡ 激进', '🛡️ 稳健', '🎯 聚焦', '🔄 均衡', '🚀 突破', '📐 重构', '🎨 体验'];
+
+// ===================== OUTPUT PREVIEWS =====================
+const OUTPUT_PREVIEWS = {
+  5: {
+    title: 'Cycle 5 — MVP 交付',
+    alpha: `# src/cli.py — Alpha MVP 核心入口
+import argparse
+
+def main():
+    parser = argparse.ArgumentParser(prog='ara', description='GitHub Star 趋势分析')
+    parser.add_argument('repo', help='owner/repo 格式')
+    parser.add_argument('--days', type=int, default=30)
+    args = parser.parse_args()
+    # 核心数据抓取逻辑已完成
+    print(f"分析仓库: {args.repo}，周期: {args.days}天")
+    print("✅ MVP v0.1.0 基础功能就绪")`,
+    beta: `# src/index.ts — Beta MVP 核心入口
+import { Command } from 'commander';
+
+const program = new Command();
+program
+  .name('repo-sense')
+  .description('GitHub 仓库智能分析器')
+  .version('0.1.0');
+
+program.command('analyze <repo>')
+  .option('-d, --days <number>', '分析天数', '30')
+  .action((repo, opts) => {
+    console.log(\`分析仓库: \${repo}，周期: \${opts.days}天\`);
+    console.log('✅ MVP v0.1.0 基础功能就绪');
+  });`
+  },
+  10: {
+    title: 'Cycle 10 — 功能竞赛',
+    alpha: `# ara trends - 趋势图表命令
+$ ara trends lijiajing-11/alpha-project-arena --chart
+
+📈 Star 趋势 (30天)
+  ╭──────────────────────────────╮
+  │  ░░▒▒▓▓████░░                │ → +42 stars
+  │  ↑ 峰值: 2026-04-15 (18/日)   │
+  │  ↓ 谷值: 2026-04-08 (3/日)    │
+  ╰──────────────────────────────╯
+✅ 趋势分析模块上线 · 支持 --json 输出`,
+    beta: `$ repo-sense insight lijiajing-11/alpha-project-arena
+
+╔══════════════════════════════════╗
+║        🔍 repo-sense insight      ║
+╠══════════════════════════════════╣
+║  仓库: alpha-project-arena       ║
+║  ⭐ Stars: 42 ↑ 趋势上升         ║
+║  📝 语言: Python (87.3%)         ║
+║  🔧 活跃度: 高 (23 commits/周)   ║
+║  👥 贡献者: 7                    ║
+╚══════════════════════════════════╝
+✅ 核心 Insight 模块上线 · chalk 彩色输出`
+  },
+  15: {
+    title: 'Cycle 15 — 创新突破',
+    alpha: `# ara insight --compare 双仓库对比
+$ ara insight --compare lijiajing-11/alpha lijiajing-11/beta
+
+━━━ 双仓库对比 ━━━━━━━━━━━━━━━━━━━━━━
+  对比项          │ Alpha    │ Beta
+─────────────────┼──────────┼──────────
+  ⭐ Stars       │ 42       │ 38
+  📝 语言         │ Python   │ TypeScript
+  🧪 测试数       │ 156 ✅    │ 52
+  📦 发布         │ PyPI ❌  │ npm ✅
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+→ AI 分析: Alpha 测试覆盖更优，Beta 发布流程更完善`,
+    beta: `# repo-sense --compare 双仓库对比
+$ repo-sense --compare alpha beta
+
+╔══════════════════════════════════════════╗
+║           双仓库对比报告                    ║
+╠══════════════════════════════════════════╣
+║  📊 Alpha:     测试冠军, 功能丰富            ║
+║  🎯 Beta:      体验冠军, 发布更快            ║
+║  💡 建议: 互相学习最佳实践                   ║
+╚══════════════════════════════════════════╝
+→ 追加 3 个独家功能: 仓库健康评分 · 技术债估算 · 贡献者网络`
+  },
+  20: {
+    title: 'Cycle 20 — 最终交付',
+    alpha: `📦 ARA v3.0.0 最终交付
+
+📊 项目规模:
+   ⚡ 11 个命令 · 276 测试用例 · 163 commits
+   📄 文档: README v19 (684 行) + CONTRIBUTING + CHANGELOG
+   ✅ CI/CD: GitHub Actions + pytest + coverage
+
+🚀 亮点:
+   • 纯 stdlib 零依赖 (轻量)
+   • insight --compare 多仓库对比
+   • CLI 支持 --json 和彩色输出
+
+📋 评分: 仲裁者 44 分`,
+    beta: `📦 repo-sense v0.2.1 最终交付
+
+📊 项目规模:
+   ⚡ 8 个命令 · 94 测试用例 · 154 commits
+   📄 文档: README v26 (12次迭代) + 完整 API 文档
+   ✅ 发布: npm 0.2.1 (已上线)
+
+🚀 亮点:
+   • chalk 彩色终端 UI (视觉碾压)
+   • 仓库健康评分 · 技术债估算 · 贡献者网络
+   • npm publish 流程完善
+
+📋 评分: 仲裁者 44 分`
+  }
+};
+
+// ===================== MESSAGE TEMPLATES =====================
+function genAlphaMsg(c, dims) {
+  const phase = c <= 4 ? 0 : c <= 9 ? 1 : c <= 14 ? 2 : 3;
+  const p = [
+    // Phase 0: Foundation (1-5)
+    [
+      `🧠 CEO: 分析需求，决定用 Python + stdlib，零依赖路线`,
+      `🏗️ 架构师: 设计模块分离架构: cli/core/chart/history`,
+      `💻 开发: 搭建项目骨架，实现 Star 数据抓取核心逻辑`,
+      `🧪 测试: 编写 pytest 基础设施，配置 CI`,
+      `🔍 审查: 发现 1 处潜在内存泄漏，建议优化`,
+      `📋 产品: 规划 CLI 命令体系，设计 --help 输出`,
+      `📢 市场: README v1 初稿，聚焦开发者的痛点`,
+    ],
+    // Phase 1: Feature Race (6-10)
+    [
+      `🧠 CEO: 检测到 Beta 用 TypeScript 加速! 启动「功能全覆盖」策略`,
+      `🏗️ 架构师: 重构数据层，支持 3 种以上图表格式`,
+      `💻 开发: 实现 trend/chart/compare 命令，新增 ${c + 3} 个功能`,
+      `🧪 测试: 覆盖率达到 ${45 + c * 3}%, 新增集成测试套件`,
+      `🔍 审查: 代码规范检查: 98% 通过率`,
+      `📋 产品: 优化 --json 输出格式，方便管道拼接`,
+      `📢 市场: README v5，添加 GIF 演示动图`,
+    ],
+    // Phase 2: Innovation (11-15)
+    [
+      `🧠 CEO: 差异化竞争! 启动 insight --compare 多仓库对比`,
+      `🏗️ 架构师: 设计插件扩展接口，支持自定义分析器`,
+      `💻 开发: 独家实现仓库影响力算法，${c + 2} 个独家特性`,
+      `🧪 测试: 最终覆盖 ${60 + c * 2}%, CI 全绿`,
+      `🔍 审查: 质量评分 A+, 建议补充性能基准测试`,
+      `📋 产品: 添加 --format 参数，支持 json/csv/table`,
+      `📢 市场: 发布技术博客，展示对比截图`,
+    ],
+    // Phase 3: Polish (16-20)
+    [
+      `🧠 CEO: 收官! 聚焦稳定性和文档，零技术债目标`,
+      `🏗️ 架构师: 最终架构评审，性能优化 2 倍`,
+      `💻 开发: 修复最后 ${c - 13} 个 Bug，添加 --watch 实时模式`,
+      `🧪 测试: 最终覆盖率 ${75 + c}%, 压力测试通过`,
+      `🔍 审查: 最终 CR 通过，所有 PR 已合并`,
+      `📋 产品: 完善用户文档，添加快速入门 + 最佳实践`,
+      `📢 市场: 准备 v3.0.0 Release Notes`,
+    ],
+  ];
+  return p[phase][Math.floor(Math.random() * p[phase].length)];
 }
+
+function genBetaMsg(c, dims) {
+  const phase = c <= 4 ? 0 : c <= 9 ? 1 : c <= 14 ? 2 : 3;
+  const p = [
+    [
+      `🧠 CEO: 快速原型，TypeScript + chalk，体验优先`,
+      `🏗️ 架构师: 最小架构，先跑通再优化`,
+      `💻 开发: TypeScript 搭建，类型安全，彩色终端输出`,
+      `🧪 测试: TDD 模式，边写功能边写测试`,
+      `🔍 审查: 持续代码检查，保持风格一致`,
+      `📋 产品: 设计直觉式 CLI 交互，错误提示友好`,
+      `📢 市场: 注册 npm 包名，准备发布流程`,
+    ],
+    [
+      `🧠 CEO: 大力出奇迹! chalk 彩页 UI 碾压 Alpha 的黑白输出`,
+      `🏗️ 架构师: 数据流向优化，支持实时流式处理`,
+      `💻 开发: 实现 ${c + 2} 个彩色命令，UI 视觉碾压`,
+      `🧪 测试: 测试数 ${30 + c * 4}+, 新增 E2E 测试`,
+      `🔍 审查: 安全审计: 无敏感信息泄露`,
+      `📋 产品: chalk 彩色输出 + spinner 加载动画`,
+      `📢 市场: README 迭代 v${5 + c}, 添加 npm badge`,
+    ],
+    [
+      `🧠 CEO: 反制 Alpha 的 insight! 做双栏对比更漂亮`,
+      `🏗️ 架构师: 优化异步数据加载，支持大规模仓库`,
+      `💻 开发: 追加 3 个独家功能: 健康评分/技术债/贡献者网络`,
+      `🧪 测试: 覆盖 ${50 + c * 2}%, 新增压力测试`,
+      `🔍 审查: 性能优化建议: 缓存策略`,
+      `📋 产品: 添加 --watch 参数，支持持续监控`,
+      `📢 市场: npm 版本 ${Math.floor(c/5)} 次迭代`,
+    ],
+    [
+      `🧠 CEO: 稳扎稳打，确保 npm publish 质量`,
+      `🏗️ 架构师: 技术债清理，重构 3 个核心模块`,
+      `💻 开发: 最终 Bug 修复，性能调优`,
+      `🧪 测试: 最终覆盖 ${70 + c}%, 所有检查通过`,
+      `🔍 审查: 最终质量门禁: 全部绿`,
+      `📋 产品: 添加 --version，自动更新检查`,
+      `📢 市场: npm publish 就绪，文档全部完成`,
+    ],
+  ];
+  return p[phase][Math.floor(Math.random() * p[phase].length)];
+}
+
+// ===================== HELPERS =====================
+function setProject(text) { document.getElementById('projectInput').value = text; }
 
 function log(el, msg, cls) {
   const d = document.createElement('div');
   d.className = 'log-line ' + (cls || 'sys');
-  const agents_list = ['🧠 CEO','🏗️ 架构师','💻 开发','🧪 测试','🔍 审查','📋 产品','📢 市场'];
-  let display = msg;
-  for (let a of agents_list) {
-    display = display.replace(a, `<strong>${a}</strong>`);
-  }
-  d.innerHTML = `[Cycle ${currentCycle}] ${display}`;
+  d.innerHTML = msg;
   el.appendChild(d);
   el.scrollTop = el.scrollHeight;
 }
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function pct(v) { return Math.min(100, Math.max(0, Math.round(v))); }
 
-function randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+// ===================== SCORING ENGINE =====================
+function computeCycle(c, aDims, bDims, aFocus, bFocus, aMomentum, bMomentum) {
+  const isAlpha = Math.random() > 0.5;
+  const aOut = aDims.map((d, i) => {
+    // Base growth: faster when behind, slower when ahead
+    let base = Math.random() * 2.5 + 0.5;
 
-// Each team has a different "personality" that shifts
-function computeDelta(score, dims, strat, isAlpha, cycle) {
-  const deltas = dims.map((d, i) => {
-    // Random base
-    let base = Math.random() * 3 + 1;
-    // Strategy focus
-    if (i === strat.focus) base *= 1.5;
-    // Catching up bonus
-    if (d < 20) base *= 1.3;
+    // Catch-up bonus: the further behind, the faster
+    const diff = (bDims[i] || 0) - d;
+    if (diff > 10) base *= 1.3;
+    if (diff > 20) base *= 1.5;
+    if (diff > 30) base *= 1.8;
+
+    // Focus bonus
+    if (i === aFocus) base *= 1.6;
+
+    // Momentum (streaks)
+    base *= aMomentum;
+
     // Diminishing returns
-    if (d > 70) base *= 0.4;
-    if (d > 85) base *= 0.2;
-    // Random breakthrough
-    if (Math.random() < 0.05) base *= 3;
-    // Beta tends to be more consistent early, Alpha spikes late
-    if (isAlpha && cycle > 10) base *= 1.2;
-    if (!isAlpha && cycle < 8) base *= 1.15;
-    return Math.round(base * 10) / 10;
+    if (d > 60) base *= 0.7;
+    if (d > 75) base *= 0.5;
+    if (d > 88) base *= 0.25;
+
+    // Breakthrough (rare, big jump)
+    if (Math.random() < 0.04 && c > 8) base *= 4;
+
+    // Late cycle acceleration for the behind team (catch-up)
+    if (c > 12 && aDims.reduce((s, v) => s + v, 0) < bDims.reduce((s, v) => s + v, 0)) base *= 1.2;
+
+    return base;
   });
-  return deltas;
+
+  const bOut = bDims.map((d, i) => {
+    let base = Math.random() * 2.5 + 0.5;
+    const diff = (aDims[i] || 0) - d;
+    if (diff > 10) base *= 1.3;
+    if (diff > 20) base *= 1.5;
+    if (diff > 30) base *= 1.8;
+
+    if (i === bFocus) base *= 1.6;
+    base *= bMomentum;
+
+    if (d > 60) base *= 0.7;
+    if (d > 75) base *= 0.5;
+    if (d > 88) base *= 0.25;
+
+    if (Math.random() < 0.04 && c > 8) base *= 4;
+    if (c > 12 && bDims.reduce((s, v) => s + v, 0) < aDims.reduce((s, v) => s + v, 0)) base *= 1.2;
+
+    return base;
+  });
+
+  return { aOut, bOut };
 }
 
-function pickStrategy(oldStrat, scores, cycle) {
-  const strat = { ...oldStrat };
-  // Every 3-5 cycles, shift focus
-  if (Math.random() < 0.3) {
-    strat.focus = randomInt(0, 6);
-  }
-  // Adjust aggressiveness based on being behind
-  if (Math.random() < 0.2) {
-    strat.aggressiveness = Math.random() < 0.5 ? 1 : 1.5;
-  }
-  return strat;
+function computeScore(dims) {
+  const w = [0.25, 0.2, 0.15, 0.12, 0.1, 0.1, 0.08];
+  return Math.round(dims.reduce((s, d, i) => s + d * w[i], 0));
 }
 
-const alphaMsgs = [
-  // Cycle 1-5: foundation
-  [() => `🧠 CEO: 分析项目需求「${document.getElementById('projectInput').value}」, 制定技术路线图`,
-   () => `🏗️ 架构师: 设计系统架构, 确定技术栈选型`,
-   () => `💻 开发: 搭建项目骨架, 实现核心功能模块`,
-   () => `🧪 测试: 编写单元测试框架, 配置 CI 流程`,
-   () => `🔍 审查: Code Review 架构设计, 提出 3 个改进点`,
-   () => `📋 产品: 梳理用户旅程, 设计 CLI 交互流程`,
-   () => `📢 市场: 编写项目 README 初稿`],
-  // Cycle 6-10: feature race
-  [() => `🧠 CEO: 检测到 Beta 在加速! 启动「双线并行」策略`,
-   () => `🏗️ 架构师: 重构模块分离, 提升扩展性`,
-   () => `💻 开发: 实现高级功能, 追加 3 个特色命令`,
-   () => `🧪 测试: 覆盖率达到 ${randomInt(45,65)}%, 新增集成测试`,
-   () => `🔍 审查: 发现 2 处潜在性能瓶颈, 建议优化`,
-   () => `📋 产品: 优化错误提示, 添加 --help 详细说明`,
-   () => `📢 市场: 更新 README v3, 添加使用示例`],
-  // Cycle 11-15: innovation
-  [() => `🧠 CEO: 差异化竞争! 启动「创新红利」策略, 开发独家功能`,
-   () => `🏗️ 架构师: 设计插件扩展系统, 提升架构灵活性`,
-   () => `💻 开发: 实现 ${randomInt(2,4)} 个独家功能, 领先 Beta`,
-   () => `🧪 测试: 覆盖率 ${randomInt(65,85)}%, CI 全绿 ✅`,
-   () => `🔍 审查: 代码质量评分 A, 建议补充边界测试`,
-   () => `📋 产品: 添加 JSON 输出模式, 方便脚本调用`,
-   () => `📢 市场: 发布技术博客, 吸引社区关注`],
-  // Cycle 16-20: polish
-  [() => `🧠 CEO: 收官阶段! 聚焦稳定性和文档, 不留技术债`,
-   () => `🏗️ 架构师: 最终架构评审, 确认无重大设计缺陷`,
-   () => `💻 开发: 修复所有已知 Bug, 性能优化`,
-   () => `🧪 测试: 最终覆盖率 ${randomInt(78,95)}%`,
-   () => `🔍 审查: 最终 Code Review, 所有 PR 已合并`,
-   () => `📋 产品: 完善用户文档, 添加快速入门指南`,
-   () => `📢 市场: 发布 v1.0.0, 准备 GitHub Release`]
-];
+function updateDims(dims, deltas) {
+  return dims.map((d, i) => Math.min(100, d + deltas[i]));
+}
 
-const betaMsgs = [
-  [() => `🧠 CEO: 快速原型开发, 先跑通核心流程`,
-   () => `🏗️ 架构师: 最小可行性架构, 快速迭代`,
-   () => `💻 开发: 用 TypeScript 搭建, 类型安全优先`,
-   () => `🧪 测试: 边开发边写测试, TDD 模式`,
-   () => `🔍 审查: 持续代码检查, 保持代码整洁`,
-   () => `📋 产品: 设计简洁直观的 CLI 交互`,
-   () => `📢 市场: 准备 npm 包名, 注册域名`],
-  [() => `🧠 CEO: 大力出奇迹! 全员加速开发, 对标 Alpha 功能`,
-   () => `🏗️ 架构师: 重构核心逻辑, 提升性能 2x`,
-   () => `💻 开发: 追赶功能进度, 实现 ${randomInt(3,5)} 个新命令`,
-   () => `🧪 测试: 测试数 ${randomInt(30,50)}+, 持续集成`,
-   () => `🔍 审查: 代码规范检查, 统一代码风格`,
-   () => `📋 产品: 添加彩色终端输出, UI 碾压`,
-   () => `📢 市场: README 迭代 v${randomInt(5,12)}, 添加社交证明`],
-  [() => `🧠 CEO: 反击! 对标 Alpha 特色功能, 做差异化实现`,
-   () => `🏗️ 架构师: 优化数据流架构, 支持大规模处理`,
-   () => `💻 开发: 实现创新功能, 添加 ${randomInt(1,3)} 个独家特性`,
-   () => `🧪 测试: 覆盖率 ${randomInt(55,75)}%, 新增压力测试`,
-   () => `🔍 审查: 安全性审查, 确保无敏感信息泄露`,
-   () => `📋 产品: 添加 -j/--json 全局参数, 提高可编程性`,
-   () => `📢 市场: npm 版本 ${randomInt(1,5)} 次迭代`],
-  [() => `🧠 CEO: 稳扎稳打, 确保发布质量`,
-   () => `🏗️ 架构师: 技术债务清理, 重构 3 个模块`,
-   () => `💻 开发: 最终 Bug 修复, 性能调优`,
-   () => `🧪 测试: 最终覆盖率 ${randomInt(75,92)}%`,
-   () => `🔍 审查: 最终质量门禁通过, 所有检查绿`,
-   () => `📋 产品: 添加 --version 和更新检查`,
-   () => `📢 市场: npm publish 准备就绪`]
-];
+// ===================== STRATEGY ENGINE =====================
+function pickFocus(oldFocus) {
+  // 30% chance to shift strategy
+  if (Math.random() < 0.35) return rand(0, 6);
+  return oldFocus;
+}
 
+function pickMomentum(score) {
+  // Momentum decays, resets on big changes
+  const base = 0.9 + Math.random() * 0.2;
+  // Being behind increases momentum
+  if (score < 30) return base * 1.2;
+  if (score < 50) return base * 1.1;
+  return base;
+}
+
+// ===================== MAIN =====================
 async function startEvolution() {
   if (running) return;
   running = true;
-  document.getElementById('startBtn').disabled = true;
-  document.getElementById('startBtn').textContent = '⏳ 进化中...';
-  document.getElementById('resetBtn').disabled = true;
+
+  const startBtn = document.getElementById('startBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  startBtn.disabled = true;
+  startBtn.textContent = '⏳ 进化中...';
+  resetBtn.disabled = true;
   document.getElementById('resultPanel').classList.remove('show');
-  
-  // Reset
-  currentCycle = 0;
-  alphaScore = 0; betaScore = 0;
-  alphaDims = [0,0,0,0,0,0,0];
-  betaDims = [0,0,0,0,0,0,0];
-  alphaStrat = { focus: randomInt(0,6), aggressiveness: 1 };
-  betaStrat = { focus: randomInt(0,6), aggressiveness: 1 };
-  
+  document.getElementById('outputPanel').classList.remove('show');
+
+  // Reset state
+  currentCycle = 0; elapsedTime = 0;
+  aScore = 0; bScore = 0;
+  aDims = [0,0,0,0,0,0,0];
+  bDims = [0,0,0,0,0,0,0];
+  aMetrics = { commits: 0, tests: 0, docs: 0, features: 0 };
+  bMetrics = { commits: 0, tests: 0, docs: 0, features: 0 };
+  aFocus = rand(0, 6); bFocus = rand(0, 6);
+  aMomentum = 1; bMomentum = 1;
+  aSkillLevel = 20; bSkillLevel = 20;
+  scoreHistory = [];
+
+  // Clear logs
   document.getElementById('alphaLog').innerHTML = '';
   document.getElementById('betaLog').innerHTML = '';
   document.getElementById('arbLog').innerHTML = '';
+
+  // Reset display
   document.getElementById('cycleNum').textContent = '0';
   document.getElementById('alphaScore').textContent = '-';
   document.getElementById('betaScore').textContent = '-';
-  document.getElementById('arbMessage').textContent = '仲裁者就绪, 等待第一轮...';
-  
+  document.getElementById('arbMessage').textContent = '仲裁者就绪...';
+  ['alphaCommits','alphaTests','betaCommits','betaTests'].forEach(id => document.getElementById(id).textContent = '0');
+  document.getElementById('elapsedDisplay').textContent = '0';
+  document.getElementById('totalCommits').textContent = '0';
+  document.getElementById('totalTests').textContent = '0';
+  document.getElementById('totalDocs').textContent = '0';
+
+  // Reset bars
+  for (let i = 1; i <= 7; i++) {
+    document.getElementById('d' + i + 'a').style.width = '0%';
+    document.getElementById('pct' + i).textContent = '0%';
+  }
+  for (let i = 1; i <= 7; i+=0) break; // dummy, bars below handle it
+
+  // Project
   const project = document.getElementById('projectInput').value || 'GitHub Star 趋势分析 CLI';
   document.getElementById('projectLabel').textContent = `「${project}」`;
 
-  // Pick a template for scoring hints
-  const template = projectTemplates.find(t => project.includes(t.name.slice(0,8))) || projectTemplates[0];
+  // Timer
+  if (elapsedTimer) clearInterval(elapsedTimer);
+  elapsedTimer = setInterval(() => {
+    elapsedTime++;
+    document.getElementById('elapsedDisplay').textContent = elapsedTime;
+  }, 1000);
 
-  log(document.getElementById('arbLog'), `⚖️ 仲裁者启动: 检测到新项目「${project}」`, 'arb');
-  log(document.getElementById('arbLog'), `📋 目标: ${template.desc}`, 'arb');
-  log(document.getElementById('arbLog'), `🏁 Alpha 和 Beta 团队已就位, 进化开始!`, 'arb');
+  // Start logs
+  log(document.getElementById('arbLog'), `⚖️ 仲裁者: 检测到新项目「${project}」`, 'arb');
+  log(document.getElementById('arbLog'), `🏁 Alpha (Python) vs Beta (TypeScript) — 进化开始!`, 'arb');
   await sleep(800);
 
-  for (let c = 1; c <= cycles; c++) {
+  // ===================== MAIN LOOP =====================
+  for (let c = 1; c <= MAX_CYCLE; c++) {
     currentCycle = c;
     document.getElementById('cycleNum').textContent = c;
-    
-    // Cycle message
-    const phase = c <= 5 ? 0 : c <= 10 ? 1 : c <= 15 ? 2 : 3;
-    
-    // Alpha actions
-    const aMsgs = alphaMsgs[phase];
-    const aIdx = randomInt(0, aMsgs.length - 1);
-    log(document.getElementById('alphaLog'), `⚡ ${aMsgs[aIdx]()}`, 'alpha');
-    
-    // Beta actions
-    const bMsgs = betaMsgs[phase];
-    const bIdx = randomInt(0, bMsgs.length - 1);
-    log(document.getElementById('betaLog'), `🧬 ${bMsgs[bIdx]()}`, 'beta');
-    
-    // Strategy shifts
-    if (c % 3 === 0) {
-      alphaStrat = pickStrategy(alphaStrat, alphaDims, c);
-      log(document.getElementById('alphaLog'), `🧠 CEO: 策略调整 → 聚焦「${['功能','测试','创新','文档','体验','质量','影响'][alphaStrat.focus]}」维度`, 'alpha');
+
+    // --- Strategy shifts ---
+    if (c > 2 && c % 3 === 0) {
+      aFocus = pickFocus(aFocus);
+      document.getElementById('alphaStratLabel').textContent = STRAT_NAMES[aFocus];
     }
-    if (c % 4 === 0) {
-      betaStrat = pickStrategy(betaStrat, betaDims, c);
-      log(document.getElementById('betaLog'), `🧠 CEO: 策略调整 → 聚焦「${['功能','测试','创新','文档','体验','质量','影响'][betaStrat.focus]}」维度`, 'beta');
+    if (c > 2 && c % 4 === 0) {
+      bFocus = pickFocus(bFocus);
+      document.getElementById('betaStratLabel').textContent = STRAT_NAMES[bFocus];
     }
-    
-    // Compute deltas
-    const aDeltas = computeDelta(alphaScore, alphaDims, alphaStrat, true, c);
-    const bDeltas = computeDelta(betaScore, betaDims, betaStrat, false, c);
-    
-    // Apply
-    alphaDims = alphaDims.map((d, i) => Math.min(100, d + aDeltas[i]));
-    betaDims = betaDims.map((d, i) => Math.min(100, d + bDeltas[i]));
-    
-    // Update bars
-    document.getElementById('d1a').style.width = alphaDims[0] + '%';
-    document.getElementById('d2b').style.width = betaDims[1] + '%';
-    document.getElementById('d3a').style.width = alphaDims[2] + '%';
-    document.getElementById('d4b').style.width = betaDims[3] + '%';
-    document.getElementById('d5a').style.width = alphaDims[4] + '%';
-    document.getElementById('d6b').style.width = betaDims[5] + '%';
-    document.getElementById('d7a').style.width = alphaDims[6] + '%';
-    
-    // Score = weighted dims
-    const weights = [0.25, 0.2, 0.15, 0.15, 0.1, 0.1, 0.05];
-    alphaScore = Math.round(alphaDims.reduce((s, d, i) => s + d * weights[i], 0));
-    betaScore = Math.round(betaDims.reduce((s, d, i) => s + d * weights[i], 0));
-    
-    document.getElementById('alphaScore').textContent = alphaScore;
-    document.getElementById('betaScore').textContent = betaScore;
-    
-    // Arbitrator comments
+
+    // Update momentum
+    aMomentum = pickMomentum(aScore);
+    bMomentum = pickMomentum(bScore);
+
+    // --- Compute ---
+    const { aOut, bOut } = computeCycle(c, aDims, bDims, aFocus, bFocus, aMomentum, bMomentum);
+    aDims = updateDims(aDims, aOut);
+    bDims = updateDims(bDims, bOut);
+
+    // Update bars (with phase info)
+    document.getElementById('d1a').style.width = pct(aDims[0]) + '%';
+    document.getElementById('pct1').textContent = pct(aDims[0]) + '%';
+    document.getElementById('d2b').style.width = pct(bDims[1]) + '%';
+    document.getElementById('pct2').textContent = pct(bDims[1]) + '%';
+    document.getElementById('d3a').style.width = pct(aDims[2]) + '%';
+    document.getElementById('pct3').textContent = pct(aDims[2]) + '%';
+    document.getElementById('d4b').style.width = pct(bDims[3]) + '%';
+    document.getElementById('pct4').textContent = pct(bDims[3]) + '%';
+    document.getElementById('d5a').style.width = pct(aDims[4]) + '%';
+    document.getElementById('pct5').textContent = pct(aDims[4]) + '%';
+    document.getElementById('d6b').style.width = pct(bDims[5]) + '%';
+    document.getElementById('pct6').textContent = pct(bDims[5]) + '%';
+    document.getElementById('d7a').style.width = pct(aDims[6]) + '%';
+    document.getElementById('pct7').textContent = pct(aDims[6]) + '%';
+
+    // --- Scores ---
+    aScore = computeScore(aDims);
+    bScore = computeScore(bDims);
+    scoreHistory.push({ c, a: aScore, b: bScore });
+    document.getElementById('alphaScore').textContent = aScore;
+    document.getElementById('betaScore').textContent = bScore;
+
+    // --- Metrics (accumulating) ---
+    aMetrics.commits += rand(2, 8);
+    aMetrics.tests += rand(1, 6);
+    aMetrics.docs += c % 3 === 0 ? rand(1, 3) : 0;
+    bMetrics.commits += rand(2, 8);
+    bMetrics.tests += rand(1, 5);
+    bMetrics.docs += c % 4 === 0 ? rand(1, 3) : 0;
+
+    document.getElementById('alphaCommits').textContent = aMetrics.commits;
+    document.getElementById('alphaTests').textContent = aMetrics.tests;
+    document.getElementById('betaCommits').textContent = bMetrics.commits;
+    document.getElementById('betaTests').textContent = bMetrics.tests;
+
+    const totalCommits = aMetrics.commits + bMetrics.commits;
+    const totalTests = aMetrics.tests + bMetrics.tests;
+    const totalDocs = aMetrics.docs + bMetrics.docs;
+    document.getElementById('totalCommits').textContent = totalCommits;
+    document.getElementById('totalTests').textContent = totalTests;
+    document.getElementById('totalDocs').textContent = totalDocs;
+
+    // --- Log messages ---
+    const aMsg = genAlphaMsg(c, aDims);
+    const bMsg = genBetaMsg(c, bDims);
+    log(document.getElementById('alphaLog'), `Cycle ${c}: ${aMsg}`, 'alpha');
+    log(document.getElementById('betaLog'), `Cycle ${c}: ${bMsg}`, 'beta');
+
+    // --- Arbitrator comments ---
     let arbMsg = '';
-    if (c <= 3) arbMsg = '🔍 仲裁者: 观察阶段, 双方在搭建基础设施...';
-    else if (alphaScore > betaScore + 5) arbMsg = `⚡ Alpha 领先 ${alphaScore - betaScore} 分! 创新红利激活 +5 分`;
-    else if (betaScore > alphaScore + 5) arbMsg = `🧬 Beta 领先 ${betaScore - alphaScore} 分! UI 优势明显`;
-    else if (Math.abs(alphaScore - betaScore) <= 3) arbMsg = `⚖️ 势均力敌! 差距仅 ${Math.abs(alphaScore - betaScore)} 分`;
-    else arbMsg = `📊 仲裁者: 第 ${c} 轮评分完成, Alpha ${alphaScore} vs Beta ${betaScore}`;
-    
-    // Special events
-    if (c === 5) arbMsg = '🔥 仲裁者: 第一阶段完成! 双方 MVP 已交付, 开始功能竞赛';
-    if (c === 10) arbMsg = '💡 仲裁者: 创新红利触发! 谁的原创功能更多?';
-    if (c === 15) arbMsg = '🤝 仲裁者: 知识传递机制启动! 领先方需分享技术文档';
-    if (c === 20) arbMsg = '🏁 仲裁者: MAX_CYCLE 达成! 最终评分...';
-    
+    const diff = Math.abs(aScore - bScore);
+
+    if (c <= 2) {
+      arbMsg = `🔍 观察阶段: 双方在搭基础设施，${c === 1 ? '检测技术栈选择' : '架构评审中...'}`;
+    } else if (c === 5) {
+      arbMsg = `🔥 Phase 1 完成! MVP 已交付，双方开始功能竞赛 (差距 ${diff} 分)`;
+    } else if (c === 10) {
+      arbMsg = `💡 Phase 2 完成! 创新红利触发——谁的独家功能更多? (差距 ${diff} 分)`;
+    } else if (c === 15) {
+      arbMsg = `🤝 Phase 3 完成! 跨队知识传递启动——领先方需分享最佳实践 (差距 ${diff} 分)`;
+    } else if (c === 20) {
+      arbMsg = `🏁 MAX_CYCLE 达成! 最终仲裁评分... 🏆`;
+    } else if (aScore > bScore + 8) {
+      arbMsg = `⚡ Alpha 领先 ${aScore - bScore} 分! ${DIM_NAMES[aFocus]} 策略奏效`;
+    } else if (bScore > aScore + 8) {
+      arbMsg = `🧬 Beta 领先 ${bScore - aScore} 分! ${DIM_NAMES[bFocus]} 维度优势明显`;
+    } else if (diff <= 3) {
+      arbMsg = `⚖️ 势均力敌! 差距仅 ${diff} 分，下一轮可能逆转`;
+    } else if (aScore > bScore) {
+      arbMsg = `📊 Alpha ${aScore} : ${bScore} Beta，Alpha 暂时领先 ${diff} 分`;
+    } else {
+      arbMsg = `📊 Alpha ${aScore} : ${bScore} Beta，Beta 暂时领先 ${diff} 分`;
+    }
+
     document.getElementById('arbMessage').textContent = `Cycle ${c}: ${arbMsg}`;
     log(document.getElementById('arbLog'), arbMsg, 'arb');
-    
-    // Speed: faster later cycles
-    const speed = c < 5 ? 600 : c < 10 ? 400 : c < 15 ? 300 : 200;
+
+    // --- Output preview at milestones ---
+    if (OUTPUT_PREVIEWS[c]) {
+      const preview = OUTPUT_PREVIEWS[c];
+      const panel = document.getElementById('outputPanel');
+      panel.classList.add('show');
+      document.getElementById('outputContent').textContent =
+        `══════ ${preview.title} ══════\n\n` +
+        `【⚡ Alpha 团队产出】\n${preview.alpha}\n\n` +
+        `【🧬 Beta 团队产出】\n${preview.beta}`;
+    }
+
+    // --- Timing (slower, more realistic) ---
+    let speed;
+    if (c <= 4) speed = 1400;      // Foundation: slow
+    else if (c <= 9) speed = 1000;  // Feature race: medium
+    else if (c <= 14) speed = 1200; // Innovation: medium-slow (need to read)
+    else if (c <= 18) speed = 1000; // Polish: medium
+    else speed = 1500;              // Final tension: slow for drama
+
     await sleep(speed);
   }
 
-  // Final result
+  // ===================== FINAL =====================
   running = false;
-  document.getElementById('startBtn').disabled = false;
-  document.getElementById('startBtn').textContent = '🚀 启动进化';
-  document.getElementById('resetBtn').disabled = false;
+  if (elapsedTimer) clearInterval(elapsedTimer);
+  startBtn.disabled = false;
+  startBtn.textContent = '🚀 启动进化';
+  resetBtn.disabled = false;
 
-  const winner = alphaScore > betaScore ? 'Alpha (A-Tech Inc.)' : alphaScore < betaScore ? 'Beta (B-Labs Corp.)' : '平局';
-  const resultPanel = document.getElementById('resultPanel');
-  resultPanel.classList.add('show');
+  const winner = aScore > bScore ? 'Alpha (A-Tech Inc.)' :
+                 bScore > aScore ? 'Beta (B-Labs Corp.)' : '平局! 双赢';
+
+  const panel = document.getElementById('resultPanel');
+  panel.classList.add('show');
+
+  const finalMetrics = `
+    <div class="big-score" style="display:flex;justify-content:center;gap:40px;margin:16px 0">
+      <span><span class="big-score alpha">${aScore}</span><br><span style="font-size:0.5em;color:#8892b0">Alpha</span></span>
+      <span style="font-size:0.5em;color:#4a5568;display:flex;align-items:center">VS</span>
+      <span><span class="big-score beta">${bScore}</span><br><span style="font-size:0.5em;color:#8892b0">Beta</span></span>
+    </div>`;
+
   document.getElementById('resultDetail').innerHTML = `
     <strong>项目:</strong> ${project}<br>
-    <strong>进化轮次:</strong> 20 Cycles<br>
-    <strong>最终比分:</strong> ⚡ Alpha <strong>${alphaScore}</strong> : <strong>${betaScore}</strong> 🧬 Beta<br>
+    <strong>进化轮次:</strong> 20 Cycles · ${elapsedTime}秒<br>
+    ${finalMetrics}
     <strong>获胜方:</strong> 🏆 ${winner}<br>
-    <strong>产出物:</strong> 完整 CLI 项目 · ${alphaDims.reduce((a,b) => a+b,0) > betaDims.reduce((a,b) => a+b,0) ? '功能更丰富' : '体验更优'} · 可直接发布到 npm/PyPI<br><br>
-    ⚡ Alpha 策略: ${alphaScore > betaScore ? '✅ 攻击型打法取胜' : '发力较晚需反思'}<br>
-    🧬 Beta 策略: ${betaScore > alphaScore ? '✅ 稳健型打法取胜' : '前期快后期被追'} |
+    <strong>总产出:</strong><br>
+    📝 ${totalCommits} Commits · 🧪 ${totalTests} 测试用例 · 📄 ${totalDocs} 文档页<br>
+    ⚡ Alpha: ${aMetrics.commits} commits · ${aMetrics.tests} tests · 策略「${STRAT_NAMES[aFocus]}」<br>
+    🧬 Beta: ${bMetrics.commits} commits · ${bMetrics.tests} tests · 策略「${STRAT_NAMES[bFocus]}」<br><br>
+    <span style="color:#4a5568;font-size:0.85em">
+    ${aScore > bScore ? 'Alpha 凭借深度洞察和测试覆盖取胜' :
+      bScore > aScore ? 'Beta 凭借用户体验优势和稳定发布取胜' :
+      '两队在功能和体验上各有所长，仲裁者判定平局'}
+    </span>
   `;
-  log(document.getElementById('arbLog'), `🏆 进化结束! ${winner} 胜出, Alpha ${alphaScore} : ${betaScore} Beta`, 'arb');
+
+  log(document.getElementById('arbLog'), `🏆 进化完成! ${winner} | Alpha ${aScore} : ${bScore} Beta`, 'arb');
+  log(document.getElementById('arbLog'), `📊 总产出: ${totalCommits} commits · ${totalTests} tests · ${totalDocs} 文档页`, 'arb');
 }
 
-// Reset
+// ===================== EVENTS =====================
+document.getElementById('startBtn').addEventListener('click', startEvolution);
 document.getElementById('resetBtn').addEventListener('click', () => {
   if (running) return;
   currentCycle = 0;
-  alphaScore = 0; betaScore = 0;
-  alphaDims = [0,0,0,0,0,0,0];
-  betaDims = [0,0,0,0,0,0,0];
+  aScore = 0; bScore = 0;
+  aDims = [0,0,0,0,0,0,0];
+  bDims = [0,0,0,0,0,0,0];
   document.getElementById('alphaLog').innerHTML = '';
   document.getElementById('betaLog').innerHTML = '';
   document.getElementById('arbLog').innerHTML = '';
@@ -594,24 +918,33 @@ document.getElementById('resetBtn').addEventListener('click', () => {
   document.getElementById('betaScore').textContent = '-';
   document.getElementById('arbMessage').textContent = '等待启动...';
   document.getElementById('resultPanel').classList.remove('show');
-  ['d1a','d2b','d3a','d4b','d5a','d6b','d7a'].forEach(id => {
-    document.getElementById(id).style.width = '0%';
-  });
+  document.getElementById('outputPanel').classList.remove('show');
+  ['alphaCommits','alphaTests','betaCommits','betaTests'].forEach(id => document.getElementById(id).textContent = '0');
+  document.getElementById('elapsedDisplay').textContent = '0';
+  document.getElementById('totalCommits').textContent = '0';
+  document.getElementById('totalTests').textContent = '0';
+  document.getElementById('totalDocs').textContent = '0';
+  document.getElementById('alphaStratLabel').textContent = '⚖️ 均衡';
+  document.getElementById('betaStratLabel').textContent = '⚖️ 均衡';
+  for (let i = 1; i <= 7; i++) {
+    document.getElementById('d' + i + 'a').style.width = '0%';
+    document.getElementById('pct' + i).textContent = '0%';
+  }
   document.getElementById('projectLabel').textContent = '';
 });
 
-document.getElementById('startBtn').addEventListener('click', startEvolution);
 document.getElementById('nextBtn').addEventListener('click', () => {
   document.getElementById('resultPanel').classList.remove('show');
-  document.getElementById('projectInput').value = ['GitHub Star 趋势分析 CLI','终端 Markdown 转 PDF 工具','AI 论文每日摘要推送服务','Docker 容器监控仪表盘','命令行 AI 对话代理框架'][randomInt(0,4)];
-  setTimeout(startEvolution, 300);
+  document.getElementById('outputPanel').classList.remove('show');
+  const options = ['GitHub Star 趋势分析 CLI','终端 Markdown 转 PDF 工具','AI 论文每日摘要推送服务','Docker 容器监控仪表盘','命令行 AI 对话代理框架'];
+  document.getElementById('projectInput').value = options[rand(0, options.length - 1)];
+  setTimeout(startEvolution, 400);
 });
 
-// Click to run immediately
+// Auto-init
 window.onload = () => {
-  // Set a random project
   const options = ['GitHub Star 趋势分析 CLI','终端 Markdown 转 PDF 工具','AI 论文每日摘要推送服务','Docker 容器监控仪表盘','命令行 AI 对话代理框架'];
-  document.getElementById('projectInput').value = options[randomInt(0, options.length-1)];
+  document.getElementById('projectInput').value = options[rand(0, options.length - 1)];
 };
 </script>
 </body>
