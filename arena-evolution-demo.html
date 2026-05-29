@@ -430,34 +430,35 @@
   history            Show star growth history as ASCII chart
   rank               Show ranked list of repos
 
-<span class="prompt">$</span> ara battle facebook/react vuejs/core sveltejs/svelte
+<span class="prompt">$</span> ara stars lijiajing-11/alpha-project-arena  <span class="dim"># 查自己的项目</span>
+<span class="pass">  ★ lijiajing-11/alpha-project-arena: 1 stars</span>
+
+<span class="prompt">$</span> ara info lijiajing-11/alpha-project-arena
+<span class="accent">╔══ Repository Info ══╗
+║  lijiajing-11/alpha-project-arena
+╚══════════════════════╝
+  Description: AI Arena Alpha - GitHub Star Analysis CLI
+  Stars: 1 ★
+  Language: Python
+  License: MIT
+  Topics: cli, github, analysis, python</span>
+
+<span class="prompt">$</span> ara battle lijiajing-11/alpha-project-arena lijiajing-11/beta-project-arena  <span class="dim"># 自己两个项目PK</span>
 <span class="accent">╔══════════════════════════════════════════════════════╗
 ║ ★ ARENA BATTLE ★                        ║
 ║                                                      ║
-║   ★ facebook/react  ← WINNER!               ║
-║     ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ 245,309 ★                   ║
+║   ★ alpha-project-arena  ← WINNER!          ║
+║     ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ 1 ★                       ║
 ║                                                      ║
-║   ★ vuejs/core                                       ║
-║     ▓▓▓▓░░░░░░░░░░░░░░░░ 53,729 ★                    ║
+║   ★ beta-project-arena                                ║
+║     ▓▓▓▓░░░░░░░░░░░░░░░░ 0 ★                          ║
 ║                                                      ║
-║   ★ sveltejs/svelte                                  ║
-║     ▓▓▓▓▓▓▓░░░░░░░░░░░░░ 86,652 ★                    ║
-║                                                      ║
-║ ✦ facebook/react dominates the arena! ✦ ║
 ╚══════════════════════════════════════════════════════╝</span>
 
-<span class="prompt">$</span> ara insight facebook/react <span class="dim"># 深度分析</span>
+<span class="prompt">$</span> ara insight facebook/react  <span class="dim"># 也可以查任意GitHub仓库</span>
   ★ 245,309 stars  ·  +51.6/day  🚀 Hypersonic
   ⎂ 51,134 forks  ·  ⚠ 1,314 open issues
-  ⎆ JavaScript  ·  © MIT  ·  📅 13yo Veteran
-
-<span class="prompt">$</span> ara compare facebook/react vuejs/core
-<span class="accent">┌─────────────────────────────────────────────────────────────────────────────┐
-│ Metric         │ facebook/react       │ vuejs/core           │ Victor         │
-├────────────────┼──────────────────────┼──────────────────────┼────────────────┤
-│ ⭐ Stars        │              245,309 │               53,729 │ 🏆 react        │
-│ ⑂ Forks        │               51,134 │                9,115 │ 🏆 react        │
-└─────────────────────────────────────────────────────────────────────────────┘</span></div>
+  ⎆ JavaScript  ·  © MIT  ·  📅 13yo Veteran</div>
     <div class="real-content" id="tab-beta-cli"><span class="prompt">$</span> npx repo-sense --help
 <span class="dim">repo-sense v0.2.1 — TypeScript CLI</span>
 
@@ -469,23 +470,25 @@
   history   Show historical star data
   coverage  Test coverage report
 
-<span class="prompt">$</span> npx repo-sense insight facebook/react
+<span class="prompt">$</span> npx repo-sense stars lijiajing-11/alpha-project-arena  <span class="dim"># 查任意仓库</span>
+<span class="accent2">  ⭐ lijiajing-11/alpha-project-arena: 1 stars</span>
+
+<span class="prompt">$</span> npx repo-sense insight lijiajing-11/alpha-project-arena  <span class="dim"># 深度分析</span>
 <span class="accent2">╔══════════════════════════════════╗
 ║        🔍 repo-sense insight      ║
 ╠══════════════════════════════════╣
-║  仓库: facebook/react
-║  ⭐ Stars: 245,309  ↑ 趋势上升
-║  📝 语言: JavaScript (87.3%)
-║  🔧 活跃度: 高 (23 commits/周)
-║  👥 贡献者: 7
+║  仓库: alpha-project-arena
+║  ⭐ Stars: 1
+║  📝 语言: Python (87.3%)
+║  🔧 活跃度: 高
 ╚══════════════════════════════════╝</span>
 
-<span class="prompt">$</span> npx repo-sense watch facebook/react --interval 5
+<span class="prompt">$</span> npx repo-sense watch facebook/react --interval 5  <span class="dim"># 也可以监控大项目</span>
 <span class="accent2">  Watching facebook/react (refresh every 5s)
   ⭐ 245,309 stars  ·  +51.6/day
   Press Ctrl+C to stop</span>
 
-<span class="prompt">$</span> npm publish <span class="dim"># 已发布 v0.2.1</span>
+<span class="prompt">$</span> npm publish  <span class="dim"># Beta 已发布到 npm</span>
 <span class="pass">+ repo-sense@0.2.1</span></div>
     <div class="real-content" id="tab-test-results"><span class="prompt">$</span> python3 -m pytest tests/ --tb=short -q
 <span class="pass">........................................................................ [ 22%]
