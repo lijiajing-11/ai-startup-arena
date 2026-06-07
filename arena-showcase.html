@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Arena · Agent 自进化平台</title>
+<title>AI Arena · 三仓库自进化平台</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -24,117 +24,119 @@
   .subtitle {
     text-align: center;
     color: #8892b0;
-    margin-bottom: 50px;
+    margin-bottom: 30px;
     font-size: 1.1em;
   }
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
+  .container { max-width: 1200px; margin: 0 auto; }
+
+  /* Platform card (top) */
+  .platform-card {
+    background: linear-gradient(135deg, rgba(255,107,107,0.08), rgba(0,212,255,0.08));
+    border: 2px solid rgba(255,215,0,0.25);
+    border-radius: 20px;
+    padding: 28px 32px;
+    text-align: center;
+    margin-bottom: 40px;
   }
-  
-  /* 3-part layout */
-  .main-row {
+  .platform-card .icon { font-size: 2.5em; }
+  .platform-card .name { font-size: 1.5em; font-weight: 700; color: #ffd700; margin: 8px 0; }
+  .platform-card .desc { color: #8892b0; font-size: 0.95em; max-width: 600px; margin: 0 auto 16px; }
+  .platform-card .meta {
+    display: flex; justify-content: center; gap: 30px; flex-wrap: wrap;
+    font-size: 0.85em; color: #8892b0;
+  }
+  .platform-card .meta span { color: #e0e6f0; font-weight: 600; }
+  .repo-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 8px 20px;
+    font-size: 0.9em;
+    color: #58a6ff;
+    text-decoration: none;
+    margin-top: 12px;
+    transition: all 0.2s;
+  }
+  .repo-badge:hover {
+    background: rgba(88,166,255,0.15);
+    border-color: #58a6ff;
+  }
+
+  /* Two team columns */
+  .team-row {
     display: flex;
     gap: 30px;
     margin-bottom: 40px;
   }
   .team-col { flex: 1; }
-  .center-col {
-    flex: 0 0 280px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  
+
   .team-card {
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: 16px;
     padding: 24px;
   }
-  
   .team-card.alpha { border-color: rgba(255,107,107,0.3); }
   .team-card.beta { border-color: rgba(138,43,226,0.3); }
-  
+
   .team-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 16px;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
     border-bottom: 1px solid rgba(255,255,255,0.06);
   }
-  .team-name { font-size: 1.4em; font-weight: 700; }
+  .team-name { font-size: 1.3em; font-weight: 700; }
   .team-name.alpha { color: #ff6b6b; }
   .team-name.beta { color: #b388ff; }
-  .team-score {
-    font-size: 2em;
-    font-weight: 800;
-    opacity: 0.8;
-  }
-  .team-score.alpha { color: #ff6b6b; }
-  .team-score.beta { color: #b388ff; }
-  
-  .agent-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-  .agent-card {
+
+  .product-name {
+    font-size: 1em;
+    color: #8892b0;
+    margin-bottom: 16px;
+    padding: 10px 14px;
     background: rgba(255,255,255,0.04);
     border-radius: 10px;
-    padding: 12px;
     border: 1px solid rgba(255,255,255,0.05);
   }
-  .agent-emoji { font-size: 1.3em; }
-  .agent-role { font-size: 0.85em; color: #8892b0; margin-top: 4px; }
-  
-  /* Arbitrator center */
-  .arbitrator-card {
-    background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(138,43,226,0.1));
-    border: 2px solid rgba(255,215,0,0.3);
-    border-radius: 20px;
-    padding: 30px 25px;
-    text-align: center;
-    width: 100%;
+  .product-name strong { color: #e0e6f0; }
+
+  .spec-list {
+    list-style: none;
+    font-size: 0.85em;
   }
-  .arb-icon { font-size: 3em; margin-bottom: 10px; }
-  .arb-title { font-size: 1.2em; font-weight: 700; color: #ffd700; margin-bottom: 6px; }
-  .arb-desc { font-size: 0.85em; color: #8892b0; margin-bottom: 16px; }
-  
-  .arb-metrics {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .arb-metric {
+  .spec-list li {
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
     display: flex;
     justify-content: space-between;
-    padding: 6px 10px;
+  }
+  .spec-list li:last-child { border-bottom: none; }
+  .spec-label { color: #8892b0; }
+  .spec-value { color: #e0e6f0; font-weight: 600; }
+
+  .team-repo-link {
+    display: block;
+    text-align: center;
+    margin-top: 14px;
+    padding: 10px;
+    border-radius: 10px;
     background: rgba(255,255,255,0.04);
-    border-radius: 6px;
-    font-size: 0.8em;
+    color: #58a6ff;
+    text-decoration: none;
+    font-size: 0.85em;
+    transition: background 0.2s;
   }
-  .arb-metric .label { color: #8892b0; }
-  .arb-metric .value { color: #ffd700; font-weight: 600; }
-  
-  /* Arrow connectors */
-  .arrow-row {
-    display: flex;
-    justify-content: center;
-    gap: 80px;
-    margin-bottom: 30px;
-    font-size: 1.5em;
-    opacity: 0.4;
-  }
-  
-  /* bottom stats */
+  .team-repo-link:hover { background: rgba(88,166,255,0.12); }
+
+  /* Stats */
   .stats-row {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: 16px;
-    margin-top: 40px;
+    margin-bottom: 40px;
   }
   .stat-card {
     background: rgba(255,255,255,0.03);
@@ -151,101 +153,112 @@
     -webkit-text-fill-color: transparent;
   }
   .stat-label { font-size: 0.8em; color: #8892b0; margin-top: 6px; }
-  
-  .footer {
+
+  /* Three-repo footer */
+  .repos-section {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 30px;
+  }
+  .repos-title {
     text-align: center;
-    margin-top: 50px;
-    padding-top: 30px;
-    border-top: 1px solid rgba(255,255,255,0.06);
-    color: #4a5568;
-    font-size: 0.85em;
-  }
-  .footer a { color: #8892b0; text-decoration: none; }
-  .footer a:hover { color: #ffd700; }
-  
-  /* incentive section */
-  .incentive-section {
-    margin-top: 40px;
-  }
-  .incentive-title {
-    font-size: 1.2em;
+    font-size: 1em;
     color: #ffd700;
-    text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
   }
-  .incentive-grid {
+  .repos-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
   }
-  .incentive-card {
-    background: rgba(255,215,0,0.03);
-    border: 1px solid rgba(255,215,0,0.15);
+  .repo-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
     border-radius: 12px;
-    padding: 20px;
+    padding: 16px;
     text-align: center;
+    transition: border-color 0.2s;
   }
-  .incentive-card .icon { font-size: 2em; margin-bottom: 8px; }
-  .incentive-card .name { color: #ffd700; font-weight: 600; margin-bottom: 6px; }
-  .incentive-card .desc { font-size: 0.8em; color: #8892b0; }
-  
+  .repo-card:hover { border-color: rgba(255,215,0,0.3); }
+  .repo-card .emoji { font-size: 1.5em; }
+  .repo-card .rname {
+    font-size: 0.85em;
+    font-weight: 600;
+    margin: 6px 0;
+    color: #e0e6f0;
+  }
+  .repo-card .rdesc {
+    font-size: 0.75em;
+    color: #8892b0;
+    margin-bottom: 8px;
+  }
+  .repo-card .rlink {
+    font-size: 0.75em;
+    color: #58a6ff;
+    text-decoration: none;
+  }
+  .repo-card .rlink:hover { text-decoration: underline; }
+
+  .footer {
+    text-align: center;
+    color: #4a5568;
+    font-size: 0.85em;
+  }
+
   @media (max-width: 900px) {
-    .main-row { flex-direction: column; }
-    .center-col { flex: auto; }
+    .team-row { flex-direction: column; }
     .stats-row { grid-template-columns: repeat(3, 1fr); }
-    .incentive-grid { grid-template-columns: 1fr; }
+    .repos-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 <div class="container">
   <h1>⚔️ AI Startup Arena</h1>
-  <p class="subtitle">多 Agent 自进化竞技系统 · 9 Agent 在博弈中自主进化</p>
+  <p class="subtitle">多 Agent 自进化竞技系统 · 3 仓库架构 · 9 Agent 在博弈中自主进化</p>
 
-  <!-- Main 3-column -->
-  <div class="main-row">
+  <!-- Platform Overview -->
+  <div class="platform-card">
+    <div class="icon">🏟️</div>
+    <div class="name">AI Startup Arena · 竞技平台</div>
+    <div class="desc">
+      Hermes Agent 驱动的多 Agent 自进化系统 —— 两个 AI 团队（各 7 角色）在仲裁者的博弈机制下竞争进化，
+      各自开发出完整的开源 CLI 产品
+    </div>
+    <div class="meta">
+      <span>⚡ 进化轮次: <span>20 Cycles</span></span>
+      <span>🤖 Agent 总数: <span>9</span></span>
+      <span>⏱ 运行时长: <span>~8 小时</span></span>
+      <span>📦 总计 Commits: <span>330+</span></span>
+    </div>
+    <a class="repo-badge" href="https://github.com/lijiajing-11/ai-startup-arena" target="_blank">
+      📂 github.com/lijiajing-11/ai-startup-arena
+    </a>
+  </div>
+
+  <!-- Two Teams -->
+  <div class="team-row">
     <!-- Alpha Team -->
     <div class="team-col">
       <div class="team-card alpha">
         <div class="team-header">
           <span class="team-name alpha">⚡ Alpha · A-Tech</span>
-          <span class="team-score alpha">44</span>
+          <span style="color:#8892b0;font-size:0.85em">仲裁分: 44</span>
         </div>
-        <div class="agent-grid">
-          <div class="agent-card"><div class="agent-emoji">🧠</div><div>CEO</div><div class="agent-role">战略决策</div></div>
-          <div class="agent-card"><div class="agent-emoji">🏗️</div><div>架构师</div><div class="agent-role">系统设计</div></div>
-          <div class="agent-card"><div class="agent-emoji">💻</div><div>开发工程师</div><div class="agent-role">编码实现</div></div>
-          <div class="agent-card"><div class="agent-emoji">🧪</div><div>测试工程师</div><div class="agent-role">自动化测试</div></div>
-          <div class="agent-card"><div class="agent-emoji">🔍</div><div>代码审查师</div><div class="agent-role">质量门禁</div></div>
-          <div class="agent-card"><div class="agent-emoji">📋</div><div>产品经理</div><div class="agent-role">需求体验</div></div>
-          <div class="agent-card"><div class="agent-emoji">📢</div><div>市场运营</div><div class="agent-role">推广包装</div></div>
-        </div>
-        <div style="margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.05)">
-          <div style="font-size:0.85em;color:#8892b0">产出: <strong style="color:#ff6b6b">ARA CLI</strong> · Python · 276 tests</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Center: Arbitrator -->
-    <div class="center-col">
-      <div class="arrow-row">
-        <span>⚔️</span>
-        <span>⚔️</span>
-      </div>
-      <div class="arbitrator-card">
-        <div class="arb-icon">⚖️</div>
-        <div class="arb-title">仲裁者</div>
-        <div class="arb-desc">中立裁判 · 评分 · 激励</div>
-        <div class="arb-metrics">
-          <div class="arb-metric"><span class="label">📍 评分维度</span><span class="value">7 维</span></div>
-          <div class="arb-metric"><span class="label">🔄 进化轮次</span><span class="value">20 Cycles</span></div>
-          <div class="arb-metric"><span class="label">💡 核心创新</span><span class="value">激励机制</span></div>
-          <div class="arb-metric"><span class="label">🎯 最终比分</span><span class="value">44 : 44</span></div>
-        </div>
-      </div>
-      <div class="arrow-row">
-        <span>🔄</span>
-        <span>🔄</span>
+        <div class="product-name">产出: <strong>ARA CLI</strong> — GitHub 仓库分析工具</div>
+        <ul class="spec-list">
+          <li><span class="spec-label">语言</span><span class="spec-value">Python</span></li>
+          <li><span class="spec-label">测试</span><span class="spec-value">276 tests ✅</span></li>
+          <li><span class="spec-label">命令</span><span class="spec-value">11 commands</span></li>
+          <li><span class="spec-label">Commits</span><span class="spec-value">163</span></li>
+          <li><span class="spec-label">核心功能</span><span class="spec-value">insight --compare 多仓库对比</span></li>
+          <li><span class="spec-label">发布状态</span><span class="spec-value">🚧 PyPI (卡 token)</span></li>
+        </ul>
+        <a class="team-repo-link" href="https://github.com/lijiajing-11/alpha-project-arena" target="_blank">
+          📂 github.com/lijiajing-11/alpha-project-arena
+        </a>
       </div>
     </div>
 
@@ -254,58 +267,62 @@
       <div class="team-card beta">
         <div class="team-header">
           <span class="team-name beta">🧬 Beta · B-Labs</span>
-          <span class="team-score beta">44</span>
+          <span style="color:#8892b0;font-size:0.85em">仲裁分: 44</span>
         </div>
-        <div class="agent-grid">
-          <div class="agent-card"><div class="agent-emoji">🧠</div><div>CEO</div><div class="agent-role">战略决策</div></div>
-          <div class="agent-card"><div class="agent-emoji">🏗️</div><div>架构师</div><div class="agent-role">系统设计</div></div>
-          <div class="agent-card"><div class="agent-emoji">💻</div><div>开发工程师</div><div class="agent-role">编码实现</div></div>
-          <div class="agent-card"><div class="agent-emoji">🧪</div><div>测试工程师</div><div class="agent-role">自动化测试</div></div>
-          <div class="agent-card"><div class="agent-emoji">🔍</div><div>代码审查师</div><div class="agent-role">质量门禁</div></div>
-          <div class="agent-card"><div class="agent-emoji">📋</div><div>产品经理</div><div class="agent-role">需求体验</div></div>
-          <div class="agent-card"><div class="agent-emoji">📢</div><div>市场运营</div><div class="agent-role">推广包装</div></div>
-        </div>
-        <div style="margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.05)">
-          <div style="font-size:0.85em;color:#8892b0">产出: <strong style="color:#b388ff">repo-sense CLI</strong> · TypeScript · npm 上线</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Incentive Mechanism -->
-  <div class="incentive-section">
-    <div class="incentive-title">🏆 仲裁者激励机制（核心差异化）</div>
-    <div class="incentive-grid">
-      <div class="incentive-card">
-        <div class="icon">⚡</div>
-        <div class="name">胜负奖惩</div>
-        <div class="desc">胜者 +10% token 配额<br>败者需对标对手功能</div>
-      </div>
-      <div class="incentive-card">
-        <div class="icon">💡</div>
-        <div class="name">创新红利</div>
-        <div class="desc">原创功能 +5 分<br>2 轮保护期禁止抄袭</div>
-      </div>
-      <div class="incentive-card">
-        <div class="icon">🤝</div>
-        <div class="name">知识传递</div>
-        <div class="desc">连续落后 3 轮 → 强制共享<br>领先方发布技术文档</div>
+        <div class="product-name">产出: <strong>repo-sense CLI</strong> — GitHub 第六感工具</div>
+        <ul class="spec-list">
+          <li><span class="spec-label">语言</span><span class="spec-value">TypeScript</span></li>
+          <li><span class="spec-label">测试</span><span class="spec-value">94 tests</span></li>
+          <li><span class="spec-label">命令</span><span class="spec-value">8 commands</span></li>
+          <li><span class="spec-label">Commits</span><span class="spec-value">170</span></li>
+          <li><span class="spec-label">核心功能</span><span class="spec-value">watch 实时 Star 跳动</span></li>
+          <li><span class="spec-label">发布状态</span><span class="spec-value">✅ npm 已上线 v0.2.1</span></li>
+        </ul>
+        <a class="team-repo-link" href="https://github.com/lijiajing-11/beta-project-arena" target="_blank">
+          📂 github.com/lijiajing-11/beta-project-arena
+        </a>
       </div>
     </div>
   </div>
 
   <!-- Stats -->
   <div class="stats-row">
-    <div class="stat-card"><div class="stat-number">7+</div><div class="stat-label">角色/队 · 可扩展</div></div>
+    <div class="stat-card"><div class="stat-number">7+</div><div class="stat-label">角色/队</div></div>
     <div class="stat-card"><div class="stat-number">20</div><div class="stat-label">进化轮次</div></div>
-    <div class="stat-card"><div class="stat-number">330+</div><div class="stat-label">Git Commits</div></div>
-    <div class="stat-card"><div class="stat-number">8h</div><div class="stat-label">运行时长</div></div>
+    <div class="stat-card"><div class="stat-number">330+</div><div class="stat-label">Commits</div></div>
+    <div class="stat-card"><div class="stat-number">3</div><div class="stat-label">Git 仓库</div></div>
     <div class="stat-card"><div class="stat-number">2</div><div class="stat-label">完整产品</div></div>
+    <div class="stat-card"><div class="stat-number">~8h</div><div class="stat-label">运行时长</div></div>
+  </div>
+
+  <!-- Three Repos -->
+  <div class="repos-section">
+    <div class="repos-title">📦 三仓库架构 · 产品即代码</div>
+    <div class="repos-grid">
+      <div class="repo-card">
+        <div class="emoji">🏟️</div>
+        <div class="rname">ai-startup-arena</div>
+        <div class="rdesc">竞技平台核心 — Agent 编排、仲裁引擎、SOP 系统</div>
+        <a class="rlink" href="https://github.com/lijiajing-11/ai-startup-arena" target="_blank">github.com/lijiajing-11/ai-startup-arena ↗</a>
+      </div>
+      <div class="repo-card">
+        <div class="emoji">⚡</div>
+        <div class="rname">alpha-project-arena</div>
+        <div class="rdesc">Alpha 队产出 — ARA CLI · Python · 276 tests</div>
+        <a class="rlink" href="https://github.com/lijiajing-11/alpha-project-arena" target="_blank">github.com/lijiajing-11/alpha-project-arena ↗</a>
+      </div>
+      <div class="repo-card">
+        <div class="emoji">🧬</div>
+        <div class="rname">beta-project-arena</div>
+        <div class="rdesc">Beta 队产出 — repo-sense CLI · TypeScript · npm 上线</div>
+        <a class="rlink" href="https://github.com/lijiajing-11/beta-project-arena" target="_blank">github.com/lijiajing-11/beta-project-arena ↗</a>
+      </div>
+    </div>
   </div>
 
   <div class="footer">
-    <p>⚔️ AI Startup Arena · <a href="https://github.com/lijiajing-11/beta-project-arena">GitHub</a></p>
-    <p style="margin-top:6px">Alpha 44 : 44 Beta · 平局，但双方都进化了 🚀</p>
+    <p>⚔️ AI Startup Arena · 14 Agents · 20 Cycles · 3 Repos · 2 Products</p>
+    <p style="margin-top:4px">由 Hermes Agent Profile 驱动 · 不是又一个 LLM 应用，而是一个元进化系统</p>
   </div>
 </div>
 </body>

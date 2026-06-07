@@ -194,7 +194,7 @@ npx repo-sense insight tensorflow     # 深度洞察
 ## 🔬 技术亮点
 
 ### 1. 多 Agent 博弈系统
-9 个 AI Agent × 2 队 = 18 Agent 同时运行，通过 Hermes Profile 模式**零人工干预**自治执行。
+9 个 AI Agent × 2 队 = 9 Agent 同时运行，通过 Hermes Profile 模式**零人工干预**自治执行。
 
 ### 2. 仲裁者激励机制
 不是简单打分——而是包含**胜负奖惩、创新红利、知识传递**的完整博弈机制。7 维评分覆盖功能、测试、创新、文档、UX、质量、影响力。
@@ -206,7 +206,7 @@ npx repo-sense insight tensorflow     # 深度洞察
 同一套进化框架产生了 **Python CLI**（stdlib-only）和 **TypeScript CLI**（chalk 彩色 UI）两个不同技术栈的完整产品。
 
 ### 5. 零人工干预
-从启动到结束，**完全由 AI Agent 自主完成**——策略、开发、测试、文档、发布。8 小时，¥15-20 成本。
+从启动到结束，**完全由 AI Agent 自主完成**——策略、开发、测试、文档、发布。8 小时，¥40-50 成本。
 
 ---
 
