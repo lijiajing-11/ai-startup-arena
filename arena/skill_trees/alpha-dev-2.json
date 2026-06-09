@@ -1,0 +1,13 @@
+{
+  "agent": "alpha-dev-2", "team": "alpha", "cycle": 0,
+  "skills": {
+    "mastered": [
+      {"name": "pytest 测试体系", "level": 90, "acquired_at": 0},
+      {"name": "CI/CD 配置", "level": 75, "acquired_at": 0}
+    ],
+    "learning": [
+      {"name": "pip 打包发布", "progress": 50, "started_at": 0}
+    ],
+    "interested": ["覆盖率优化", "pytest fixture 复用"]
+  }
+}

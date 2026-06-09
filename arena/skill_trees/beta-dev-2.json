@@ -1,0 +1,13 @@
+{
+  "agent": "beta-dev-2", "team": "beta", "cycle": 0,
+  "skills": {
+    "mastered": [
+      {"name": "vitest 测试", "level": 80, "acquired_at": 0},
+      {"name": "tsup 构建", "level": 78, "acquired_at": 0}
+    ],
+    "learning": [
+      {"name": "npm 包发布", "progress": 70, "started_at": 0}
+    ],
+    "interested": ["chalk mock 统一", "覆盖率门槛"]
+  }
+}

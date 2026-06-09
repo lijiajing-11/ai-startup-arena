@@ -1,0 +1,14 @@
+{
+  "agent": "beta-ceo", "team": "beta", "cycle": 0,
+  "skills": {
+    "mastered": [
+      {"name": "市场先发策略", "level": 85, "acquired_at": 0},
+      {"name": "体验优先决策", "level": 80, "acquired_at": 0},
+      {"name": "双线反制", "level": 75, "acquired_at": 0}
+    ],
+    "learning": [
+      {"name": "测试深度补强", "progress": 40, "started_at": 0}
+    ],
+    "interested": ["品牌人格", "Telegram 推送"]
+  }
+}

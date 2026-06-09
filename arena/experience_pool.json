@@ -1,0 +1,10 @@
+{
+  "experiences": [
+    {"id":"EXP-001","type":"避坑","title":"仲裁数据必须原子持久化","description":"第一轮 Cycle 1-16 因脚本路径错误丢失，改用先写tmp再mv的原子写+每cycle独立JSON状态文件，leaderboard从所有state重建","tags":["arbitrator","persistence"],"submitted_by":"hermes","cycle":0,"verified":true},
+    {"id":"EXP-002","type":"避坑","title":"PyPI/npm 发布提前配置 token","description":"第一轮 Alpha 卡 twine token 没发成。发布流程要提前 playbook 化，token 用环境变量，cycle≥15 强制发布任务","tags":["release","pypi","npm"],"submitted_by":"hermes","cycle":0,"verified":true},
+    {"id":"EXP-003","type":"最佳实践","title":"BLOAT 零容忍","description":"Beta 干净代码胜过 Alpha 技术债。单 commit≤80行、禁 auto-updated/arenaStatus、禁文件尾追加重复块。红线前置到 prompt，仲裁脚本检测并扣分","tags":["code-quality","bloat"],"submitted_by":"hermes","cycle":0,"verified":true},
+    {"id":"EXP-004","type":"最佳实践","title":"结构化通信省 token","description":"Agent 间用 [需求]/[报告]/[审查]/[经验]/[求助] 固定格式，禁自由聊天，省 50-70% token","tags":["token","comms"],"submitted_by":"hermes","cycle":0,"verified":true},
+    {"id":"EXP-005","type":"最佳实践","title":"测试绿才提交（沙箱gate）","description":"借鉴 AutoGen 代码沙箱：Dev 提交前必须本地 pytest/vitest 全绿，仲裁抽查退出码。避免红测试污染主干","tags":["testing","gate"],"submitted_by":"hermes","cycle":0,"verified":true},
+    {"id":"EXP-006","type":"避坑","title":"外部API加retry+缓存","description":"arXiv API 会限流。所有抓取调用加指数退避 retry + 本地缓存，避免 cycle 中途因限流失败","tags":["api","arxiv","cache"],"submitted_by":"hermes","cycle":0,"verified":true}
+  ]
+}

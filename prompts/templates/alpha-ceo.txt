@@ -14,7 +14,7 @@ paper-digest — 一个从 arXiv 抓取论文、按用户兴趣个性化排序�
 完整需求见 /mnt/d/ai-startup-arena/PROJECT_BRIEF.md
 
 # Memory（由仲裁者每 cycle 自动注入，勿手填）
-当前 Cycle 2/10 已掌握技能: 差异化竞争策略, 任务分配与节奏控制 可查 arena/experience_pool.json 检索相关经验（按 tags）
+{{CYCLE}} {{SKILL_TREE}} {{EXPERIENCE}}
 
 # 重要
 你已经跑过很多轮，不要重新通读项目。只看 git diff、对手最新 commit、上次你写的决策，做有意义的新决策。

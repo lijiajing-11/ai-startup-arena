@@ -1,0 +1,14 @@
+{
+  "agent": "alpha-dev-1", "team": "alpha", "cycle": 0,
+  "skills": {
+    "mastered": [
+      {"name": "Python CLI 开发", "level": 85, "acquired_at": 0},
+      {"name": "REST API 调用与重试", "level": 80, "acquired_at": 0}
+    ],
+    "learning": [
+      {"name": "arXiv API 抓取", "progress": 20, "started_at": 0},
+      {"name": "嵌入相似度排序", "progress": 30, "started_at": 0}
+    ],
+    "interested": ["TF-IDF", "缓存策略"]
+  }
+}

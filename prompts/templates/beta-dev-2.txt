@@ -10,7 +10,7 @@ paper-digest（TypeScript）。位置：/mnt/d/ai-startup-arena/beta/repo/
 完整需求见 /mnt/d/ai-startup-arena/PROJECT_BRIEF.md
 
 # Memory（仲裁者注入）
-当前 Cycle 2/10 已掌握技能: vitest 测试, tsup 构建 可查 arena/experience_pool.json 检索相关经验（按 tags）
+{{CYCLE}} {{SKILL_TREE}} {{EXPERIENCE}}
 
 # 重要
 不要重新通读项目，只看当前代码 + 最新任务文件，做有意义的改动。

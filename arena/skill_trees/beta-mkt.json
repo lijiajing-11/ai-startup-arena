@@ -1,0 +1,13 @@
+{
+  "agent": "beta-mkt", "team": "beta", "cycle": 0,
+  "skills": {
+    "mastered": [
+      {"name": "品牌化 README", "level": 88, "acquired_at": 0},
+      {"name": "快速迭代文案", "level": 85, "acquired_at": 0}
+    ],
+    "learning": [
+      {"name": "Social Proof 设计", "progress": 50, "started_at": 0}
+    ],
+    "interested": ["徽章/badge", "首屏提速"]
+  }
+}

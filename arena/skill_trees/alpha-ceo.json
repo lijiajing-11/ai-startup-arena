@@ -1,0 +1,13 @@
+{
+  "agent": "alpha-ceo", "team": "alpha", "cycle": 0,
+  "skills": {
+    "mastered": [
+      {"name": "差异化竞争策略", "level": 80, "acquired_at": 0},
+      {"name": "任务分配与节奏控制", "level": 75, "acquired_at": 0}
+    ],
+    "learning": [
+      {"name": "发布上线流程", "progress": 40, "started_at": 0}
+    ],
+    "interested": ["RAG个性化推荐", "多渠道推送"]
+  }
+}

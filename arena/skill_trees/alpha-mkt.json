@@ -1,0 +1,13 @@
+{
+  "agent": "alpha-mkt", "team": "alpha", "cycle": 0,
+  "skills": {
+    "mastered": [
+      {"name": "README 结构设计", "level": 82, "acquired_at": 0},
+      {"name": "技术文档写作", "level": 80, "acquired_at": 0}
+    ],
+    "learning": [
+      {"name": "差异化卖点提炼", "progress": 45, "started_at": 0}
+    ],
+    "interested": ["发布公告", "对比表设计"]
+  }
+}

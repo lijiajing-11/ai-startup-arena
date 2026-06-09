@@ -1,0 +1,13 @@
+{
+  "agent": "beta-dev-1", "team": "beta", "cycle": 0,
+  "skills": {
+    "mastered": [
+      {"name": "TypeScript CLI 开发", "level": 85, "acquired_at": 0},
+      {"name": "chalk 彩色终端 UI", "level": 88, "acquired_at": 0}
+    ],
+    "learning": [
+      {"name": "arXiv Atom 解析", "progress": 20, "started_at": 0}
+    ],
+    "interested": ["AbortSignal 优雅退出", "cli-table3 卡片"]
+  }
+}

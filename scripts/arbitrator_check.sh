@@ -1,117 +1,116 @@
 #!/bin/bash
-# Arena arbitrator script - runs every 30 min, checks cycle, runs agents
-set +euo pipefail  # disable strict mode for reliability
-cd /mnt/d/ai-startup-arena || { echo "[ERROR] cd failed"; exit 1; }
-
+# Arena 仲裁脚本 v4 — JSON原子持久化 + 断点续跑 + 记忆注入 + human-in-loop
+# 进化重点：根治第一轮 Cycle 1-16 数据丢失 + Agent 失忆
+set +euo pipefail
 ARENA_ROOT="/mnt/d/ai-startup-arena"
-MAX_CYCLE=20
-CYCLE_FILE="$ARENA_ROOT/arena/arbitrator-cycle.txt"
-LEADERBOARD="$ARENA_ROOT/arena/leaderboard.md"
-ALPHA_REPO="$ARENA_ROOT/alpha/repo"
-BETA_REPO="$ARENA_ROOT/beta/repo"
-PROGRESS_DIR="$ARENA_ROOT/arena/progress_reports"
+cd "$ARENA_ROOT" || { echo "[ERROR] cd failed"; exit 1; }
 
-mkdir -p "$ARENA_ROOT/arena" "$PROGRESS_DIR"
+MAX_CYCLE="${MAX_CYCLE:-10}"   # 先 10 试水，顺了改 20
+STATE_DIR="$ARENA_ROOT/arena/state"
+SKILL_DIR="$ARENA_ROOT/arena/skill_trees"
+LOG="$ARENA_ROOT/arena/logs/arbitrator-$(date +%Y%m%d).log"
+PROFILES="alpha-ceo alpha-dev-1 alpha-dev-2 alpha-mkt beta-ceo beta-dev-1 beta-dev-2 beta-mkt"
+mkdir -p "$STATE_DIR" "$ARENA_ROOT/arena/logs" "$SKILL_DIR"
 
-# Read current cycle
-CURRENT_CYCLE=$(cat "$CYCLE_FILE" 2>/dev/null || echo "17")
-if [ -z "$CURRENT_CYCLE" ] || ! echo "$CURRENT_CYCLE" | grep -qE '^[0-9]+$'; then
-    CURRENT_CYCLE=17
-fi
+log(){ echo "[$(date +%H:%M:%S)] $*" | tee -a "$LOG"; }
 
-echo "[Cycle $CURRENT_CYCLE] Starting arbitrator check..."
+# --- 断点续跑：读 state 目录最大 cycle（LangGraph 持久化思想）---
+LAST=$(ls "$STATE_DIR"/cycle-*.json 2>/dev/null | sed -E 's/.*cycle-0*([0-9]+)\.json/\1/' | sort -n | tail -1)
+CURRENT_CYCLE=$(( ${LAST:-0} + 1 ))
+log "Cycle $CURRENT_CYCLE start (max=$MAX_CYCLE)"
 
-# Check MAX_CYCLE
-if [ "$CURRENT_CYCLE" -ge "$MAX_CYCLE" ]; then
-    echo "[Cycle $CURRENT_CYCLE] MAX_CYCLE=$MAX_CYCLE reached. Shutting down."
-    echo "$CURRENT_CYCLE" > "$CYCLE_FILE"
-    echo "# Arena Complete" > "$ARENA_ROOT/ARENA_COMPLETE.md"
+if [ "$CURRENT_CYCLE" -gt "$MAX_CYCLE" ]; then
+    log "MAX_CYCLE reached. Arena complete."
+    echo "# Arena Complete (round 2)" > "$ARENA_ROOT/ARENA_COMPLETE.md"
     exit 0
 fi
 
-# --- Pollution Detection (Engine A: git diff) ---
-pollution_alpha=0
-pollution_beta=0
-bloat_msg=""
+CC=$(printf '%03d' "$CURRENT_CYCLE")   # 统一三位，修掉第一轮 report-0NNN 多余 0 的 bug
 
-# Alpha pollution check
-cd "$ALPHA_REPO" || { echo "[WARN] Alpha repo not found"; cd "$ARENA_ROOT"; }
-ALPHA_DIFF=$(git diff HEAD~3 --stat 2>/dev/null || echo "")
-ADDED_LINES=$(echo "$ALPHA_DIFF" | grep -Eo '[0-9]+ insertion' | grep -Eo '[0-9]+' || echo "0")
-if [ "$ADDED_LINES" -gt 80 ] 2>/dev/null; then
-    pollution_alpha=1
-    bloat_msg="$bloat_msg Alpha:+${ADDED_LINES}lines"
-fi
+# --- 评分（确定流程层 = Workflow）---
+# 返回: "score report_flag bloat_flag"
+score_team(){
+  local t="$1" repo="$ARENA_ROOT/$1/repo" s=50 rep=0 bloat=0 added
+  [ -f "$ARENA_ROOT/$t/arena/reports/report-$CC.md" ] && { s=$((s+5)); rep=1; }
+  if cd "$repo" 2>/dev/null; then
+    added=$(git diff HEAD~3 --stat 2>/dev/null | grep -Eo '[0-9]+ insertion' | grep -Eo '[0-9]+' | head -1)
+    [ "${added:-0}" -gt 80 ] 2>/dev/null && { s=$((s-6)); bloat=1; }
+    # BLOAT 零容忍：检测污染标记
+    grep -rqs "auto-updated\|arenaStatus" --include="*.py" --include="*.ts" . 2>/dev/null && s=$((s-4))
+    cd "$ARENA_ROOT" || true
+  fi
+  echo "$s $rep $bloat"
+}
+read AS AREP ABLOAT <<< "$(score_team alpha)"
+read BS BREP BBLOAT <<< "$(score_team beta)"
+log "Scores: Alpha=$AS(rep=$AREP,bloat=$ABLOAT) Beta=$BS(rep=$BREP,bloat=$BBLOAT)"
 
-# Beta pollution check
-cd "$BETA_REPO" || { echo "[WARN] Beta repo not found"; cd "$ARENA_ROOT"; }
-BETA_DIFF=$(git diff HEAD~3 --stat 2>/dev/null || echo "")
-BETA_ADDED=$(echo "$BETA_DIFF" | grep -Eo '[0-9]+ insertion' | grep -Eo '[0-9]+' || echo "0")
-if [ "$BETA_ADDED" -gt 80 ] 2>/dev/null; then
-    pollution_beta=1
-    bloat_msg="$bloat_msg Beta:+${BETA_ADDED}lines"
-fi
+# --- 原子写 JSON 状态（先写 tmp 再 mv，防半写丢失）---
+TMP="$STATE_DIR/.cycle-$CC.tmp"
+cat > "$TMP" <<JSON
+{"cycle":$CURRENT_CYCLE,"ts":"$(date -Iseconds)",
+ "alpha":{"score":$AS,"report":$AREP,"bloat":$ABLOAT},
+ "beta":{"score":$BS,"report":$BREP,"bloat":$BBLOAT}}
+JSON
+mv "$TMP" "$STATE_DIR/cycle-$CC.json"   # mv 是原子操作
+log "State persisted: cycle-$CC.json"
 
-cd "$ARENA_ROOT"
+# --- 从所有 state JSON 重建 leaderboard（历史永不丢）---
+python3 - "$STATE_DIR" "$ARENA_ROOT/arena/leaderboard.md" <<'PY'
+import sys, json, glob, os
+state_dir, out = sys.argv[1], sys.argv[2]
+rows = []
+for f in sorted(glob.glob(os.path.join(state_dir, "cycle-*.json"))):
+    try:
+        d = json.load(open(f))
+        rows.append((d["cycle"], d["alpha"]["score"], d["beta"]["score"]))
+    except Exception:
+        pass
+with open(out, "w") as w:
+    w.write("# Arena Leaderboard (Round 2 — paper-digest)\n\n")
+    w.write("| Cycle | Alpha (A-Tech) | Beta (B-Labs) |\n|--|--|--|\n")
+    for c, a, b in rows:
+        w.write(f"| {c} | {a} | {b} |\n")
+PY
+log "Leaderboard rebuilt"
 
-# --- Check agent output files ---
-alpha_ok=0
-beta_ok=0
-[ -f "$ARENA_ROOT/alpha/arena/reports/report-0$(printf '%03d' $((CURRENT_CYCLE))).md" ] && alpha_ok=1
-[ -f "$ARENA_ROOT/beta/arena/reports/report-0$(printf '%03d' $((CURRENT_CYCLE))).md" ] && beta_ok=1
-
-echo "[Cycle $CURRENT_CYCLE] Alpha reports: $alpha_ok, Beta reports: $beta_ok"
-echo "[Cycle $CURRENT_CYCLE] Pollution: Alpha=$pollution_alpha, Beta=$pollution_beta"
-
-# --- Score calculation ---
-alpha_score=50
-beta_score=50
-[ "$alpha_ok" = 1 ] && alpha_score=$((alpha_score + 5))
-[ "$beta_ok" = 1 ] && beta_score=$((beta_score + 5))
-[ "$pollution_alpha" = 1 ] && alpha_score=$((alpha_score - 6))
-[ "$pollution_beta" = 1 ] && beta_score=$((beta_score - 6))
-
-# --- Write leaderboard ---
-{
-    echo "# Arena Leaderboard"
-    echo ""
-    echo "| Cycle | Alpha (A-Tech) | Beta (B-Labs) |"
-    echo "|-------|---------------|---------------|"
-    CURRENT_SCORE="$alpha_score"
-    RIVAL_SCORE="$beta_score"
-    for c in $(seq 1 "$CURRENT_CYCLE"); do
-        fn="$PROGRESS_DIR/cycle-$(printf '%03d' $c).txt"
-        if [ -f "$fn" ]; then
-            read a b < "$fn"
-            echo "| $c | $a | $b |"
-        else
-            echo "| $c | - | - |"
-        fi
-    done
-    echo "| **$CURRENT_CYCLE** | **$CURRENT_SCORE** | **$RIVAL_SCORE** |"
-} > "$LEADERBOARD"
-
-# Save cycle score
-echo "$alpha_score $beta_score" > "$PROGRESS_DIR/cycle-$(printf '%03d' $CURRENT_CYCLE).txt"
-
-echo "[Cycle $CURRENT_CYCLE] Leaderboard: Alpha $alpha_score - Beta $beta_score"
-
-# --- Increment cycle ---
+# --- 为下一轮 agent 生成 prompt：从 template 重新渲染 + 注入记忆 ---
+# 关键：占位符永远留在 template 里，不会被一次性消耗（AutoGPT 记忆注入）
 NEXT_CYCLE=$((CURRENT_CYCLE + 1))
-echo "$NEXT_CYCLE" > "$CYCLE_FILE"
-echo "[Cycle $CURRENT_CYCLE -> $NEXT_CYCLE] Completed. Next run in 30min."
+if [ "$NEXT_CYCLE" -le "$MAX_CYCLE" ]; then
+  for prof in $PROFILES; do
+    python3 - "$prof" "$NEXT_CYCLE" "$MAX_CYCLE" "$ARENA_ROOT" <<'PY'
+import sys, json, os
+prof, cyc, mx, root = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+tpl = f"{root}/prompts/templates/{prof}.txt"
+if not os.path.exists(tpl):
+    sys.exit(0)
+text = open(tpl, encoding="utf-8").read()
+st = f"{root}/arena/skill_trees/{prof}.json"
+skills = ""
+if os.path.exists(st):
+    try:
+        d = json.load(open(st, encoding="utf-8"))
+        m = d.get("skills", {}).get("mastered", [])
+        if m:
+            skills = "已掌握技能: " + ", ".join(x["name"] for x in m)
+    except Exception:
+        pass
+text = (text.replace("{{CYCLE}}", f"当前 Cycle {cyc}/{mx}")
+            .replace("{{SKILL_TREE}}", skills)
+            .replace("{{EXPERIENCE}}", "可查 arena/experience_pool.json 检索相关经验（按 tags）"))
+open(f"{root}/prompts/{prof}.txt", "w", encoding="utf-8").write(text)
+PY
+  done
+  log "Prompts regenerated for cycle $NEXT_CYCLE (memory injected)"
+fi
 
-# --- Trigger prompt files update ---
-# Write fresh context files for next cycle's agents
-for team in alpha beta; do
-    for role in ceo dev-1 dev-2 mkt; do
-        profile="${team}-${role}"
-        prompt_file="$ARENA_ROOT/prompts/$profile.txt"
-        if [ -f "$prompt_file" ]; then
-            # Inject current cycle number
-            echo "[auto-update] Cycle $NEXT_CYCLE/$MAX_CYCLE"
-        fi
-    done
-done
+# --- human-in-loop 检查点（每 5 cycle）← AutoGen ---
+if [ $((CURRENT_CYCLE % 5)) -eq 0 ]; then
+  printf "# Checkpoint Cycle %s\n\nAlpha %s : Beta %s\n\n请过目方向是否正确，可在此调整 PROJECT_BRIEF 或 prompt 后继续。\n" \
+    "$CURRENT_CYCLE" "$AS" "$BS" > "$ARENA_ROOT/arena/CHECKPOINT-$CC.md"
+  log "Checkpoint written: CHECKPOINT-$CC.md"
+fi
 
+log "Cycle $CURRENT_CYCLE done: Alpha $AS - Beta $BS -> next $NEXT_CYCLE"
 exit 0
