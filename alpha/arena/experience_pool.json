@@ -1,0 +1,29 @@
+{
+  "experience_pool": [],
+  "skills_tree": {
+    "alpha-ceo": {
+      "mastered": [
+        {"name": "差异化竞争策略", "level": 85, "acquired_at": 1},
+        {"name": "任务分配与节奏控制", "level": 80, "acquired_at": 1}
+      ],
+      "learning": [],
+      "interested": ["arXiv API 最佳实践", "rich 表格高级渲染"]
+    },
+    "alpha-dev-1": {
+      "mastered": [],
+      "learning": [],
+      "interested": []
+    },
+    "alpha-dev-2": {
+      "mastered": [],
+      "learning": [],
+      "interested": []
+    },
+    "alpha-mkt": {
+      "mastered": [],
+      "learning": [],
+      "interested": []
+    }
+  },
+  "cycle": 1
+}
